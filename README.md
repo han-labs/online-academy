@@ -9,9 +9,13 @@
 Ứng dụng web **Online Academy** - nền tảng học trực tuyến tương tự Udemy, cho phép học viên đăng ký học các khóa học, giảng viên đăng tải nội dung, và quản trị viên quản lý hệ thống.
 
 **Môn học:** Web Programming
+
 **Mã lớp:** 251WEPR330479E_01FIE 
+
 **Giảng viên hướng dẫn:** ThS. Ngô Ngọc Đăng Khoa
+
 **Nhóm:** 11  
+
 **Thành viên:**
 - Nhóm trưởng (Guest System + Integration)
 - [Họ tên 3] - [MSSV] - Authentication & Student
@@ -201,16 +205,6 @@ npm test
 **Học viên:**
 - Email: student@example.com
 - Password: student123
-
-## 🎯 Phân công nhiệm vụ
-
-| Thành viên | Công việc | Tiến độ |
-|------------|-----------|---------|
-| Người 1 | Guest System | 🟡 In Progress |
-| Người 2 | Auth & Student | 🟡 In Progress |
-| Người 3 | Student Learning | 🔴 Not Started |
-| Người 4 | Teacher System | 🔴 Not Started |
-| Người 5 | Admin System | 🔴 Not Started |
 
 ## 🐛 Báo lỗi
 
