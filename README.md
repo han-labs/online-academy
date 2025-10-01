@@ -57,26 +57,13 @@
 
 ## 🛠️ Công nghệ sử dụng
 
-**Backend:**
-- Node.js v18+
-- Express.js v4.18
-- Handlebars (View Engine)
+**Backend:** Node.js v18+, Express.js v4.18, Handlebars (View Engine)
 
-**Database:**
-- PostgreSQL (qua Supabase)
-- Full-text search
+**Database:** PostgreSQL (qua Supabase), full-text search
 
-**Frontend:**
-- HTML5, CSS3, JavaScript
-- Bootstrap 5
-- Plyr.io (Video Player)
-- TinyMCE/CKEditor (WYSIWYG)
+**Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5, Plyr.io (Video Player), TinyMCE/CKEditor (WYSIWYG)
 
-**Authentication & Security:**
-- bcrypt (mã hóa mật khẩu)
-- JWT (JSON Web Tokens)
-- Express Session
-- OTP Email verification
+**Authentication & Security:** bcrypt (mã hóa mật khẩu), JWT (JSON Web Tokens), Express Session, OTP Email verification
 
 ## 📦 Cài đặt
 
