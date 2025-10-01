@@ -10,7 +10,7 @@
 
 **Môn học:** Web Programming
 **Mã lớp:** 251WEPR330479E_01FIE 
-**Giảng viên hướng dẫn: ** ThS. Ngô Ngọc Đăng Khoa
+**Giảng viên hướng dẫn:** ThS. Ngô Ngọc Đăng Khoa
 **Nhóm:** 11  
 **Thành viên:**
 - Nhóm trưởng (Guest System + Integration)
