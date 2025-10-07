@@ -17,11 +17,6 @@
 **Nhóm:** 11  
 
 **Thành viên:**
-- Nhóm trưởng (Guest System + Integration)
-- [Họ tên 3] - [MSSV] - Authentication & Student
-- [Họ tên 3] - [MSSV] - Student Learning System
-- [Họ tên 4] - [MSSV] - Teacher System
-- [Họ tên 5] - [MSSV] - Admin System
 - 23110019	Huỳnh Gia Hân
 - 23110051	Trần Thị Tố Như
 - 23110065	Mai Trần Thùy Trang
