@@ -1,0 +1,32 @@
+{
+  "name": "online-academy",
+  "version": "1.0.0",
+  "description": "[![Node.js](https://img.shields.io/badge/Node.js-v18+-green.svg)](https://nodejs.org/)\r [![Express.js](https://img.shields.io/badge/Express.js-v4.18-blue.svg)](https://expressjs.com/)\r [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-blue.svg)](https://supabase.com/)",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/han-labs/online-academy.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/han-labs/online-academy/issues"
+  },
+  "homepage": "https://github.com/han-labs/online-academy#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.75.0",
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0",
+    "express-handlebars": "^8.0.3",
+    "express-handlebars-sections": "^1.0.1",
+    "express-session": "^1.17.3",
+    "knex": "^3.1.0",
+    "nodemailer": "^7.0.9",
+    "nodemon": "^3.1.10",
+    "pg": "^8.16.3"
+  }
+}

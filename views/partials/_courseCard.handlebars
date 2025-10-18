@@ -1,0 +1,24 @@
+<div class="card h-100 border-0 shadow-sm">
+    <a href="/courses/{{id}}">
+        <img class="card-img-top" src="{{cover}}" alt="{{title}}">
+    </a>
+    <div class="card-body">
+        <h6 class="card-title text-truncate" title="{{title}}">
+            <a class="link-dark text-decoration-none" href="/courses/{{id}}">{{title}}</a>
+        </h6>
+        <div class="small text-muted">{{category_name}} • {{instructor_name}}</div>
+        <div class="small text-muted mb-2">⭐ {{formatNumber rating}} ({{formatNumber rating_count}})</div>
+
+        {{#if is_best_seller}}
+        <span class="badge text-bg-warning mb-1">Best Seller</span>
+        {{/if}}
+
+        {{#ifPromo price promo_price}}
+        <div><span class="fw-bold text-danger">{{formatNumber promo_price}}₫</span>
+            <span class="text-decoration-line-through text-muted ms-2">{{formatNumber price}}₫</span>
+        </div>
+        {{else}}
+        <div class="fw-bold">{{formatNumber price}}₫</div>
+        {{/ifPromo}}
+    </div>
+</div>
