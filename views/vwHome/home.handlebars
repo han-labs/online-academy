@@ -1,0 +1,78 @@
+{{!-- Carousel “Nổi bật tuần” kiểu Udemy --}}
+<section class="mb-4">
+    <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            {{#each featured}}
+            <div class="carousel-item {{#if @first}}active{{/if}}">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-5">
+                        <img src="{{cover}}" class="d-block w-100 rounded" alt="{{title}}">
+                    </div>
+                    <div class="col-md-7">
+                        <h3 class="mb-2">{{title}}</h3>
+                        <div class="mb-2">⭐ {{formatNumber rating}} ({{formatNumber rating_count}})</div>
+                        {{#ifPromo price promo_price}}
+                        <div class="h4 text-danger">{{formatNumber promo_price}}₫
+                            <span class="h6 text-muted text-decoration-line-through ms-2">{{formatNumber price}}₫</span>
+                        </div>
+                        {{else}}
+                        <div class="h4">{{formatNumber price}}₫</div>
+                        {{/ifPromo}}
+                        <a class="btn btn-primary mt-2" href="/courses/{{id}}">Xem khoá học</a>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+</section>
+
+<section class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0">Xem nhiều</h4>
+        <a class="small" href="#">Tất cả</a>
+    </div>
+    <div class="row g-3">
+        {{#each mostViewed}}
+        <div class="col-6 col-md-4 col-lg-3">
+            {{> _courseCard}}
+        </div>
+        {{/each}}
+    </div>
+</section>
+
+<section class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0">Mới nhất</h4>
+        <a class="small" href="#">Tất cả</a>
+    </div>
+    <div class="row g-3">
+        {{#each newest}}
+        <div class="col-6 col-md-4 col-lg-3">
+            {{> _courseCard}}
+        </div>
+        {{/each}}
+    </div>
+</section>
+
+
+<section class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0">Danh mục học nhiều tuần này</h4>
+    </div>
+    <div class="row g-2">
+        {{#each hotCats}}
+        <div class="col-6 col-md-3 col-lg-2">
+            <a class="btn btn-outline-dark w-100" href="/categories/{{id}}">
+                {{name}} <span class="badge text-bg-secondary ms-1">{{enroll_count}}</span>
+            </a>
+        </div>
+        {{/each}}
+    </div>
+</section>
