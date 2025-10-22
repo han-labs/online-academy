@@ -101,6 +101,10 @@ app.use('/categories', categoryRouter);
 app.use('/courses', courseRouter);
 app.use('/admin/categories', requireAuth, checkAdmin, adminCategoryRouter); // 👉 đặt SAU khi có app
 app.use('/student', studentRouter);
+
+import watchlistRouter from './routes/watchlist.route.js';
+app.use('/watchlist', watchlistRouter);
+
 // 404
 app.use((req, res) => res.status(404).render('vwAccount/404'));
 

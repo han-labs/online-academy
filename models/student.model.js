@@ -1,42 +1,41 @@
 import db from '../utils/db.js';
+import watchlistModel from '../models/watchlist.model.js';
+import { requireAuth } from '../middlewares/auth.js';
+import { Router } from 'express';
 
-export default {
-  // Lấy danh sách khóa học yêu thích của học viên
-  async getWatchlist(userId) {
-    return await db('watchlists as w')
-      .join('courses as c', 'w.course_id', 'c.id')
-      .join('users as u', 'c.instructor_id', 'u.id')
-      .where('w.user_id', userId)
-      .select(
-        'c.id',
-        'c.title',
-        'c.short_description',
-        'c.image_url',
-        'c.promotional_price',
-        'c.price',
-        'u.full_name as instructor_name'
-      )
-      .orderBy('w.added_at', 'desc');
-  },
+const router = Router();
 
-  // Thêm khóa học vào danh sách yêu thích
-  async addToWatchlist(userId, courseId) {
-    const existed = await db('watchlists')
-      .where({ user_id: userId, course_id: courseId })
-      .first();
-    if (!existed) {
-      await db('watchlists').insert({
-        user_id: userId,
-        course_id: courseId,
-        added_at: new Date()
-      });
+// Thêm khóa học vào watchlist
+router.post('/watchlist/add/:courseId', requireAuth, async (req, res) => {
+    const userId = req.session.user.id;
+    const courseId = Number(req.params.courseId);
+    try {
+        await watchlistModel.add(userId, courseId);
+        res.redirect('back');
+    } catch (err) {
+        console.error(err);
+        res.redirect('back');
     }
-  },
+});
 
-  // Xóa khóa học khỏi danh sách yêu thích
-  async removeFromWatchlist(userId, courseId) {
-    await db('watchlists')
-      .where({ user_id: userId, course_id: courseId })
-      .del();
-  }
-};
+// Xoá khóa học khỏi watchlist
+router.post('/watchlist/remove/:courseId', requireAuth, async (req, res) => {
+    const userId = req.session.user.id;
+    const courseId = Number(req.params.courseId);
+    try {
+        await watchlistModel.remove(userId, courseId);
+        res.redirect('back');
+    } catch (err) {
+        console.error(err);
+        res.redirect('back');
+    }
+});
+
+// Xem danh sách watchlist
+router.get('/watchlist', requireAuth, async (req, res) => {
+    const userId = req.session.user.id;
+    const courses = await watchlistModel.findByUser(userId);
+    res.render('vwStudent/watchlist', { courses });
+});
+
+export default router;

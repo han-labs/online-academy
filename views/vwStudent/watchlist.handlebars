@@ -1,38 +1,55 @@
-<div class="container mt-5">
-  <h3 class="mb-4">Danh sách khóa học yêu thích</h3>
+<div class="container my-5">
+    <h3 class="mb-4">Danh sách khóa học yêu thích</h3>
 
-  {{#if empty}}
-    <div class="alert alert-info text-center">
-      Bạn chưa thêm khóa học nào vào danh sách yêu thích.
-    </div>
-  {{else}}
+    {{#if courses.length}}
     <div class="row row-cols-1 row-cols-md-3 g-4">
-      {{#each watchlist}}
+        {{#each courses}}
         <div class="col">
-          <div class="card h-100 shadow-sm">
-            <img src="{{this.image_url}}" class="card-img-top" alt="{{this.title}}" style="height: 180px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title">{{this.title}}</h5>
-              <p class="text-muted mb-1">{{this.instructor_name}}</p>
-              <p class="card-text small">{{this.short_description}}</p>
-              <p class="fw-bold text-primary">
-                {{#if this.promotional_price}}
-                  {{this.promotional_price}} đ <del class="text-muted small">{{this.price}} đ</del>
-                {{else}}
-                  {{this.price}} đ
-                {{/if}}
-              </p>
+            <div class="card h-100 shadow-sm border-0">
+                <img src="{{this.image_url}}" class="card-img-top" alt="{{this.title}}">
+                <div class="card-body">
+                    <h5 class="card-title">{{this.title}}</h5>
+                    <p class="card-text">{{this.short_description}}</p>
+                    <p class="mb-1"><strong>Giảng viên:</strong> {{this.instructor_name}}</p>
+                    <p class="mb-2"><strong>Giá:</strong> 
+                        {{#if this.promo_price}}
+                            <span class="text-danger">{{this.promo_price}} VND</span>
+                            <del>{{this.price}} VND</del>
+                        {{else}}
+                            <span>{{this.price}} VND</span>
+                        {{/if}}
+                    </p>
+                    <button class="btn btn-sm btn-warning removeWatchlistBtn" data-course="{{this.id}}">
+                        Xoá khỏi yêu thích
+                    </button>
+                    <a href="/courses/{{this.id}}" class="btn btn-sm btn-primary ms-1">Xem chi tiết</a>
+                </div>
             </div>
-            <div class="card-footer text-center">
-              <form method="post" action="/student/watchlist/remove/{{this.id}}">
-                <button type="submit" class="btn btn-outline-danger btn-sm">
-                  <i class="bi bi-heartbreak"></i> Xóa khỏi danh sách
-                </button>
-              </form>
-            </div>
-          </div>
         </div>
-      {{/each}}
+        {{/each}}
     </div>
-  {{/if}}
+    {{else}}
+    <p>Bạn chưa thêm khóa học nào vào yêu thích.</p>
+    {{/if}}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('.removeWatchlistBtn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const courseId = btn.dataset.course;
+            try {
+                const res = await fetch(`/watchlist/${courseId}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    btn.closest('.col').remove();
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Có lỗi xảy ra, thử lại sau');
+            }
+        });
+    });
+});
+</script>

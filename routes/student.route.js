@@ -1,34 +1,22 @@
 // routes/student.route.js
 import { Router } from 'express';
-import studentModel from '../models/student.model.js';
 import { requireAuth } from '../middlewares/auth.js';
+import watchlistModel from '../models/watchlist.model.js';
 
 const router = Router();
 
-// GET /student/watchlist
+// Xem danh sách khóa học yêu thích (Watchlist)
 router.get('/watchlist', requireAuth, async (req, res) => {
-    const studentId = req.session.user.id; //  dùng user thay vì authUser
-    const watchlist = await studentModel.getWatchlist(studentId);
-    res.render('vwStudent/watchlist', {
-        watchlist,
-        empty: watchlist.length === 0
-    });
+    try {
+        const courses = await watchlistModel.getByUser(req.session.user.id);
+        res.render('vwStudent/watchlist', { courses });
+    } catch (err) {
+        console.error('Lỗi lấy watchlist:', err);
+        res.status(500).render('vwAccount/404', { error: 'Có lỗi xảy ra khi tải danh sách yêu thích' });
+    }
 });
 
-// POST /student/watchlist/add/:courseId
-router.post('/watchlist/add/:courseId', requireAuth, async (req, res) => {
-    const studentId = req.session.user.id; // 
-    const courseId = Number(req.params.courseId);
-    await studentModel.addToWatchlist(studentId, courseId);
-    res.redirect(`/courses/${courseId}`);
-});
-
-// POST /student/watchlist/remove/:courseId
-router.post('/watchlist/remove/:courseId', requireAuth, async (req, res) => {
-    const studentId = req.session.user.id; // 
-    const courseId = Number(req.params.courseId);
-    await studentModel.removeFromWatchlist(studentId, courseId);
-    res.redirect('/student/watchlist');
-});
+// Bạn có thể thêm các route khác cho student ở đây nếu cần
+// ví dụ: /my-courses, ...
 
 export default router;
