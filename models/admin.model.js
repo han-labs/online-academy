@@ -362,4 +362,12 @@ export default {
       throw error;
     }
   },
+  async getUserByEmail(email) {
+    try {
+      return await knex("users").where({ email }).first();
+    } catch (error) {
+      console.error("Get user by email error:", error);
+      return null;
+    }
+  },
 };

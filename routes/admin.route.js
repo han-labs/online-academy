@@ -165,8 +165,7 @@ router.post("/users", async (req, res) => {
     } else if (action === "createInstructor") {
       const { full_name, email, password, instructor_bio } = req.body;
 
-      // Kiểm tra email đã tồn tại chưa
-      const existingUser = await knex("users").where({ email }).first();
+      const existingUser = await adminModel.getUserByEmail(email);
       if (existingUser) {
         req.session.flash = {
           type: "danger",
