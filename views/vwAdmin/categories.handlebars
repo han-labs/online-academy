@@ -1,0 +1,123 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Quản lý lĩnh vực</h1>
+</div>
+
+{{#if flash}}
+<div class="alert alert-{{flash.type}} alert-dismissible fade show" role="alert">
+  {{flash.message}}
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{{/if}}
+
+{{#if error}}
+<div class="alert alert-danger">{{error}}</div>
+{{/if}}
+
+<button class="btn btn-primary mb-3" id="btnAdd">
+  <i class="bi bi-plus-circle"></i> Thêm lĩnh vực
+</button>
+
+<div class="table-responsive">
+  <table class="table table-bordered align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Tên lĩnh vực</th>
+        <th>Parent ID</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each categories}}
+      <tr>
+        <td>{{id}}</td>
+        <td>{{name}}</td>
+        <td>{{#if parent_id}}{{parent_id}}{{else}}-{{/if}}</td>
+        <td>
+          <button class="btn btn-sm btn-warning btnEdit" 
+                  data-id="{{id}}" 
+                  data-name="{{name}}" 
+                  data-parent="{{parent_id}}">
+            <i class="bi bi-pencil"></i> Sửa
+          </button>
+          <form method="post" action="/admin/categories" class="d-inline" 
+                onsubmit="return confirm('Xóa lĩnh vực này?')">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="id" value="{{id}}">
+            <button class="btn btn-sm btn-danger">
+              <i class="bi bi-trash"></i> Xóa
+            </button>
+          </form>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal thêm / sửa -->
+<div class="modal fade" id="catModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="/admin/categories" id="catForm">
+        <input type="hidden" name="action" id="catAction" value="create">
+        <input type="hidden" name="id" id="catId">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="catModalTitle">Thêm lĩnh vực</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Tên lĩnh vực</label>
+            <input name="name" id="catName" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Parent ID (tùy chọn)</label>
+            <select name="parent_id" id="catParent" class="form-select">
+              <option value="">-- Không có --</option>
+              {{#each categories}}
+              <option value="{{id}}">{{name}}</option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = new bootstrap.Modal(document.getElementById('catModal'));
+  const form = document.getElementById('catForm');
+  const title = document.getElementById('catModalTitle');
+  const parentSelect = document.getElementById('catParent');
+
+  document.getElementById('btnAdd').addEventListener('click', () => {
+    form.reset();
+    document.getElementById('catAction').value = 'create';
+    title.textContent = 'Thêm lĩnh vực';
+    parentSelect.value = '';
+    modal.show();
+  });
+
+  document.querySelectorAll('.btnEdit').forEach(btn => {
+    btn.addEventListener('click', () => {
+      form.reset();
+      document.getElementById('catAction').value = 'update';
+      document.getElementById('catId').value = btn.dataset.id;
+      document.getElementById('catName').value = btn.dataset.name;
+      parentSelect.value = btn.dataset.parent || '';
+      title.textContent = 'Cập nhật lĩnh vực';
+      modal.show();
+    });
+  });
+});
+</script>

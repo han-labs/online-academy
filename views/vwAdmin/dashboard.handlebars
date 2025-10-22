@@ -1,0 +1,94 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Dashboard</h1>
+</div>
+
+{{#if flash}}
+<div class="alert alert-{{flash.type}} alert-dismissible fade show" role="alert">
+  {{flash.message}}
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{{/if}}
+
+<div class="row">
+  <!-- Thống kê -->
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-primary">
+      <div class="card-body">
+        <h5 class="card-title">Học viên</h5>
+        <h2 class="card-text">{{stats.total_students}}</h2>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-success">
+      <div class="card-body">
+        <h5 class="card-title">Giảng viên</h5>
+        <h2 class="card-text">{{stats.total_instructors}}</h2>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-warning">
+      <div class="card-body">
+        <h5 class="card-title">Khóa học</h5>
+        <h2 class="card-text">{{stats.total_courses}}</h2>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-info">
+      <div class="card-body">
+        <h5 class="card-title">Doanh thu</h5>
+        <h2 class="card-text">{{formatCurrency stats.total_revenue}}</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Khóa học gần đây -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5>Khóa học mới nhất</h5>
+      </div>
+      <div class="card-body">
+        {{#if recentCourses.length}}
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Tên khóa học</th>
+                  <th>Giảng viên</th>
+                  <th>Giá</th>
+                  <th>Trạng thái</th>
+                  <th>Ngày tạo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each recentCourses}}
+                <tr>
+                  <td>{{this.title}}</td>
+                  <td>{{this.instructor_name}}</td>
+                  <td>{{formatCurrency this.price}}</td>
+                  <td>
+                    <span class="badge bg-{{getStatusBadge this.status}}">
+                      {{getStatusText this.status}}
+                    </span>
+                  </td>
+                  <td>{{formatDate this.created_at}}</td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        {{else}}
+          <p class="text-muted">Chưa có khóa học nào</p>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>

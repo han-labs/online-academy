@@ -1,0 +1,6 @@
+{{#if flash}}
+  <div class="alert alert-{{#eq flash.type 'success'}}success{{else}}danger{{/eq}} alert-dismissible fade show" role="alert">
+    {{flash.message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+{{/if}}
