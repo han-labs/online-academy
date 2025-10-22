@@ -262,32 +262,40 @@ router.post('/profile', requireAuth, async (req, res) => {
     }
 
     try {
-        // Check email unique (except current user)
+        // Check email unique (trừ chính user hiện tại)
         const existed = await db('users')
             .where({ email })
             .andWhereNot({ id: myId })
             .first();
 
         if (existed) {
-            return res.redirect('/account/profile?error=1'); // Email exists
+            return res.redirect('/account/profile?error=1'); // Email đã tồn tại
         }
 
-        // Update user
-        await db('users').where({ id: myId }).update({
-            full_name,
-            email,
-            updated_at: new Date()
-        });
+        // Update DB
+        const updated = await db('users')
+            .where({ id: myId })
+            .update({
+                full_name,
+                email,
+                
+            });
 
-        // Update session
+        if (updated === 0) {
+            // Không tìm thấy user, hoặc update thất bại
+            return res.redirect('/account/profile?error=3');
+        }
+
+        // Cập nhật session để hiển thị đúng ở navbar/header
         req.session.user.name = full_name;
         req.session.user.email = email;
 
+        // Redirect với thông báo thành công
         return res.redirect('/account/profile?success=1');
 
     } catch (error) {
         console.error('Update profile error:', error);
-        return res.redirect('/account/profile?error=3'); // Server error
+        return res.redirect('/account/profile?error=3'); // Lỗi server
     }
 });
 
