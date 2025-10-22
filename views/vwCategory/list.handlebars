@@ -1,0 +1,89 @@
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{category.name}}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2>{{category.name}}</h2>
+            <p class="text-muted mb-0">{{formatNumber total}} khóa học</p>
+        </div>
+
+        {{!-- Sort dropdown --}}
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Sắp xếp: 
+                {{#if (eq sort 'newest')}}Mới nhất
+                {{else if (eq sort 'price_asc')}}Giá tăng dần
+                {{else if (eq sort 'best_seller')}}Bán chạy
+                {{else}}Đánh giá cao{{/if}}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="?sort=rating_desc&page=1">Đánh giá cao nhất</a></li>
+                <li><a class="dropdown-item" href="?sort=price_asc&page=1">Giá tăng dần</a></li>
+                <li><a class="dropdown-item" href="?sort=newest&page=1">Mới nhất</a></li>
+                <li><a class="dropdown-item" href="?sort=best_seller&page=1">Bán chạy nhất</a></li>
+            </ul>
+        </div>
+    </div>
+
+    {{!-- Subcategories --}}
+    {{#if subcategories}}
+    <div class="mb-3">
+        <div class="d-flex flex-wrap gap-2">
+            {{#each subcategories}}
+            <a href="/categories/{{id}}" class="btn btn-outline-primary btn-sm">
+                {{name}}
+            </a>
+            {{/each}}
+        </div>
+    </div>
+    {{/if}}
+</div>
+
+{{!-- Course Grid --}}
+{{#if hasResults}}
+<div class="row g-3 mb-4">
+    {{#each courses}}
+    <div class="col-6 col-md-4 col-lg-3">
+        {{> _courseCard}}
+    </div>
+    {{/each}}
+</div>
+
+{{!-- Pagination --}}
+{{#if (length (range 1 totalPages))}}
+<nav aria-label="Category pagination">
+    <ul class="pagination justify-content-center">
+        <li class="page-item {{#if (eq page 1)}}disabled{{/if}}">
+            <a class="page-link" href="?sort={{sort}}&page={{sub page 1}}">
+                Trước
+            </a>
+        </li>
+
+        {{#each (range 1 totalPages)}}
+        <li class="page-item {{#if (eq this ../page)}}active{{/if}}">
+            <a class="page-link" href="?sort={{../sort}}&page={{this}}">
+                {{this}}
+            </a>
+        </li>
+        {{/each}}
+
+        <li class="page-item {{#if (eq page totalPages)}}disabled{{/if}}">
+            <a class="page-link" href="?sort={{sort}}&page={{add page 1}}">
+                Sau
+            </a>
+        </li>
+    </ul>
+</nav>
+{{/if}}
+
+{{else}}
+<div class="alert alert-info">
+    <h5>Chưa có khóa học nào trong danh mục này</h5>
+    <p class="mb-0">Vui lòng quay lại sau hoặc xem các danh mục khác</p>
+</div>
+{{/if}}
