@@ -1,0 +1,38 @@
+<div class="container mt-5">
+  <h3 class="mb-4">Danh sách khóa học yêu thích</h3>
+
+  {{#if empty}}
+    <div class="alert alert-info text-center">
+      Bạn chưa thêm khóa học nào vào danh sách yêu thích.
+    </div>
+  {{else}}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      {{#each watchlist}}
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <img src="{{this.image_url}}" class="card-img-top" alt="{{this.title}}" style="height: 180px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">{{this.title}}</h5>
+              <p class="text-muted mb-1">{{this.instructor_name}}</p>
+              <p class="card-text small">{{this.short_description}}</p>
+              <p class="fw-bold text-primary">
+                {{#if this.promotional_price}}
+                  {{this.promotional_price}} đ <del class="text-muted small">{{this.price}} đ</del>
+                {{else}}
+                  {{this.price}} đ
+                {{/if}}
+              </p>
+            </div>
+            <div class="card-footer text-center">
+              <form method="post" action="/student/watchlist/remove/{{this.id}}">
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                  <i class="bi bi-heartbreak"></i> Xóa khỏi danh sách
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{/if}}
+</div>
