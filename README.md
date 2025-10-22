@@ -66,7 +66,7 @@
 
 1. **Clone repository**
 ```bash
-git clone [https://github.com/han-labs/online-academy.git]
+git clone https://github.com/han-labs/online-academy.git
 cd online-academy
 ```
 
