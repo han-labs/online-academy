@@ -1,35 +1,101 @@
 <div class="container my-5">
-  <h2 class="mb-4 text-center">Danh sách khóa học yêu thích</h2>
+  <!-- Thông tin chính khóa học -->
+  <div class="row">
+    <div class="col-md-5">
+      <img src="{{course.image_url}}" class="img-fluid rounded shadow" alt="{{course.title}}">
+    </div>
+    <div class="col-md-7">
+      <h2>{{course.title}}</h2>
+      <p class="text-muted">{{course.short_description}}</p>
+      <p>{{course.detailed_description}}</p>
+      
+      <p>
+        <strong>Giá: </strong>
+        {{#if course.promo_price}}
+          <span class="text-danger">{{course.promo_price}} VND</span>
+          <del>{{course.price}} VND</del>
+        {{else}}
+          <span>{{course.price}} VND</span>
+        {{/if}}
+      </p>
+      <p>
+        <strong>Đánh giá: </strong> {{course.rating}} ⭐ ({{course.rating_count}} học viên đánh giá)
+        <br>
+        <strong>Học viên: </strong> {{course.students}}
+        <br>
+        <strong>Cập nhật cuối: </strong> {{course.last_updated}}
+      </p>
+    </div>
+  </div>
 
-  {{#if watchlist.length}}
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-      {{#each watchlist}}
-        <div class="col">
-          <div class="card h-100 shadow-sm border-0">
-            <img src="{{this.thumbnail}}" class="card-img-top" alt="{{this.title}}">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">{{this.title}}</h5>
-              <p class="card-text text-muted mb-4">{{this.short_description}}</p>
-              
-              <div class="mt-auto d-flex justify-content-between align-items-center">
-                <a href="/courses/{{this.id}}" class="btn btn-sm btn-primary">
-                  Xem chi tiết
-                </a>
+  <hr>
 
-                <form action="/student/watchlist/remove/{{this.id}}" method="post" class="d-inline">
-                  <button type="submit" class="btn btn-sm btn-outline-danger">
-                    <i class="bi bi-trash"></i> Xóa
-                  </button>
-                </form>
-              </div>
-            </div>
+  <!-- Đề cương khóa học -->
+  <h4>Đề cương khóa học</h4>
+  {{#each chapters}}
+    <div class="mb-3">
+      <h5>{{this.chapter_order}}. {{this.title}}</h5>
+      <ul>
+        {{#each ../lectures}}
+          {{#ifCond this.chapter_id ../this.id}}
+            <li>
+              {{this.lecture_order}}. {{this.title}}
+              {{#if this.is_preview_allowed}}
+                <span class="badge bg-info text-dark">Preview</span>
+              {{/if}}
+            </li>
+          {{/ifCond}}
+        {{/each}}
+      </ul>
+    </div>
+  {{/each}}
+
+  <hr>
+
+  <!-- Khóa học cùng lĩnh vực -->
+  <h4>Khóa học cùng lĩnh vực bán chạy</h4>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {{#each relatedCourses}}
+      <div class="col">
+        <div class="card h-100 shadow-sm border-0">
+          <img src="{{this.cover}}" class="card-img-top" alt="{{this.title}}">
+          <div class="card-body">
+            <h5 class="card-title">{{this.title}}</h5>
+            <p class="card-text">{{this.short_description}}</p>
+            <a href="/courses/{{this.id}}" class="btn btn-sm btn-primary">Xem chi tiết</a>
           </div>
         </div>
+      </div>
+    {{/each}}
+  </div>
+
+  <hr>
+
+  <!-- Thông tin giảng viên -->
+  <h4>Giảng viên</h4>
+  <div class="d-flex align-items-center mb-4">
+    <img src="{{course.instructor_avatar}}" class="rounded-circle me-3" width="80" height="80">
+    <div>
+      <h5>{{course.instructor_name}}</h5>
+      <p>{{course.instructor_bio}}</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Feedback học viên -->
+  <h4>Đánh giá của học viên</h4>
+  {{#if reviews.length}}
+    <ul class="list-group">
+      {{#each reviews}}
+        <li class="list-group-item">
+          <strong>{{this.user_name}}</strong> - {{this.rating}} ⭐
+          <p>{{this.comment}}</p>
+          <small class="text-muted">{{this.created_at}}</small>
+        </li>
       {{/each}}
-    </div>
+    </ul>
   {{else}}
-    <div class="alert alert-info text-center">
-      Bạn chưa thêm khóa học nào vào danh sách yêu thích 
-    </div>
+    <p>Chưa có đánh giá nào</p>
   {{/if}}
 </div>

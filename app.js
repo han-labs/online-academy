@@ -21,6 +21,7 @@ const __dirname = path.dirname(__filename);
 // 👉 Khởi tạo app TRƯỚC, rồi mới app.use(...)
 const app = express();
 
+
 // view engine
 app.engine('handlebars', engine({
   helpers: {
@@ -38,7 +39,30 @@ app.engine('handlebars', engine({
       const s = Number(start) || 0, e = Number(end) || 0, out = [];
       for (let i = s; i <= e; i++) out.push(i);
       return out;
+    },
+
+    // 👉 Thêm ifCond
+    ifCond: function (v1, operator, v2, options) {
+      // Nếu options không tồn tại, trả về false
+      if (!options || !options.fn || !options.inverse) return '';
+
+      let result;
+      switch (operator) {
+        case '==': result = (v1 == v2); break;
+        case '===': result = (v1 === v2); break;
+        case '!=': result = (v1 != v2); break;
+        case '!==': result = (v1 !== v2); break;
+        case '<': result = (v1 < v2); break;
+        case '<=': result = (v1 <= v2); break;
+        case '>': result = (v1 > v2); break;
+        case '>=': result = (v1 >= v2); break;
+        case '&&': result = (v1 && v2); break;
+        case '||': result = (v1 || v2); break;
+        default: result = false;
+      }
+      return result ? options.fn(this) : options.inverse(this);
     }
+
   },
   defaultLayout: 'main',
   layoutsDir: path.join(__dirname, 'views/layouts'),

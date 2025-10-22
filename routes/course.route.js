@@ -16,6 +16,42 @@ router.get('/', async (req, res) => {
     res.render('vwCategory/list', { rows, page, totalPages, q, sort, categoryId });
 });
 
+
+// GET /courses/:id - Xem chi tiết khóa học
+router.get('/courses/:id', async (req, res) => {
+    const id = Number(req.params.id);
+
+    try {
+        // 1️⃣ Lấy chi tiết khóa học
+        const course = await courseModel.detail(id);
+        if (!course) {
+            return res.status(404).render('vwAccount/404', { error: 'Khóa học không tồn tại' });
+        }
+
+        // 2️⃣ Lấy đề cương khóa học
+        const { chapters, lectures } = await courseModel.curriculum(id);
+
+        // 3️⃣ Lấy đánh giá học viên
+        const reviews = await courseModel.reviews(id);
+
+        // 4️⃣ Lấy 5 khóa học khác cùng lĩnh vực bestsellers
+        const relatedCourses = await courseModel.relatedBestSellers(course.category_id, course.id, 5);
+
+        // Render view
+        res.render('vwCourse/detail', {
+            course,
+            chapters,
+            lectures,
+            reviews,
+            relatedCourses
+        });
+
+    } catch (error) {
+        console.error('Course detail route error:', error);
+        res.status(500).render('vwAccount/404', { error: 'Có lỗi xảy ra khi tải chi tiết khóa học' });
+    }
+});
+
 // /courses/:id detail
 router.get('/:id', async (req, res) => {
     const id = Number(req.params.id);

@@ -1,0 +1,156 @@
+{{!-- views/vwCategory/list.handlebars --}}
+
+<div class="container py-4">
+    {{!-- Header với tên category --}}
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">{{category.name}}</li>
+                </ol>
+            </nav>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">{{category.name}}</h1>
+                    <p class="text-muted">
+                        {{#if hasCourses}}
+                            Tìm thấy {{total}} khóa học
+                        {{else}}
+                            Chưa có khóa học nào
+                        {{/if}}
+                    </p>
+                </div>
+
+                {{!-- Bộ lọc sắp xếp --}}
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Sắp xếp: 
+                        {{#if (eq sort 'newest')}}Mới nhất
+                        {{else if (eq sort 'price_asc')}}Giá thấp
+                        {{else}}Đánh giá cao
+                        {{/if}}
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="?sort=newest&page=1">Mới nhất</a></li>
+                        <li><a class="dropdown-item" href="?sort=rating_desc&page=1">Đánh giá cao nhất</a></li>
+                        <li><a class="dropdown-item" href="?sort=price_asc&page=1">Giá thấp đến cao</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{!-- Danh sách courses --}}
+    {{#if hasCourses}}
+        <div class="row g-4">
+            {{#each rows}}
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 shadow-sm course-card">
+                        <a href="/courses/{{id}}" class="text-decoration-none">
+                            <img src="{{cover}}" class="card-img-top" alt="{{title}}" 
+                                 onerror="this.src='https://via.placeholder.com/300x160?text=No+Image'">
+                        </a>
+                        
+                        <div class="card-body">
+                            <a href="/courses/{{id}}" class="text-decoration-none text-dark">
+                                <h5 class="card-title mb-2" style="font-size: 1rem; line-height: 1.4;">
+                                    {{title}}
+                                </h5>
+                            </a>
+                            
+                            <p class="text-muted small mb-2">{{instructor_name}}</p>
+
+                            {{!-- Rating --}}
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-warning text-dark me-2">⭐ {{rating}}</span>
+                                <small class="text-muted">({{rating_count}} đánh giá)</small>
+                            </div>
+
+                            {{!-- Price --}}
+                            <div class="price">
+                                {{#ifPromo price promo_price}}
+                                    <span class="h5 text-danger mb-0">{{formatNumber promo_price}}₫</span>
+                                    <span class="text-muted text-decoration-line-through ms-2">
+                                        {{formatNumber price}}₫
+                                    </span>
+                                {{else}}
+                                    <span class="h5 mb-0">{{formatNumber price}}₫</span>
+                                {{/ifPromo}}
+                            </div>
+
+                            {{!-- Best seller badge --}}
+                            {{#if is_best_seller}}
+                                <span class="badge bg-success mt-2">Best Seller</span>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+
+        {{!-- Pagination --}}
+        {{#if (length rows)}}
+            <nav class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {{!-- Previous button --}}
+                    <li class="page-item {{#if (eq page 1)}}disabled{{/if}}">
+                        <a class="page-link" href="?sort={{sort}}&page={{sub page 1}}">
+                            Trước
+                        </a>
+                    </li>
+
+                    {{!-- Page numbers --}}
+                    {{#each (range 1 totalPages)}}
+                        <li class="page-item {{#if (eq this ../page)}}active{{/if}}">
+                            <a class="page-link" href="?sort={{../sort}}&page={{this}}">
+                                {{this}}
+                            </a>
+                        </li>
+                    {{/each}}
+
+                    {{!-- Next button --}}
+                    <li class="page-item {{#if (eq page totalPages)}}disabled{{/if}}">
+                        <a class="page-link" href="?sort={{sort}}&page={{add page 1}}">
+                            Sau
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        {{/if}}
+
+    {{else}}
+        {{!-- Empty state --}}
+        <div class="text-center py-5">
+            <img src="https://via.placeholder.com/200x200?text=No+Courses" 
+                 alt="No courses" class="mb-4 opacity-50">
+            <h3 class="h4 text-muted">Chưa có khóa học nào trong danh mục này</h3>
+            <p class="text-muted">Hãy quay lại sau hoặc khám phá các danh mục khác</p>
+            <a href="/" class="btn btn-primary mt-3">Về trang chủ</a>
+        </div>
+    {{/if}}
+</div>
+
+<style>
+.course-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
+}
+
+.card-img-top {
+    height: 160px;
+    object-fit: cover;
+}
+
+.card-title {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+</style>
