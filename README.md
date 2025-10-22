@@ -89,7 +89,7 @@ Truy cập: `http://localhost:3000`
 ## 🗂️ Cấu trúc thư mục
 
 ```
-src/
+online-academy/
 ├── middlewares/    # Authentication, validation
 ├── models/         # Database models
 ├── routes/         # API routes
