@@ -1,0 +1,53 @@
+<h2 class="mb-4">✏️ Chỉnh sửa khóa học</h2>
+
+<form action="/teacher/courses/{{course.id}}/edit" method="post">
+  <div class="mb-3">
+    <label class="form-label">Tên khóa học</label>
+    <input type="text" name="title" class="form-control" value="{{course.title}}" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Mô tả ngắn</label>
+    <textarea name="short_description" class="form-control" rows="4" required>{{course.short_description}}</textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Mô tả chi tiết</label>
+    <textarea name="detailed_description" class="form-control" rows="6">{{course.detailed_description}}</textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Giá</label>
+    <input type="number" name="price" class="form-control" value="{{course.price}}" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Giá khuyến mãi</label>
+    <input type="number" name="promotional_price" class="form-control" value="{{course.promotional_price}}">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Danh mục</label>
+    <select name="category_id" class="form-select" required>
+      {{#each categories}}
+        <option value="{{this.id}}" {{#if (eq this.id ../course.category_id)}}selected{{/if}}>{{this.name}}</option>
+      {{/each}}
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Hình ảnh (URL)</label>
+    <input type="text" name="image_url" class="form-control" value="{{course.image_url}}">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Trạng thái</label>
+    <select name="status" class="form-select" required>
+      <option value="published" {{#if (eq course.status 'published')}}selected{{/if}}>Đã xuất bản</option>
+      <option value="draft" {{#if (eq course.status 'draft')}}selected{{/if}}>Bản nháp</option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+  <a href="/teacher/courses" class="btn btn-secondary">Quay lại</a>
+</form>

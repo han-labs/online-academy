@@ -1,0 +1,45 @@
+<h2 class="mb-4">➕ Thêm khóa học mới</h2>
+
+<form action="/teacher/courses/add" method="post">
+  <div class="mb-3">
+    <label class="form-label">Tên khóa học</label>
+    <input type="text" name="title" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Mô tả ngắn</label>
+    <textarea name="short_description" class="form-control" rows="4" required></textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Mô tả chi tiết</label>
+    <textarea name="detailed_description" class="form-control" rows="6"></textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Giá</label>
+    <input type="number" name="price" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Giá khuyến mãi</label>
+    <input type="number" name="promotional_price" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Danh mục</label>
+    <select name="category_id" class="form-select" required>
+      {{#each categories}}
+        <option value="{{this.id}}">{{this.name}}</option>
+      {{/each}}
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Hình ảnh (URL)</label>
+    <input type="text" name="image_url" class="form-control">
+  </div>
+
+  <button type="submit" class="btn btn-primary">Thêm</button>
+  <a href="/teacher/courses" class="btn btn-secondary">Hủy</a>
+</form>
