@@ -1,0 +1,81 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Quản lý người dùng</h1>
+</div>
+
+{{#if flash}}
+<div class="alert alert-{{flash.type}} alert-dismissible fade show" role="alert">
+  {{flash.message}}
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{{/if}}
+
+<!-- Form tạo giảng viên -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0">Tạo tài khoản giảng viên</h5>
+  </div>
+  <div class="card-body">
+    <form method="post" action="/admin/users">
+      <input type="hidden" name="action" value="createInstructor">
+      <div class="row">
+        <div class="col-md-4">
+          <input type="text" class="form-control" name="full_name" placeholder="Họ tên" required>
+        </div>
+        <div class="col-md-3">
+          <input type="email" class="form-control" name="email" placeholder="Email" required>
+        </div>
+        <div class="col-md-3">
+          <input type="password" class="form-control" name="password" placeholder="Mật khẩu" required minlength="6">
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-success w-100">Tạo</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Tên</th>
+        <th>Email</th>
+        <th>Vai trò</th>
+        <th>Ngày tạo</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each users}}
+      <tr>
+        <td>{{id}}</td>
+        <td>{{full_name}}</td>
+        <td>{{email}}</td>
+        <td>
+          <form method="post" action="/admin/users" class="d-inline">
+            <input type="hidden" name="action" value="updateRole">
+            <input type="hidden" name="id" value="{{id}}">
+            <select name="role" class="form-select form-select-sm d-inline-block" style="width:130px" onchange="this.form.submit()">
+              <option value="student" {{#eq role 'student'}}selected{{/eq}}>Student</option>
+              <option value="instructor" {{#eq role 'instructor'}}selected{{/eq}}>Instructor</option>
+              <option value="admin" {{#eq role 'admin'}}selected{{/eq}}>Admin</option>
+            </select>
+          </form>
+        </td>
+        <td>{{formatDate created_at}}</td>
+        <td>
+          <form method="post" action="/admin/users" onsubmit="return confirm('Xóa người dùng này?')">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="id" value="{{id}}">
+            <button class="btn btn-sm btn-danger">
+              <i class="bi bi-trash"></i> Xóa
+            </button>
+          </form>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>

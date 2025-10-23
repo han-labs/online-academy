@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Quản lý khoá học</h1>
+</div>
+
+{{#if flash}}
+<div class="alert alert-{{flash.type}} alert-dismissible fade show" role="alert">
+  {{flash.message}}
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{{/if}}
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Tên khoá học</th>
+        <th>Giảng viên</th>
+        <th>Lĩnh vực</th>
+        <th>Giá</th>
+        <th>Trạng thái</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each courses}}
+      <tr>
+        <td>{{id}}</td>
+        <td>{{title}}</td>
+        <td>{{instructor_name}}</td>
+        <td>{{category_name}}</td>
+        <td>{{formatCurrency price}}</td>
+        <td>
+          <span class="badge bg-{{getStatusBadge status}}">
+            {{getStatusText status}}
+          </span>
+        </td>
+        <td>
+          <form method="post" action="/admin/courses/remove" onsubmit="return confirm('Gỡ bỏ khoá học này?')">
+            <input type="hidden" name="id" value="{{id}}">
+            <button class="btn btn-sm btn-danger">
+              <i class="bi bi-trash"></i> Gỡ bỏ
+            </button>
+          </form>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
