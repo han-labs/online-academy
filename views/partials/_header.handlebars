@@ -1,157 +1,79 @@
-<nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm sticky-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
     <div class="container">
         <a class="navbar-brand fw-bold" href="/">
-            <i class="bi bi-mortarboard-fill text-primary"></i>
-            OnlineAcademy
+            🎓 Online Academy
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div id="navMain" class="collapse navbar-collapse">
-            <!-- Left Menu -->
-            <ul class="navbar-nav me-auto">
+        <div class="collapse navbar-collapse" id="navbarMain">
+            {{!-- Search Form --}}
+            <form class="d-flex mx-auto my-2 my-lg-0" action="/courses/search" method="GET" style="width: 100%; max-width: 500px;">
+                <input class="form-control me-2" 
+                       type="search" 
+                       name="q" 
+                       placeholder="Tìm kiếm khóa học..." 
+                       aria-label="Search">
+                <button class="btn btn-outline-light" type="submit">🔍</button>
+            </form>
+
+            {{!-- Right Menu --}}
+            <ul class="navbar-nav ms-auto">
+                {{!-- Categories Dropdown --}}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-grid-3x3-gap"></i> Danh mục
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        Danh mục
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu dropdown-menu-end">
                         {{#each global_categories_tree}}
                         <li>
-                            <h6 class="dropdown-header text-primary">
-                                <i class="bi bi-folder"></i> {{name}}
-                            </h6>
-                        </li>
-                        {{#each children}}
-                        <li>
-                            <a class="dropdown-item" href="/categories/{{id}}">
-                                <i class="bi bi-chevron-right small"></i> {{name}}
+                            <a class="dropdown-item fw-bold" href="/categories/{{id}}">
+                                {{name}}
                             </a>
+                            {{#if children}}
+                            {{#each children}}
+                            <a class="dropdown-item ps-4 small" href="/categories/{{id}}">
+                                • {{name}}
+                            </a>
+                            {{/each}}
+                            {{/if}}
                         </li>
-                        {{/each}}
-                        {{#unless @last}}
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        {{/unless}}
+                        {{#unless @last}}<li><hr class="dropdown-divider"></li>{{/unless}}
                         {{/each}}
                     </ul>
                 </li>
-            </ul>
 
-            <!-- Search Form -->
-            <form class="d-flex me-3" action="/courses" method="get" style="min-width:280px">
-                <div class="input-group">
-                    <input class="form-control" name="q" placeholder="Tìm khóa học..." value="{{q}}">
-                    <button class="btn btn-outline-primary" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </div>
-            </form>
-
-            <!-- User Menu -->
-            {{#if user}}
-            <div class="d-flex align-items-center gap-2">
-                <!-- Notifications (optional) -->
-                <a href="#" class="btn btn-link text-dark position-relative" title="Thông báo">
-                    <i class="bi bi-bell fs-5"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                        style="font-size: 0.6rem;">
-                        3
-                    </span>
-                </a>
-
-                <!-- User Dropdown -->
-                <div class="dropdown">
-                    <button
-                        class="btn btn-link text-dark text-decoration-none dropdown-toggle d-flex align-items-center gap-2"
-                        data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle fs-4"></i>
-                        <span class="d-none d-lg-inline">{{user.name}}</span>
-                    </button>
+                {{!-- User Menu --}}
+                {{#if user}}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        👤 {{user.full_name}}
+                    </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <div class="dropdown-header">
-                                <div class="fw-bold">{{user.name}}</div>
-                                <small class="text-muted">{{user.email}}</small>
-                            </div>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item" href="/account/profile">
-                                <i class="bi bi-person"></i> Hồ sơ cá nhân
-                            </a>
-                        </li>
-
-                        {{#if (eq user.role 'student')}}
-                        <li>
-                            <a class="dropdown-item" href="/student/my-courses">
-                                <i class="bi bi-journal-bookmark"></i> Khóa học của tôi
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/student/watchlist">
-                                <i class="bi bi-heart"></i> Danh sách yêu thích
-                            </a>
-                        </li>
-                        {{/if}}
-
-                        {{#if (eq user.role 'instructor')}}
-                        <li>
-                            <a class="dropdown-item" href="/teacher/dashboard">
-                                <i class="bi bi-speedometer2"></i> Dashboard
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/teacher/courses">
-                                <i class="bi bi-easel"></i> Khóa học của tôi
-                            </a>
-                        </li>
-                        {{/if}}
-
+                        <li><a class="dropdown-item" href="/account/profile">Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="/account/my-courses">Khóa học của tôi</a></li>
+                        <li><a class="dropdown-item" href="/account/watchlist">Yêu thích</a></li>
                         {{#if (eq user.role 'admin')}}
-                        <li>
-                            <a class="dropdown-item text-danger" href="/admin/dashboard">
-                                <i class="bi bi-shield-lock"></i> Admin Panel
-                            </a>
-                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/admin">Quản trị</a></li>
                         {{/if}}
-
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item" href="/account/change-password">
-                                <i class="bi bi-key"></i> Đổi mật khẩu
-                            </a>
-                        </li>
-
-                        <li>
-                            <form action="/account/logout" method="post" class="d-inline">
-                                <button class="dropdown-item text-danger">
-                                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                                </button>
-                            </form>
-                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/account/logout">Đăng xuất</a></li>
                     </ul>
-                </div>
-            </div>
-            {{else}}
-            <!-- Guest Menu -->
-            <div class="d-flex gap-2">
-                <a class="btn btn-outline-primary btn-sm" href="/account/login">
-                    <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
-                </a>
-                <a class="btn btn-primary btn-sm" href="/account/register">
-                    <i class="bi bi-person-plus"></i> Đăng ký
-                </a>
-            </div>
-            {{/if}}
+                </li>
+                {{else}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/account/login">Đăng nhập</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-primary text-white ms-2" href="/account/register">
+                        Đăng ký
+                    </a>
+                </li>
+                {{/if}}
+            </ul>
         </div>
     </div>
 </nav>

@@ -1,0 +1,223 @@
+{{!-- Course Hero Section --}}
+<div class="bg-dark text-white py-4 mb-4 rounded">
+    <div class="row">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="/" class="text-white-50">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="/categories/{{course.category_id}}" class="text-white-50">{{course.category_name}}</a></li>
+                    <li class="breadcrumb-item active text-white" aria-current="page">{{course.title}}</li>
+                </ol>
+            </nav>
+
+            <h1 class="h2 mb-3">{{course.title}}</h1>
+            <p class="lead mb-3">{{course.short_description}}</p>
+
+            <div class="d-flex align-items-center mb-3">
+                <span class="badge bg-warning text-dark me-2">⭐ {{formatNumber course.rating}}</span>
+                <span class="me-3">({{formatNumber course.rating_count}} đánh giá)</span>
+                <span>{{formatNumber course.students}} học viên</span>
+            </div>
+
+            <p class="mb-2">
+                <strong>Giảng viên:</strong> {{course.instructor_name}}
+            </p>
+            <p class="mb-2">
+                <strong>Cập nhật:</strong> {{course.last_updated}}
+            </p>
+            <p class="mb-0">
+                <strong>Thời lượng:</strong> {{totalHours}} giờ {{remainingMinutes}} phút
+            </p>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-white text-dark">
+                <img src="{{course.image_url}}" class="card-img-top" alt="{{course.title}}">
+                <div class="card-body text-center">
+                    {{#ifPromo course.price course.promotional_price}}
+                    <div class="h3 text-danger mb-0">
+                        {{formatNumber course.promotional_price}}₫
+                    </div>
+                    <div class="text-muted text-decoration-line-through">
+                        {{formatNumber course.price}}₫
+                    </div>
+                    {{else}}
+                    <div class="h3 mb-0">{{formatNumber course.price}}₫</div>
+                    {{/ifPromo}}
+
+                    <button class="btn btn-primary w-100 mt-3 mb-2">
+                        Đăng ký học
+                    </button>
+                    <button class="btn btn-outline-secondary w-100">
+                        Thêm vào yêu thích
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{!-- Course Content --}}
+<div class="row">
+    <div class="col-md-8">
+        {{!-- What you'll learn --}}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Bạn sẽ học được gì</h5>
+            </div>
+            <div class="card-body">
+                <p>{{course.detailed_description}}</p>
+            </div>
+        </div>
+
+        {{!-- Course Curriculum --}}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Nội dung khóa học</h5>
+                <p class="text-muted mb-0 small">
+                    {{totalChapters}} chương • {{totalLectures}} bài giảng • {{totalHours}}h{{remainingMinutes}}m
+                </p>
+            </div>
+            <div class="card-body p-0">
+                <div class="accordion" id="curriculumAccordion">
+                    {{#each chapters}}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button {{#unless @first}}collapsed{{/unless}}" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#chapter{{id}}">
+                                <strong>{{title}}</strong>
+                                <span class="text-muted ms-auto me-3">{{length lectures}} bài giảng</span>
+                            </button>
+                        </h2>
+                        <div id="chapter{{id}}" 
+                             class="accordion-collapse collapse {{#if @first}}show{{/if}}" 
+                             data-bs-parent="#curriculumAccordion">
+                            <div class="accordion-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    {{#each lectures}}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="me-2">▶️</span>
+                                            {{title}}
+                                            {{#if is_preview_allowed}}
+                                            <span class="badge bg-info ms-2">Preview</span>
+                                            {{/if}}
+                                        </div>
+                                        <span class="text-muted">{{duration_minutes}} phút</span>
+                                    </li>
+                                    {{/each}}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+
+        {{!-- Instructor Info --}}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Giảng viên</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-start">
+                    {{#if course.instructor_avatar}}
+                    <img src="{{course.instructor_avatar}}" 
+                         alt="{{course.instructor_name}}" 
+                         class="rounded-circle me-3" 
+                         style="width: 80px; height: 80px; object-fit: cover;">
+                    {{else}}
+                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3" 
+                         style="width: 80px; height: 80px; font-size: 2rem;">
+                        {{substring course.instructor_name 0 1}}
+                    </div>
+                    {{/if}}
+                    <div>
+                        <h5>{{course.instructor_name}}</h5>
+                        <p class="text-muted mb-0">{{course.instructor_bio}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{!-- Student Reviews --}}
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Đánh giá từ học viên</h5>
+                <div>
+                    <span class="badge bg-warning text-dark">⭐ {{formatNumber course.rating}}</span>
+                    <span class="text-muted ms-2">({{formatNumber course.rating_count}})</span>
+                </div>
+            </div>
+            <div class="card-body">
+                {{#if reviews}}
+                {{#each reviews}}
+                <div class="mb-3 pb-3 {{#unless @last}}border-bottom{{/unless}}">
+                    <div class="d-flex align-items-center mb-2">
+                        {{#if user_avatar}}
+                        <img src="{{user_avatar}}" 
+                             alt="{{user_name}}" 
+                             class="rounded-circle me-2" 
+                             style="width: 40px; height: 40px; object-fit: cover;">
+                        {{else}}
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" 
+                             style="width: 40px; height: 40px;">
+                            {{substring user_name 0 1}}
+                        </div>
+                        {{/if}}
+                        <div>
+                            <strong>{{user_name}}</strong>
+                            <div class="small text-muted">{{created_at}}</div>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        {{#each (range 1 rating)}}⭐{{/each}}
+                    </div>
+                    <p class="mb-0">{{comment}}</p>
+                </div>
+                {{/each}}
+                {{else}}
+                <p class="text-muted mb-0">Chưa có đánh giá nào</p>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+
+    {{!-- Sidebar --}}
+    <div class="col-md-4">
+        {{!-- Related Courses --}}
+        {{#if related}}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Khóa học liên quan</h5>
+            </div>
+            <div class="card-body p-2">
+                {{#each related}}
+                <div class="card mb-2 border-0 shadow-sm">
+                    <a href="/courses/{{id}}">
+                        <img src="{{cover}}" class="card-img-top" alt="{{title}}">
+                    </a>
+                    <div class="card-body p-2">
+                        <h6 class="card-title mb-1">
+                            <a href="/courses/{{id}}" class="text-decoration-none text-dark">
+                                {{title}}
+                            </a>
+                        </h6>
+                        <div class="small text-muted mb-1">{{instructor_name}}</div>
+                        <div class="small mb-1">⭐ {{formatNumber rating}} ({{formatNumber rating_count}})</div>
+                        {{#ifPromo price promo_price}}
+                        <div class="fw-bold text-danger">{{formatNumber promo_price}}₫</div>
+                        {{else}}
+                        <div class="fw-bold">{{formatNumber price}}₫</div>
+                        {{/ifPromo}}
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+        {{/if}}
+    </div>
+</div>
