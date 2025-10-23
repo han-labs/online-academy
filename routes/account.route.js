@@ -1,11 +1,10 @@
-// routes/account.route.js - UPDATED VERSION
+// routes/account.route.js
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import db from "../utils/db.js";
 import { requireGuest, requireAuth } from "../middlewares/auth.js";
 import otpService from "../utils/otp.service.js";
 import emailService from "../utils/email.service.js";
-
 
 const router = Router();
 
@@ -120,10 +119,8 @@ router.post("/verify-otp", requireGuest, async (req, res) => {
     // Send welcome email
     await emailService.sendWelcome(email, full_name);
 
-
     // Clear temp data
     delete req.session.tempUser;
-
 
     // Redirect to login with success message
     req.session.registerSuccess = true;
@@ -173,7 +170,7 @@ router.get("/login", requireGuest, (req, res) => {
   res.render("vwAccount/login", { success });
 });
 
-// POST /account/login
+// POST /account/login - UPDATED: Redirect instructor to /teacher/dashboard
 router.post("/login", requireGuest, async (req, res) => {
   const { email, password, remember } = req.body;
 
@@ -192,11 +189,7 @@ router.post("/login", requireGuest, async (req, res) => {
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.password_hash || ""
-    );
-
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash || "");
 
     if (!isPasswordValid) {
       return res.render("vwAccount/login", {
@@ -218,9 +211,14 @@ router.post("/login", requireGuest, async (req, res) => {
       req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
     }
 
+    // Redirect theo role
     if (user.role === "admin") {
       return res.redirect("/admin/dashboard");
-    } else return res.redirect("/");
+    } else if (user.role === "instructor") {
+      return res.redirect("/teacher/dashboard"); // <-- redirect cho instructor
+    } else {
+      return res.redirect("/"); // student
+    }
   } catch (error) {
     console.error("Login error:", error);
     return res.render("vwAccount/login", {
@@ -232,7 +230,6 @@ router.post("/login", requireGuest, async (req, res) => {
 // ============================================
 // ĐĂNG XUẤT
 // ============================================
-
 router.post("/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/"));
 });
@@ -240,8 +237,6 @@ router.post("/logout", (req, res) => {
 // ============================================
 // PROFILE
 // ============================================
-
-// GET /account/profile
 router.get("/profile", requireAuth, async (req, res) => {
   try {
     const me = await db("users").where({ id: req.session.user.id }).first();
@@ -272,7 +267,6 @@ router.get("/profile", requireAuth, async (req, res) => {
   }
 });
 
-// POST /account/profile - Update profile
 router.post("/profile", requireAuth, async (req, res) => {
   const { full_name, email } = req.body;
   const myId = req.session.user.id;
@@ -282,7 +276,6 @@ router.post("/profile", requireAuth, async (req, res) => {
   }
 
   try {
-    // Check email unique (except current user)
     const existed = await db("users")
       .where({ email })
       .andWhereNot({ id: myId })
@@ -292,14 +285,12 @@ router.post("/profile", requireAuth, async (req, res) => {
       return res.redirect("/account/profile?error=1"); // Email exists
     }
 
-    // Update user
     await db("users").where({ id: myId }).update({
       full_name,
       email,
       updated_at: new Date(),
     });
 
-    // Update session
     req.session.user.name = full_name;
     req.session.user.email = email;
 
@@ -313,18 +304,14 @@ router.post("/profile", requireAuth, async (req, res) => {
 // ============================================
 // ĐỔI MẬT KHẨU
 // ============================================
-
-// GET /account/change-password
 router.get("/change-password", requireAuth, (req, res) => {
   res.render("vwAccount/change-password");
 });
 
-// POST /account/change-password
 router.post("/change-password", requireAuth, async (req, res) => {
   const { current_password, new_password, confirm_password } = req.body;
   const userId = req.session.user.id;
 
-  // Validation
   if (!current_password || !new_password || !confirm_password) {
     return res.render("vwAccount/change-password", {
       error: "Vui lòng điền đầy đủ thông tin",
@@ -344,18 +331,13 @@ router.post("/change-password", requireAuth, async (req, res) => {
   }
 
   try {
-    // Get current user
     const user = await db("users").where({ id: userId }).first();
 
     if (!user) {
       return res.redirect("/account/login");
     }
 
-    // Verify current password
-    const isValid = await bcrypt.compare(
-      current_password,
-      user.password_hash || ""
-    );
+    const isValid = await bcrypt.compare(current_password, user.password_hash || "");
 
     if (!isValid) {
       return res.render("vwAccount/change-password", {
@@ -363,16 +345,13 @@ router.post("/change-password", requireAuth, async (req, res) => {
       });
     }
 
-    // Hash new password
     const newPasswordHash = await bcrypt.hash(new_password, 10);
 
-    // Update password
     await db("users").where({ id: userId }).update({
       password_hash: newPasswordHash,
       updated_at: new Date(),
     });
 
-    // Send notification email
     await emailService.sendPasswordResetSuccess(user.email);
 
     return res.render("vwAccount/change-password", {
