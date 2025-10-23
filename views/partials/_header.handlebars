@@ -82,9 +82,15 @@
                         </li>
 
                         <li>
-                            <a class="dropdown-item" href="/account/profile">
-                                <i class="bi bi-person"></i> Hồ sơ cá nhân
+                            {{#if (eq user.role 'instructor')}}
+                            <a class="dropdown-item" href="/teacher/profile">
+                                <i class="bi bi-person"></i>  Quản Lý Hồ Sơ Cá Nhân
                             </a>
+                            {{else}}
+                            <a class="dropdown-item" href="/account/profile">
+                                <i class="bi bi-person"></i>  Hồ sơ cá nhân
+                            </a>
+                            {{/if}}
                         </li>
 
                         {{#if (eq user.role 'student')}}
@@ -102,13 +108,13 @@
 
                         {{#if (eq user.role 'instructor')}}
                         <li>
-                            <a class="dropdown-item" href="/teacher/dashboard">
-                                <i class="bi bi-speedometer2"></i> Dashboard
+                            <a class="dropdown-item" href="/teacher/course/{{course.id}}/edit">
+                                <i class="bi bi-speedometer2"></i>  Bổ sung thông tin & bài giảng cho khoá học
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/teacher/courses">
-                                <i class="bi bi-easel"></i> Khóa học của tôi
+                            <a class="dropdown-item" href="/teacher/course/add">
+                                <i class="bi bi-easel"></i>  Đăng Khóa Học
                             </a>
                         </li>
                         {{/if}}

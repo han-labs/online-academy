@@ -1,53 +1,118 @@
-<h2 class="mb-4">✏️ Chỉnh sửa khóa học</h2>
+{{!-- vwTeacher/editCourse.handlebars --}}
 
-<form action="/teacher/courses/{{course.id}}/edit" method="post">
-  <div class="mb-3">
-    <label class="form-label">Tên khóa học</label>
-    <input type="text" name="title" class="form-control" value="{{course.title}}" required>
-  </div>
 
-  <div class="mb-3">
-    <label class="form-label">Mô tả ngắn</label>
-    <textarea name="short_description" class="form-control" rows="4" required>{{course.short_description}}</textarea>
-  </div>
+<div class="container my-5">
+  <h2 class="mb-4 text-primary fw-bold text-center">Chỉnh Sửa Khóa Học: {{course.title}}</h2>
 
-  <div class="mb-3">
-    <label class="form-label">Mô tả chi tiết</label>
-    <textarea name="detailed_description" class="form-control" rows="6">{{course.detailed_description}}</textarea>
-  </div>
+  <form action="/teacher/course/{{course.id}}/edit" method="POST" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
+    <div class="mb-3">
+      <label class="fw-semibold">Tiêu đề khóa học</label>
+      <input type="text" name="title" class="form-control" value="{{course.title}}" required>
+    </div>
 
-  <div class="mb-3">
-    <label class="form-label">Giá</label>
-    <input type="number" name="price" class="form-control" value="{{course.price}}" required>
-  </div>
+    <div class="mb-3">
+      <label class="fw-semibold">Ảnh bìa</label>
+      <input type="file" name="image" class="form-control mb-2">
+      {{#if course.cover}}
+        <img src="{{course.cover}}" alt="cover" width="150" class="rounded border">
+      {{/if}}
+    </div>
 
-  <div class="mb-3">
-    <label class="form-label">Giá khuyến mãi</label>
-    <input type="number" name="promotional_price" class="form-control" value="{{course.promotional_price}}">
-  </div>
+    <div class="mb-3">
+      <label class="fw-semibold">Danh mục</label>
+      <select name="category_id" class="form-control">
+        <option value="">-- Chọn danh mục --</option>
+        {{#each categories}}
+          <option value="{{id}}" {{#ifEquals id ../course.category_id}}selected{{/ifEquals}}>{{name}}</option>
+        {{/each}}
+      </select>
+    </div>
 
-  <div class="mb-3">
-    <label class="form-label">Danh mục</label>
-    <select name="category_id" class="form-select" required>
-      {{#each categories}}
-        <option value="{{this.id}}" {{#if (eq this.id ../course.category_id)}}selected{{/if}}>{{this.name}}</option>
-      {{/each}}
-    </select>
-  </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="fw-semibold">Giá</label>
+        <input type="number" name="price" class="form-control" value="{{course.price}}" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="fw-semibold">Giá khuyến mãi</label>
+        <input type="number" name="promotional_price" class="form-control" value="{{course.promotional_price}}">
+      </div>
+    </div>
 
-  <div class="mb-3">
-    <label class="form-label">Hình ảnh (URL)</label>
-    <input type="text" name="image_url" class="form-control" value="{{course.image_url}}">
-  </div>
+    <div class="mb-3">
+      <label class="fw-semibold">Mô tả ngắn</label>
+      <textarea name="short_description" class="form-control" rows="3">{{course.short_description}}</textarea>
+    </div>
 
-  <div class="mb-3">
-    <label class="form-label">Trạng thái</label>
-    <select name="status" class="form-select" required>
-      <option value="published" {{#if (eq course.status 'published')}}selected{{/if}}>Đã xuất bản</option>
-      <option value="draft" {{#if (eq course.status 'draft')}}selected{{/if}}>Bản nháp</option>
-    </select>
-  </div>
+    <div class="mb-3">
+      <label class="fw-semibold">Mô tả chi tiết</label>
+      <textarea name="detailed_description" id="editor">{{course.detailed_description}}</textarea>
+    </div>
 
-  <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-  <a href="/teacher/courses" class="btn btn-secondary">Quay lại</a>
-</form>
+    <div class="mb-3">
+      <label class="fw-semibold">Trạng thái</label>
+      <select name="status" class="form-control">
+        <option value="draft" {{#ifEquals course.status "draft"}}selected{{/ifEquals}}>Chưa hoàn thành</option>
+        <option value="published" {{#ifEquals course.status "published"}}selected{{/ifEquals}}>Đã hoàn thành</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-success w-100 mt-3">Cập nhật khóa học</button>
+  </form>
+
+  <hr class="my-5">
+  <h3 class="text-secondary mb-3">Danh Sách Bài Giảng</h3>
+
+  {{#if chapters.length}}
+    {{#each chapters}}
+      <div class="card mb-3 shadow-sm">
+        <div class="card-header fw-semibold bg-primary text-white">
+          Chương {{chapter_order}}: {{title}}
+        </div>
+        <div class="card-body">
+          {{#if ../lectures.length}}
+            <ul class="list-unstyled mb-3">
+              {{#each ../lectures}}
+                {{#ifEquals chapter_id ../id}}
+                  <li class="d-flex justify-content-between align-items-center mb-2">
+                    <span>{{title}}</span>
+                    <form action="/lecture/{{id}}/delete" method="POST" style="display:inline">
+                      <button class="btn btn-danger btn-sm">Xóa</button>
+                    </form>
+                  </li>
+                {{/ifEquals}}
+              {{/each}}
+            </ul>
+          {{else}}
+            <p class="text-muted fst-italic">Chưa có bài giảng nào trong chương này.</p>
+          {{/if}}
+
+          <form action="/lecture/add" method="POST" enctype="multipart/form-data" class="border-top pt-3">
+            <input type="hidden" name="chapter_id" value="{{id}}">
+            <div class="mb-2">
+              <input type="text" name="lecture_title" placeholder="Tên bài giảng" class="form-control" required>
+            </div>
+            <div class="mb-2">
+              <input type="file" name="lecture_video" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Thêm bài giảng</button>
+          </form>
+        </div>
+      </div>
+    {{/each}}
+  {{else}}
+    <div class="alert alert-info text-center">Chưa có chương nào được tạo.</div>
+  {{/if}}
+</div>
+
+
+
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  tinymce.init({
+    selector: '#editor',
+    height: 400,
+    plugins: 'lists link image table code',
+    toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image table | code'
+  });
+</script>

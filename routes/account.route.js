@@ -1,4 +1,4 @@
-// routes/account.route.js - UPDATED VERSION
+// routes/account.route.js - UPDATED WITH ROLE REDIRECT
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import db from '../utils/db.js';
@@ -111,7 +111,7 @@ router.post('/verify-otp', requireGuest, async (req, res) => {
             full_name,
             email,
             password_hash,
-            role: 'student',
+            role: 'student', // default role là student
             created_at: new Date()
         });
 
@@ -204,7 +204,17 @@ router.post('/login', requireGuest, async (req, res) => {
             req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
         }
 
-        return res.redirect('/');
+        // ==== CHỖ SỬA ====
+        // Redirect theo role
+        if (user.role === 'instructor') {
+            return res.redirect('/teacher/dashboard'); // dashboard giảng viên
+        } else if (user.role === 'student') {
+            return res.redirect('/'); // home page cho học sinh
+        } else if (user.role === 'admin') {
+            return res.redirect('/admin'); // admin panel (nếu có)
+        } else {
+            return res.redirect('/'); // default
+        }
 
     } catch (error) {
         console.error('Login error:', error);

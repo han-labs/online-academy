@@ -1,0 +1,252 @@
+<div class="container my-5">
+    <!-- Header với nút quay lại -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary">Chi tiết khóa học</h1>
+        <a href="/teacher/dashboard" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại Dashboard
+        </a>
+    </div>
+
+    <!-- Thông tin cơ bản -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin cơ bản</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Ảnh bìa -->
+                <div class="col-md-4 mb-3">
+                    {{#if course.cover}}
+                        <img src="/static{{course.cover}}" alt="{{course.title}}" class="img-fluid rounded shadow">
+                    {{else}}
+                        <img src="/static/images/default-course.jpg" alt="Không có ảnh" class="img-fluid rounded shadow">
+                    {{/if}}
+                </div>
+                
+                <!-- Thông tin chi tiết -->
+                <div class="col-md-8">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th width="200">Tên khóa học:</th>
+                                <td><strong>{{course.title}}</strong></td>
+                            </tr>
+                            <tr>
+                                <th>Mô tả ngắn:</th>
+                                <td>{{course.short_description}}</td>
+                            </tr>
+                            <tr>
+                                <th>Danh mục:</th>
+                                <td>
+                                    {{#if course.category_name}}
+                                        <span class="badge bg-info">{{course.category_name}}</span>
+                                    {{else}}
+                                        <span class="text-muted">Chưa phân loại</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Giá gốc:</th>
+                                <td><strong class="text-success">{{formatNumber course.price}} VNĐ</strong></td>
+                            </tr>
+                            <tr>
+                                <th>Giá khuyến mãi:</th>
+                                <td>
+                                    {{#if course.promotional_price}}
+                                        <strong class="text-danger">{{formatNumber course.promotional_price}} VNĐ</strong>
+                                    {{else}}
+                                        <span class="text-muted">Không có</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Trạng thái:</th>
+                                <td>
+                                    {{#ifEquals course.status "published"}}
+                                        <span class="badge bg-success">Đã xuất bản</span>
+                                    {{else}}
+                                        <span class="badge bg-warning">Nháp</span>
+                                    {{/ifEquals}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Hoàn thành:</th>
+                                <td>
+                                    {{#if course.is_completed}}
+                                        <span class="badge bg-success"><i class="fas fa-check"></i> Hoàn thành</span>
+                                    {{else}}
+                                        <span class="badge bg-warning"><i class="fas fa-clock"></i> Chưa hoàn thành</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Lượt đăng ký:</th>
+                                <td><strong>{{course.total_students}}</strong> học viên</td>
+                            </tr>
+                            <tr>
+                                <th>Đánh giá:</th>
+                                <td>
+                                    {{#if course.average_rating}}
+                                        <span class="text-warning">
+                                            <i class="fas fa-star"></i> {{course.average_rating}}/5
+                                        </span>
+                                        <small class="text-muted">({{course.rating_count}} đánh giá)</small>
+                                    {{else}}
+                                        <span class="text-muted">Chưa có đánh giá</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mô tả chi tiết -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0"><i class="fas fa-align-left"></i> Mô tả chi tiết</h4>
+        </div>
+        <div class="card-body">
+            <div class="course-description">
+                {{#if course.detailed_description}}
+                    {{{course.detailed_description}}}
+                {{else}}
+                    <p class="text-muted">Chưa có mô tả chi tiết</p>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+<!-- Thông tin giảng viên -->
+<div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0"><i class="fas fa-chalkboard-teacher"></i> Thông tin giảng viên</h4>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-2 text-center">
+                {{#if course.instructor_avatar}}
+                    <img src="/static{{course.instructor_avatar}}" alt="{{course.instructor_name}}" 
+                         class="rounded-circle img-thumbnail" 
+                         style="width: 100px; height: 100px; object-fit: cover;">
+                {{else}}
+                    <img src="/static/images/default-avatar.png" alt="Avatar" 
+                         class="rounded-circle img-thumbnail" 
+                         style="width: 100px; height: 100px; object-fit: cover;">
+                {{/if}}
+            </div>
+            <div class="col-md-10">
+                <h5 class="fw-bold">{{course.instructor_name}}</h5>
+                {{#if course.instructor_expertise}}
+                    <p class="text-muted mb-2">
+                        <i class="fas fa-graduation-cap"></i> <strong>Chuyên môn:</strong> {{course.instructor_expertise}}
+                    </p>
+                {{/if}}
+                <p class="mb-2">
+                    <i class="fas fa-book"></i> <strong>Tổng số khóa học:</strong> {{course.instructor_total_courses}} khóa học
+                </p>
+                {{#if course.instructor_bio}}
+                    <div class="mt-3">
+                        <strong>Giới thiệu:</strong>
+                        <p class="mt-2">{{course.instructor_bio}}</p>
+                    </div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Nội dung khóa học (Chapters & Lectures) -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0"><i class="fas fa-book"></i> Nội dung khóa học</h4>
+        </div>
+        <div class="card-body">
+            {{#if chapters}}
+                <div class="accordion" id="courseContent">
+                    {{#each chapters}}
+                        <div class="accordion-item mb-2">
+                            <h2 class="accordion-header" id="heading{{id}}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{id}}">
+                                    <strong>Chương {{order}}: {{title}}</strong>
+                                    <span class="badge bg-primary ms-2">
+                                        {{length (lookup ../lectures id)}} bài giảng
+                                    </span>
+                                </button>
+                            </h2>
+                            <div id="collapse{{id}}" class="accordion-collapse collapse" data-bs-parent="#courseContent">
+                                <div class="accordion-body">
+                                    {{#if (lookup ../lectures id)}}
+                                        <ol class="list-group list-group-numbered">
+                                            {{#each (lookup ../lectures id)}}
+                                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto">
+                                                        <div class="fw-bold">{{title}}</div>
+                                                        {{#if video_url}}
+                                                            <small class="text-muted">
+                                                                <i class="fas fa-video"></i> Video: {{video_url}}
+                                                            </small>
+                                                        {{/if}}
+                                                        {{#if duration}}
+                                                            <small class="text-muted ms-2">
+                                                                <i class="fas fa-clock"></i> {{duration}} phút
+                                                            </small>
+                                                        {{/if}}
+                                                    </div>
+                                                </li>
+                                            {{/each}}
+                                        </ol>
+                                    {{else}}
+                                        <p class="text-muted mb-0">Chưa có bài giảng nào trong chương này</p>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
+                    {{/each}}
+                </div>
+            {{else}}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Khóa học chưa có chương nào. Hãy thêm chương và bài giảng!
+                </div>
+            {{/if}}
+        </div>
+    </div>
+
+    <!-- Nút hành động -->
+    <div class="d-flex gap-2 justify-content-end">
+        <a href="/teacher/course/{{course.id}}/edit" class="btn btn-primary btn-lg">
+            <i class="fas fa-edit"></i> Chỉnh sửa khóa học
+        </a>
+        <form method="POST" action="/teacher/course/{{course.id}}/delete" style="display: inline;" 
+              onsubmit="return confirm('⚠️ Bạn có chắc chắn muốn xóa khóa học này?\n\nToàn bộ chương, bài giảng và dữ liệu liên quan sẽ bị xóa vĩnh viễn!');">
+            <button type="submit" class="btn btn-danger btn-lg">
+                <i class="fas fa-trash"></i> Xóa khóa học
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+.course-description {
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #e7f3ff;
+    color: #0056b3;
+}
+
+.list-group-item {
+    border-left: 3px solid #28a745;
+}
+
+.card-header h4 {
+    font-weight: 600;
+}
+
+table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+</style>

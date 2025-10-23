@@ -6,5 +6,17 @@ export default {
         const rows = await db('categories').select('id', 'name', 'parent_id').orderBy(['parent_id', 'name']);
         const parents = rows.filter(r => !r.parent_id).map(p => ({ ...p, children: rows.filter(c => c.parent_id === p.id) }));
         return parents;
+    },
+
+
+    async findById(id) {
+        return db('categories').where({ id }).first();
+    },
+
+    async getSubcategories(parentId) {
+        return db('categories').where({ parent_id: parentId }).orderBy('name');
     }
 };
+
+
+

@@ -1,45 +1,65 @@
-<h2 class="mb-4">➕ Thêm khóa học mới</h2>
+{{!-- vwTeacher/addCourse.handlebars --}}
 
-<form action="/teacher/courses/add" method="post">
-  <div class="mb-3">
-    <label class="form-label">Tên khóa học</label>
-    <input type="text" name="title" class="form-control" required>
-  </div>
 
-  <div class="mb-3">
-    <label class="form-label">Mô tả ngắn</label>
-    <textarea name="short_description" class="form-control" rows="4" required></textarea>
-  </div>
+<div class="container my-5">
+  <h2 class="mb-4 text-center text-primary fw-bold">Đăng Khóa Học Mới</h2>
 
-  <div class="mb-3">
-    <label class="form-label">Mô tả chi tiết</label>
-    <textarea name="detailed_description" class="form-control" rows="6"></textarea>
-  </div>
+  <form action="/teacher/course/add" method="POST" enctype="multipart/form-data" class="bg-light p-4 rounded shadow-sm">
+    <div class="mb-3">
+      <label class="form-label">Tiêu đề khóa học</label>
+      <input type="text" name="title" class="form-control" required>
+    </div>
 
-  <div class="mb-3">
-    <label class="form-label">Giá</label>
-    <input type="number" name="price" class="form-control" required>
-  </div>
+    <div class="mb-3">
+      <label class="form-label">Ảnh bìa</label>
+      <input type="file" name="image" class="form-control">
+    </div>
 
-  <div class="mb-3">
-    <label class="form-label">Giá khuyến mãi</label>
-    <input type="number" name="promotional_price" class="form-control">
-  </div>
+    <div class="mb-3">
+      <label class="form-label">Danh mục</label>
+      <select name="category_id" class="form-select" required>
+        <option value="">-- Chọn danh mục --</option>
+        {{#each categories}}
+          <option value="{{id}}">{{name}}</option>
+        {{/each}}
+      </select>
+    </div>
 
-  <div class="mb-3">
-    <label class="form-label">Danh mục</label>
-    <select name="category_id" class="form-select" required>
-      {{#each categories}}
-        <option value="{{this.id}}">{{this.name}}</option>
-      {{/each}}
-    </select>
-  </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Giá</label>
+        <input type="number" name="price" class="form-control" required>
+      </div>
 
-  <div class="mb-3">
-    <label class="form-label">Hình ảnh (URL)</label>
-    <input type="text" name="image_url" class="form-control">
-  </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Giá khuyến mãi</label>
+        <input type="number" name="promotional_price" class="form-control">
+      </div>
+    </div>
 
-  <button type="submit" class="btn btn-primary">Thêm</button>
-  <a href="/teacher/courses" class="btn btn-secondary">Hủy</a>
-</form>
+    <div class="mb-3">
+      <label class="form-label">Mô tả ngắn</label>
+      <textarea name="short_description" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Mô tả chi tiết</label>
+      <textarea name="detailed_description" id="editor"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success px-4 py-2">Đăng Khóa Học</button>
+  </form>
+</div>
+
+
+
+{{!-- TinyMCE --}}
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  tinymce.init({
+    selector: '#editor',
+    height: 400,
+    plugins: 'lists link image table code',
+    toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image table | code'
+  });
+</script>

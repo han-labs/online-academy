@@ -14,10 +14,6 @@ import adminCategoryRouter from './routes/admin.category.route.js';
 import { requireAuth, checkAdmin } from './middlewares/auth.js';
 import teacherRouter from './routes/teacher.route.js';
 
-
-
-
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -29,6 +25,10 @@ app.engine('handlebars', engine({
   helpers: {
     formatNumber(v) { return new Intl.NumberFormat('en-US').format(v ?? 0); },
     eq(a, b) { return a === b; },
+    // ✅ THÊM HELPER ifEquals VÀO ĐÂY
+    ifEquals(arg1, arg2, options) {
+      return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+    },
     add: (a, b) => (a || 0) + (b || 0),
     sub: (a, b) => (a || 0) - (b || 0),
     length: (arr) => Array.isArray(arr) ? arr.length : 0,
@@ -78,7 +78,7 @@ app.use('/', homeRouter);
 app.use('/account', accountRouter);
 app.use('/categories', categoryRouter);
 app.use('/courses', courseRouter);
-app.use('/admin/categories', requireAuth, checkAdmin, adminCategoryRouter); // 👉 đặt SAU khi có app
+app.use('/admin/categories', requireAuth, checkAdmin, adminCategoryRouter); 
 app.use('/teacher', teacherRouter);
 // 404
 app.use((req, res) => res.status(404).render('vwAccount/404'));
