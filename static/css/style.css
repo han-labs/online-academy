@@ -1,3 +1,40 @@
+/* ============================================
+   HERO SLIDESHOW
+   ============================================ */
+.hero-slide {
+    min-height: 400px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.carousel-item {
+    transition: transform 0.6s ease-in-out;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 5%;
+    opacity: 0.8;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    opacity: 1;
+}
+
+.carousel-indicators {
+    bottom: 20px;
+}
+
+.carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* ============================================
+   EXISTING STYLES (GIỮ NGUYÊN)
+   ============================================ */
 :root {
   font-family: system-ui, sans-serif;
 }
