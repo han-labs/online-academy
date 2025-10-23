@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/">
-            🎓 Online Academy
+        <a class="navbar-brand fw-bold text-dark" href="/">
+            Online Academy
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
@@ -9,47 +9,54 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarMain">
-            {{!-- Search Form --}}
-            <form class="d-flex mx-auto my-2 my-lg-0" action="/courses/search" method="GET" style="width: 100%; max-width: 500px;">
-                <input class="form-control me-2" 
-                       type="search" 
-                       name="q" 
-                       placeholder="Tìm kiếm khóa học..." 
-                       aria-label="Search">
-                <button class="btn btn-outline-light" type="submit">🔍</button>
-            </form>
-
-            {{!-- Right Menu --}}
-            <ul class="navbar-nav ms-auto">
-                {{!-- Categories Dropdown --}}
+            {{!-- Categories Dropdown --}}
+            <ul class="navbar-nav me-auto">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
                         Danh mục
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu">
                         {{#each global_categories_tree}}
                         <li>
                             <a class="dropdown-item fw-bold" href="/categories/{{id}}">
                                 {{name}}
                             </a>
-                            {{#if children}}
-                            {{#each children}}
-                            <a class="dropdown-item ps-4 small" href="/categories/{{id}}">
-                                • {{name}}
-                            </a>
-                            {{/each}}
-                            {{/if}}
                         </li>
+                        {{#if children}}
+                        {{#each children}}
+                        <li>
+                            <a class="dropdown-item ps-4 small text-muted" href="/categories/{{id}}">
+                                {{name}}
+                            </a>
+                        </li>
+                        {{/each}}
+                        {{/if}}
                         {{#unless @last}}<li><hr class="dropdown-divider"></li>{{/unless}}
                         {{/each}}
                     </ul>
                 </li>
+            </ul>
 
-                {{!-- User Menu --}}
+            {{!-- Search Form --}}
+            <form class="d-flex mx-auto" action="/courses/search" method="GET" style="max-width: 400px;">
+                <input class="form-control" 
+                       type="search" 
+                       name="q" 
+                       placeholder="Tìm kiếm..." 
+                       aria-label="Search">
+                <button class="btn btn-outline-secondary ms-2" type="submit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                </button>
+            </form>
+
+            {{!-- Right Menu --}}
+            <ul class="navbar-nav ms-auto">
                 {{#if user}}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        👤 {{user.full_name}}
+                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                        {{user.full_name}}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="/account/profile">Hồ sơ</a></li>
@@ -65,10 +72,10 @@
                 </li>
                 {{else}}
                 <li class="nav-item">
-                    <a class="nav-link" href="/account/login">Đăng nhập</a>
+                    <a class="nav-link text-dark" href="/account/login">Đăng nhập</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link btn btn-primary text-white ms-2" href="/account/register">
+                    <a class="btn btn-dark text-white ms-2 px-3" href="/account/register">
                         Đăng ký
                     </a>
                 </li>
