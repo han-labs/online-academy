@@ -1,66 +1,71 @@
 // utils/email.service.js - GỬI EMAIL THẬT
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 
 // ⚠️ QUAN TRỌNG: Thay email và password của bạn vào đây
 const SMTP_CONFIG = {
-    service: 'gmail',
-    auth: {
-        user: 'giahanthcstmt@gmail.com',
-        pass: 'jqwegjdsksjiaeaa'
-    }
+  service: "gmail",
+  auth: {
+    user: "giahanthcstmt@gmail.com",
+    pass: "jqwegjdsksjiaeaa",
+  },
 };
 
 class EmailService {
-    constructor() {
-        this.transporter = nodemailer.createTransport(SMTP_CONFIG);
-        console.log('✉️  Email service initialized (Gmail SMTP)');
+  constructor() {
+    this.transporter = nodemailer.createTransport(SMTP_CONFIG);
+    console.log("✉️  Email service initialized (Gmail SMTP)");
+  }
+
+  /**
+   * Send OTP email
+   * @param {string} email - Recipient email
+   * @param {string} code - 6-digit OTP code
+   * @param {string} type - 'register' | 'reset_password'
+   */
+  async sendOTP(email, code, type = "register") {
+    const subject =
+      type === "register"
+        ? "Xác thực đăng ký - Online Academy"
+        : "Đặt lại mật khẩu - Online Academy";
+    const html = this._buildOTPTemplate(code, type);
+
+    try {
+      const info = await this.transporter.sendMail({
+        from: `"Online Academy" <${SMTP_CONFIG.auth.user}>`,
+        to: email,
+        subject: subject,
+        html: html,
+      });
+
+      console.log(
+        `✅ OTP email sent to ${email} (MessageID: ${info.messageId})`
+      );
+      return true;
+    } catch (error) {
+      console.error("❌ Email send error:", error.message);
+
+      // Backup: In ra console để không block flow
+      console.log("\n=================================");
+      console.log("📧 BACKUP - OTP CODE");
+      console.log("=================================");
+      console.log(`Email: ${email}`);
+      console.log(`OTP: ${code}`);
+      console.log("=================================\n");
+
+      return true; // Vẫn return true để không dừng flow đăng ký
     }
+  }
 
-    /**
-     * Send OTP email
-     * @param {string} email - Recipient email
-     * @param {string} code - 6-digit OTP code
-     * @param {string} type - 'register' | 'reset_password'
-     */
-    async sendOTP(email, code, type = 'register') {
-        const subject = type === 'register' ? 'Xác thực đăng ký - Online Academy' : 'Đặt lại mật khẩu - Online Academy';
-        const html = this._buildOTPTemplate(code, type);
-
-        try {
-            const info = await this.transporter.sendMail({
-                from: `"Online Academy" <${SMTP_CONFIG.auth.user}>`,
-                to: email,
-                subject: subject,
-                html: html
-            });
-
-            console.log(`✅ OTP email sent to ${email} (MessageID: ${info.messageId})`);
-            return true;
-        } catch (error) {
-            console.error('❌ Email send error:', error.message);
-
-            // Backup: In ra console để không block flow
-            console.log('\n=================================');
-            console.log('📧 BACKUP - OTP CODE');
-            console.log('=================================');
-            console.log(`Email: ${email}`);
-            console.log(`OTP: ${code}`);
-            console.log('=================================\n');
-
-            return true; // Vẫn return true để không dừng flow đăng ký
-        }
-    }
-
-    /**
-     * Send welcome email after successful registration
-     */
-    async sendWelcome(email, fullName) {
-        try {
-            await this.transporter.sendMail({
-                from: `"Online Academy" <${SMTP_CONFIG.auth.user}>`,
-                to: email,
-                subject: 'Chào mừng đến với Online Academy! 🎉',
-                html: `
+  /**
+   * Send welcome email after successful registration
+   */
+  async sendWelcome(email, fullName) {
+    try {
+      await this.transporter.sendMail({
+        from: `"Online Academy" <${SMTP_CONFIG.auth.user}>`,
+        to: email,
+        subject: "Chào mừng đến với Online Academy! 🎉",
+        html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                         <div style="text-align: center; margin-bottom: 30px;">
                             <h1 style="color: #5624d0; margin: 0;">🎓 Online Academy</h1>
@@ -92,27 +97,27 @@ class EmailService {
                             <p>&copy; 2024 Online Academy. All rights reserved.</p>
                         </div>
                     </div>
-                `
-            });
+                `,
+      });
 
-            console.log(`✅ Welcome email sent to ${email}`);
-            return true;
-        } catch (error) {
-            console.error('❌ Welcome email error:', error.message);
-            return true; // Không block flow
-        }
+      console.log(`✅ Welcome email sent to ${email}`);
+      return true;
+    } catch (error) {
+      console.error("❌ Welcome email error:", error.message);
+      return true; // Không block flow
     }
+  }
 
-    /**
-     * Send password reset success notification
-     */
-    async sendPasswordResetSuccess(email) {
-        try {
-            await this.transporter.sendMail({
-                from: `"Online Academy" <${SMTP_CONFIG.auth.user}>`,
-                to: email,
-                subject: 'Mật khẩu đã được thay đổi - Online Academy',
-                html: `
+  /**
+   * Send password reset success notification
+   */
+  async sendPasswordResetSuccess(email) {
+    try {
+      await this.transporter.sendMail({
+        from: `"Online Academy" <${SMTP_CONFIG.auth.user}>`,
+        to: email,
+        subject: "Mật khẩu đã được thay đổi - Online Academy",
+        html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                         <div style="text-align: center; margin-bottom: 30px;">
                             <h1 style="color: #5624d0; margin: 0;">🎓 Online Academy</h1>
@@ -138,28 +143,29 @@ class EmailService {
                             <p>&copy; 2024 Online Academy. All rights reserved.</p>
                         </div>
                     </div>
-                `
-            });
+                `,
+      });
 
-            console.log(`✅ Password reset confirmation sent to ${email}`);
-            return true;
-        } catch (error) {
-            console.error('❌ Password reset email error:', error.message);
-            return true;
-        }
+      console.log(`✅ Password reset confirmation sent to ${email}`);
+      return true;
+    } catch (error) {
+      console.error("❌ Password reset email error:", error.message);
+      return true;
     }
+  }
 
-    /**
-     * Build OTP email template
-     * @private
-     */
-    _buildOTPTemplate(code, type) {
-        const title = type === 'register' ? 'Xác thực đăng ký' : 'Đặt lại mật khẩu';
-        const message = type === 'register'
-            ? 'Sử dụng mã OTP sau để hoàn tất đăng ký tài khoản:'
-            : 'Sử dụng mã OTP sau để đặt lại mật khẩu tài khoản:';
+  /**
+   * Build OTP email template
+   * @private
+   */
+  _buildOTPTemplate(code, type) {
+    const title = type === "register" ? "Xác thực đăng ký" : "Đặt lại mật khẩu";
+    const message =
+      type === "register"
+        ? "Sử dụng mã OTP sau để hoàn tất đăng ký tài khoản:"
+        : "Sử dụng mã OTP sau để đặt lại mật khẩu tài khoản:";
 
-        return `
+    return `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5;">
                 <div style="text-align: center; margin-bottom: 30px;">
                     <h1 style="color: #5624d0; margin: 0;">🎓 Online Academy</h1>
@@ -199,7 +205,7 @@ class EmailService {
                 </div>
             </div>
         `;
-    }
+  }
 }
 
 export default new EmailService();

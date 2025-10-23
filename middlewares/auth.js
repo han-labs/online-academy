@@ -1,11 +1,12 @@
 export function requireAuth(req, res, next) {
-    if (!req.session.user) {
-        return res.redirect('/account/login');
-    }
-    next();
+  if (!req.session.user) {
+    return res.redirect("/account/login");
+  }
+  next();
 }
 
 export function requireGuest(req, res, next) {
+
     if (req.session.user) {
         // Nếu là giảng viên → dashboard giảng viên
         if (req.session.user.role === 'instructor') {
@@ -18,15 +19,15 @@ export function requireGuest(req, res, next) {
 }
 
 export function checkAdmin(req, res, next) {
-    if (!req.session.user) {
-        return res.redirect('/account/login');
-    }
-    if (req.session.user.permission === 1) {
-        return next();
-    }
-    return res.status(403).render('vwAccount/403', {
-        error: 'You do not have permission to access this page.'
-    });
+  if (!req.session.user) {
+    return res.redirect("/account/login");
+  }
+  if (req.session.user.role === "admin") {
+    return next();
+  }
+  return res.status(403).render("vwAccount/403", {
+    error: "You do not have permission to access this page.",
+  });
 }
 
 export function requireInstructor(req, res, next) {
