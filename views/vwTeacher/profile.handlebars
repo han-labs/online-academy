@@ -67,17 +67,29 @@
         <td>{{add @index 1}}</td>
         <td>{{title}}</td>
         <td>
-          {{#if is_completed}}
-            <span class="badge bg-success">Hoàn thành</span>
-          {{else}}
-            <span class="badge bg-warning text-dark">Chưa hoàn thành</span>
-          {{/if}}
-        </td>
+  {{#if (eq status "published")}}
+    <span class="badge bg-success">Published</span>
+  {{else if (eq status "completed")}}
+    <span class="badge bg-info">Completed</span>
+  {{else if (eq status "draft")}}
+    <span class="badge bg-warning text-dark">Draft</span>
+  {{else}}
+    <span class="badge bg-secondary">Không xác định</span>
+  {{/if}}
+</td>
+
         <td>{{students}}</td>
-        <td>
-          <a href="/teacher/course/{{id}}/detail" class="btn btn-info btn-sm">Chi tiết</a>
-          <a href="/teacher/course/{{id}}/edit" class="btn btn-warning btn-sm">Sửa</a>
-        </td>
+       <td>
+  <a href="/teacher/course/{{id}}/detail" class="btn btn-info btn-sm">Chi tiết</a>
+  <a href="/teacher/course/{{id}}/edit" class="btn btn-warning btn-sm">Sửa</a>
+
+  <form action="/teacher/profile/course/{{id}}/delete" method="POST" style="display:inline;"
+        onsubmit="return confirm('Bạn có chắc chắn muốn xóa khóa học này không?');">
+    <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+  </form>
+</td>
+
+
       </tr>
       {{/each}}
     </tbody>

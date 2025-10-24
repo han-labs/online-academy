@@ -59,7 +59,16 @@
                                     {{/if}}
                                 </td>
                             </tr>
-                            
+                            <tr>
+                                <th>Trạng thái:</th>
+                                <td>
+                                    {{#ifEquals course.status "published"}}
+                                        <span class="badge bg-success">Đã xuất bản</span>
+                                    {{else}}
+                                        <span class="badge bg-warning">Nháp</span>
+                                    {{/ifEquals}}
+                                </td>
+                            </tr>
                             
                             <tr>
                                 <th>Lượt đăng ký:</th>

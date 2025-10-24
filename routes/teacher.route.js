@@ -411,6 +411,26 @@ router.post('/course/:id/delete', requireAuth, requireInstructor, async (req, re
     
     res.redirect('/teacher/dashboard');
 });
+// ---------------- Delete Course (from Profile page) ----------------
+router.post('/profile/course/:id/delete', requireAuth, requireInstructor, async (req, res) => {
+    const id = Number(req.params.id);
+    const course = await courseModel.detail(id);
+
+    if (!course || course.instructor_id !== req.session.user.id) {
+        return res.status(403).send('Không có quyền xóa khóa học này.');
+    }
+
+    // Xóa tất cả lectures, chapters, rồi course
+    const chapters = await db('chapters').where('course_id', id);
+    for (const chapter of chapters) {
+        await db('lectures').where('chapter_id', chapter.id).del();
+    }
+    await db('chapters').where('course_id', id).del();
+    await db('courses').where('id', id).del();
+
+    // Xong thì quay lại /teacher/profile
+    res.redirect('/teacher/profile');
+});
 
 // ---------------- Profile ----------------
 router.get('/profile', requireAuth, requireInstructor, async (req, res) => {
