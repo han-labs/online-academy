@@ -16,7 +16,7 @@ import { requireAuth, checkAdmin } from './middlewares/auth.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 👉 Khởi tạo app TRƯỚC, rồi mới app.use(...)
+// Khởi tạo app TRƯỚC, rồi mới app.use(...)
 const app = express();
 
 // view engine
@@ -51,7 +51,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // middleware
 app.use(express.urlencoded({ extended: true }));
-app.use('/static', express.static(path.join(__dirname, 'static'))); // ✅ không dùng ../static
+app.use('/static', express.static(path.join(__dirname, 'static'))); // không dùng ../static
 
 app.use(session({
   secret: 'exam-secret',
@@ -76,7 +76,7 @@ app.use('/', homeRouter);
 app.use('/account', accountRouter);
 app.use('/categories', categoryRouter);
 app.use('/courses', courseRouter);
-app.use('/admin/categories', requireAuth, checkAdmin, adminCategoryRouter); // 👉 đặt SAU khi có app
+app.use('/admin/categories', requireAuth, checkAdmin, adminCategoryRouter); // đặt SAU khi có app
 
 // 404
 app.use((req, res) => res.status(404).render('vwAccount/404'));

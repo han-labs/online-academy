@@ -38,17 +38,24 @@
             </ul>
 
             {{!-- Search Form --}}
-            <form class="d-flex mx-auto" action="/courses/search" method="GET" style="max-width: 400px;">
-                <input class="form-control" 
-                       type="search" 
-                       name="q" 
-                       placeholder="Tìm kiếm..." 
-                       aria-label="Search">
-                <button class="btn btn-outline-secondary ms-2" type="submit">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                    </svg>
-                </button>
+            <form class="d-flex mx-auto" action="/courses/search" method="GET" style="max-width: 400px; width: 100%;">
+                <div class="input-group">
+                    <input class="form-control" 
+                           type="text" 
+                           name="q" 
+                           id="searchInput"
+                           placeholder="Tìm kiếm..." 
+                           aria-label="Search">
+                    <button class="btn btn-link text-secondary position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent d-none" 
+                            type="button" 
+                            id="clearSearch"
+                            style="z-index: 5; right: 50px !important;">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
             </form>
 
             {{!-- Right Menu --}}
@@ -84,3 +91,40 @@
         </div>
     </div>
 </nav>
+
+<script>
+// Clear search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearSearch');
+    
+    if (searchInput && clearBtn) {
+        // Show/hide clear button based on input value
+        function toggleClearButton() {
+            if (searchInput.value.trim().length > 0) {
+                clearBtn.classList.remove('d-none');
+            } else {
+                clearBtn.classList.add('d-none');
+            }
+        }
+        
+        // Check on input
+        searchInput.addEventListener('input', toggleClearButton);
+        
+        // Check on keyup (for better responsiveness)
+        searchInput.addEventListener('keyup', toggleClearButton);
+        
+        // Clear input on click
+        clearBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            searchInput.value = '';
+            clearBtn.classList.add('d-none');
+            searchInput.focus();
+        });
+        
+        // Check initial value on page load
+        toggleClearButton();
+    }
+});
+</script>

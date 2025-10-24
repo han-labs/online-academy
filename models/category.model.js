@@ -34,5 +34,22 @@ export default {
             .where('parent_id', parentId)
             .select('id', 'name')
             .orderBy('name');
+    },
+
+    // Lấy tất cả IDs của category và subcategories
+    async getCategoryWithChildren(categoryId) {
+        const category = await this.findById(categoryId);
+        if (!category) return [];
+
+        // Nếu là category con (có parent_id)
+        if (category.parent_id) {
+            return [categoryId];
+        }
+
+        // Nếu là category cha, lấy tất cả con
+        const children = await this.getSubcategories(categoryId);
+        
+        // Trả về [categoryId, ...childrenIds]
+        return [categoryId, ...children.map(c => c.id)];
     }
 };
