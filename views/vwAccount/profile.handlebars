@@ -3,8 +3,28 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const p = new URLSearchParams(location.search);
-        if (p.get('success') === '1') Swal.fire({ title: 'Thành công', text: 'Cập nhật hồ sơ xong.', icon: 'success' });
-        if (p.get('error') === '1') Swal.fire({ title: 'Lỗi', text: 'Email đã tồn tại.', icon: 'error' });
+        
+        if (p.get('success') === '1') {
+            Swal.fire({ 
+                title: 'Thành công', 
+                text: 'Cập nhật hồ sơ xong.', 
+                icon: 'success' 
+            }).then(() => {
+                // XÓA QUERY STRING SAU KHI HIỂN THỊ
+                window.history.replaceState({}, '', '/account/profile');
+            });
+        }
+        
+        if (p.get('error') === '1') {
+            Swal.fire({ 
+                title: 'Lỗi', 
+                text: 'Email đã tồn tại.', 
+                icon: 'error' 
+            }).then(() => {
+                // XÓA QUERY STRING SAU KHI HIỂN THỊ
+                window.history.replaceState({}, '', '/account/profile');
+            });
+        }
     });
 </script>
 
@@ -49,6 +69,9 @@
                                 <div class="d-flex gap-2 justify-content-end">
                                     <button class="btn btn-primary"><i class="bi bi-check2-circle"></i> Cập
                                         nhật</button>
+                                    <a href="/account/change-password" class="btn btn-outline-danger">
+                                        <i class="bi bi-shield-lock"></i> Đổi mật khẩu
+                                    </a>
                                     <a class="btn btn-secondary" href="/">Về trang chủ</a>
                                 </div>
                             </form>
