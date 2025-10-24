@@ -8,13 +8,15 @@
                 <div class="hero-slide" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <div class="row align-items-center g-0">
                         <div class="col-md-6 p-5">
-                            <span class="badge bg-warning text-dark mb-3">⚡ Khóa học nổi bật</span>
+                            <span class="badge bg-warning text-dark mb-3">
+                                <i class="bi bi-lightning-fill"></i> Khóa học nổi bật
+                            </span>
                             <h1 class="text-white mb-3">{{title}}</h1>
                             <p class="text-white-50 mb-4">{{short_description}}</p>
                             
                             <div class="d-flex gap-3 mb-3 text-white">
-                                <span>⭐ {{formatNumber rating}}</span>
-                                <span>👥 {{formatNumber students}} học viên</span>
+                                <span><i class="bi bi-star-fill text-warning"></i> {{formatNumber rating}}</span>
+                                <span><i class="bi bi-people-fill"></i> {{formatNumber students}} học viên</span>
                             </div>
                             
                             <div class="mb-4">
@@ -26,7 +28,9 @@
                                 {{/ifPromo}}
                             </div>
                             
-                            <a href="/courses/{{id}}" class="btn btn-light btn-lg">Xem chi tiết →</a>
+                            <a href="/courses/{{id}}" class="btn btn-light btn-lg">
+                                Xem chi tiết <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
                         </div>
                         <div class="col-md-6 d-none d-md-block p-4">
                             <img src="{{cover}}" class="img-fluid rounded shadow" alt="{{title}}" style="max-height: 350px; width: 100%; object-fit: cover;">
@@ -56,8 +60,12 @@
 {{!-- Khóa học xem nhiều --}}
 <section class="mb-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Khóa học xem nhiều nhất</h3>
-        <a href="/courses/search?sort=best_seller" class="text-decoration-none">Xem tất cả →</a>
+        <h3 class="mb-0">
+            <i class="bi bi-graph-up-arrow text-primary"></i> Khóa học xem nhiều nhất
+        </h3>
+        <a href="/courses/search?sort=best_seller" class="text-decoration-none">
+            Xem tất cả <i class="bi bi-arrow-right"></i>
+        </a>
     </div>
     <div class="row g-3">
         {{#each mostViewed}}
@@ -71,8 +79,12 @@
 {{!-- Khóa học mới nhất --}}
 <section class="mb-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Khóa học mới nhất</h3>
-        <a href="/courses/search?sort=newest" class="text-decoration-none">Xem tất cả →</a>
+        <h3 class="mb-0">
+            <i class="bi bi-stars text-warning"></i> Khóa học mới nhất
+        </h3>
+        <a href="/courses/search?sort=newest" class="text-decoration-none">
+            Xem tất cả <i class="bi bi-arrow-right"></i>
+        </a>
     </div>
     <div class="row g-3">
         {{#each newest}}
@@ -86,13 +98,16 @@
 {{!-- Danh mục hot --}}
 <section class="mb-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Danh mục học nhiều tuần này</h3>
+        <h3 class="mb-0">
+            <i class="bi bi-fire text-danger"></i> Danh mục học nhiều tuần này
+        </h3>
     </div>
     <div class="row g-3">
         {{#each hotCats}}
         <div class="col-6 col-md-4 col-lg-3">
             <a href="/categories/{{id}}" class="btn btn-outline-dark w-100 py-3">
-                {{name}} <span class="badge bg-dark">{{enroll_count}}</span>
+                <i class="bi bi-folder-fill me-2"></i>{{name}} 
+                <span class="badge bg-dark ms-2">{{enroll_count}}</span>
             </a>
         </div>
         {{/each}}
