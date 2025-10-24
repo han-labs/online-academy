@@ -1,151 +1,83 @@
-<!-- Alerts bằng SweetAlert2 qua query success/error -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const p = new URLSearchParams(location.search);
-        
-        if (p.get('success') === '1') {
-            Swal.fire({ 
-                title: 'Thành công', 
-                text: 'Cập nhật hồ sơ xong.', 
-                icon: 'success' 
-            }).then(() => {
-                // XÓA QUERY STRING SAU KHI HIỂN THỊ
-                window.history.replaceState({}, '', '/account/profile');
-            });
-        }
-        
-        if (p.get('error') === '1') {
-            Swal.fire({ 
-                title: 'Lỗi', 
-                text: 'Email đã tồn tại.', 
-                icon: 'error' 
-            }).then(() => {
-                // XÓA QUERY STRING SAU KHI HIỂN THỊ
-                window.history.replaceState({}, '', '/account/profile');
-            });
-        }
-    });
-</script>
-
 <div class="container py-4">
     <div class="row">
-        <div class="col-lg-8 offset-lg-2">
+        <!-- SIDEBAR NAVIGATION -->
+        <div class="col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> Tài khoản</h6>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="/account/profile" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-person-gear"></i> Thông tin cá nhân
+                    </a>
+                    <a href="/account/change-password" class="list-group-item list-group-item-action">
+                        <i class="bi bi-shield-lock"></i> Đổi mật khẩu
+                    </a>
+                    <a href="/student/watchlist" class="list-group-item list-group-item-action">
+                        <i class="bi bi-bookmark-heart"></i> Khóa học yêu thích
+                        <span class="badge bg-primary rounded-pill float-end">{{stats.watchlists}}</span>
+                    </a>
+                    <a href="/account/my-courses" class="list-group-item list-group-item-action">
+                        <i class="bi bi-collection-play"></i> Khóa học của tôi
+                        <span class="badge bg-primary rounded-pill float-end">{{stats.enrollments}}</span>
+                    </a>
+                    <form action="/account/logout" method="post" class="list-group-item">
+                        <button type="submit" class="btn btn-link text-danger p-0 border-0 text-start w-100">
+                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-            <!-- Header -->
-            <div class="card mb-4">
-                <div class="card-body text-center">
-                    <div class="mb-3">
-                        <i class="bi bi-person-circle" style="font-size:4rem;color:#6c757d;"></i>
-                    </div>
-                    <h3 class="mb-0">{{me.full_name}}</h3>
-                    <p class="text-muted">{{me.email}}</p>
-                    <small class="badge {{#if (eq user.role 'admin')}}text-bg-success{{else}}text-bg-secondary{{/if}}">
-                        {{#if (eq user.role 'admin')}}Administrator{{else if (eq user.role
-                        'instructor')}}Instructor{{else}}Student{{/if}}
-                    </small>
+        <!-- MAIN CONTENT -->
+        <div class="col-lg-9">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-person-gear"></i> Thông tin cá nhân</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Giữ nguyên form hiện tại -->
+                    <form id="frmProfile" method="post" action="/account/profile">
+                        <div class="mb-3">
+                            <label class="form-label">Họ tên</label>
+                            <input class="form-control" id="txtName" name="full_name" value="{{me.full_name}}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input class="form-control" id="txtEmail" type="email" name="email" value="{{me.email}}"
+                                required>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button class="btn btn-primary">
+                                <i class="bi bi-check2-circle"></i> Cập nhật
+                            </button>
+                            <a class="btn btn-secondary" href="/">
+                                <i class="bi bi-house"></i> Về trang chủ
+                            </a>
+                        </div>
+                    </form>
                 </div>
             </div>
 
-            <div class="row">
-                <!-- Form thông tin -->
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-person-gear"></i> Thông tin cá nhân</h5>
-                        </div>
-                        <div class="card-body">
-                            <form id="frmProfile" method="post" action="/account/profile">
-                                <div class="mb-3">
-                                    <label class="form-label">Họ tên</label>
-                                    <input class="form-control" id="txtName" name="full_name" value="{{me.full_name}}"
-                                        required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input class="form-control" id="txtEmail" type="email" name="email"
-                                        value="{{me.email}}" required>
-                                </div>
-                                <div class="d-flex gap-2 justify-content-end">
-                                    <button class="btn btn-primary"><i class="bi bi-check2-circle"></i> Cập
-                                        nhật</button>
-                                    <a href="/account/change-password" class="btn btn-outline-danger">
-                                        <i class="bi bi-shield-lock"></i> Đổi mật khẩu
-                                    </a>
-                                    <a class="btn btn-secondary" href="/">Về trang chủ</a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+            <!-- Thống kê (di chuyển xuống đây) -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Thống kê tài khoản</h6>
                 </div>
-
-                <!-- Thống kê + nhanh -->
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="bi bi-info-circle"></i> Tài khoản</h6>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="h4 text-primary">{{stats.enrollments}}</div>
+                            <small class="text-muted">Khóa học đã ghi danh</small>
                         </div>
-                        <div class="card-body">
-                            <div class="mb-2">
-                                <small class="text-muted">User ID</small>
-                                <div class="fw-semibold text-break">{{me.id}}</div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Loại tài khoản</small>
-                                <div>
-                                    <span
-                                        class="badge {{#if (eq user.role 'admin')}}text-bg-success{{else if (eq user.role 'instructor')}}text-bg-primary{{else}}text-bg-secondary{{/if}}">
-                                        {{#if (eq user.role 'admin')}}Admin{{else if (eq user.role
-                                        'instructor')}}Instructor{{else}}Student{{/if}}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Tham gia</small>
-                                <div>{{me.created_at}}</div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Đã ghi danh</small>
-                                <div><span class="badge text-bg-dark">{{stats.enrollments}}</span> khóa học</div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Watchlist</small>
-                                <div><span class="badge text-bg-dark">{{stats.watchlists}}</span> khóa</div>
-                            </div>
+                        <div class="col-6">
+                            <div class="h4 text-success">{{stats.watchlists}}</div>
+                            <small class="text-muted">Khóa học yêu thích</small>
                         </div>
                     </div>
-
-                    <div class="card mt-3">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="bi bi-lightning"></i> Nhanh</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-grid gap-2">
-                                <a href="/categories/1" class="btn btn-outline-primary btn-sm"><i
-                                        class="bi bi-collection"></i> Khóa học</a>
-                                <form action="/account/logout" method="post" class="d-inline">
-                                    <button class="btn btn-outline-danger btn-sm w-100"><i
-                                            class="bi bi-box-arrow-right"></i> Đăng xuất</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
-
         </div>
     </div>
 </div>
-
-<script>
-    // validate đơn giản
-    document.querySelector('#frmProfile')?.addEventListener('submit', (e) => {
-        const name = document.querySelector('#txtName').value.trim();
-        const email = document.querySelector('#txtEmail').value.trim();
-        if (!name || !email) {
-            e.preventDefault();
-            Swal.fire({ title: 'Lỗi', text: 'Họ tên và Email bắt buộc.', icon: 'error' });
-        }
-    });
-</script>
