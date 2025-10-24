@@ -59,26 +59,8 @@
                                     {{/if}}
                                 </td>
                             </tr>
-                            <tr>
-                                <th>Trạng thái:</th>
-                                <td>
-                                    {{#ifEquals course.status "published"}}
-                                        <span class="badge bg-success">Đã xuất bản</span>
-                                    {{else}}
-                                        <span class="badge bg-warning">Nháp</span>
-                                    {{/ifEquals}}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Hoàn thành:</th>
-                                <td>
-                                    {{#if course.is_completed}}
-                                        <span class="badge bg-success"><i class="fas fa-check"></i> Hoàn thành</span>
-                                    {{else}}
-                                        <span class="badge bg-warning"><i class="fas fa-clock"></i> Chưa hoàn thành</span>
-                                    {{/if}}
-                                </td>
-                            </tr>
+                            
+                            
                             <tr>
                                 <th>Lượt đăng ký:</th>
                                 <td><strong>{{course.total_students}}</strong> học viên</td>
