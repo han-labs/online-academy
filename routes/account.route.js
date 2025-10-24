@@ -5,7 +5,7 @@ import db from '../utils/db.js';
 import { requireGuest, requireAuth } from '../middlewares/auth.js';
 import otpService from '../utils/otp.service.js';
 import emailService from '../utils/email.service.js';
-
+import enrollmentModel from '../models/enrollment.model.js';
 const router = Router();
 
 // ============================================
@@ -278,7 +278,7 @@ router.post('/profile', requireAuth, async (req, res) => {
             .update({
                 full_name,
                 email,
-                
+
             });
 
         if (updated === 0) {
@@ -373,4 +373,27 @@ router.post('/change-password', requireAuth, async (req, res) => {
     }
 });
 
+// GET /account/my-courses - Khóa học của tôi
+router.get('/my-courses', requireAuth, async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+
+        // Lấy danh sách khóa học đã ghi danh
+        const enrolledCourses = await enrollmentModel.getEnrolledCourses(userId);
+
+        res.render('vwAccount/my-courses', {
+            courses: enrolledCourses,
+            hasCourses: enrolledCourses.length > 0,
+            user: req.session.user
+        });
+
+    } catch (error) {
+        console.error('My courses error:', error);
+        res.render('vwAccount/my-courses', {
+            courses: [],
+            hasCourses: false,
+            user: req.session.user
+        });
+    }
+});
 export default router;

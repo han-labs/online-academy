@@ -46,9 +46,18 @@
                     <div class="h3 mb-0">{{formatNumber course.price}}₫</div>
                     {{/ifPromo}}
 
-                    <button class="btn btn-primary w-100 mt-3 mb-2">
-                        Đăng ký học
-                    </button>
+                    {{!-- NÚT ĐĂNG KÝ HỌC--}}
+                    {{#if user}}
+                    {{!-- USER ĐÃ ĐĂNG NHẬP - ĐẾN TRANG THANH TOÁN --}}
+                    <a href="/checkout/{{course.id}}" class="btn btn-primary w-100 mt-3 mb-2">
+                        <i class="bi bi-cart-check"></i> Đăng ký học
+                    </a>
+                    {{else}}
+                    {{!-- GUEST - ĐẾN TRANG ĐĂNG NHẬP --}}
+                    <a href="/account/login?returnUrl=/courses/{{course.id}}" class="btn btn-primary w-100 mt-3 mb-2">
+                        <i class="bi bi-box-arrow-in-right"></i> Đăng nhập để đăng ký
+                    </a>
+                    {{/if}}
                     {{#if user}}
                     {{#if isInWatchlist}}
                     <form action="/student/watchlist/remove" method="POST" class="w-100">

@@ -1,0 +1,64 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <!-- Icon thành công -->
+            <div class="mb-4">
+                <i class="bi bi-check-circle-fill" style="font-size: 4rem; color: #28a745;"></i>
+            </div>
+
+            <!-- Thông báo -->
+            <h1 class="mb-3">Thanh toán thành công! </h1>
+            <p class="lead mb-4">Chúc mừng bạn đã đăng ký thành công khóa học</p>
+
+            <!-- Thông tin khóa học -->
+            <div class="card mx-auto mb-4" style="max-width: 400px;">
+                <div class="card-body">
+                    <img src="{{course.image_url}}" class="card-img-top mb-3" alt="{{course.title}}">
+                    <h5 class="card-title">{{course.title}}</h5>
+                    <p class="card-text text-muted">Giảng viên: {{course.instructor_name}}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-success fw-bold">
+                            {{#ifPromo course.price course.promotional_price}}
+                                {{formatNumber course.promotional_price}}₫
+                            {{else}}
+                                {{formatNumber course.price}}₫
+                            {{/ifPromo}}
+                        </span>
+                        <span class="badge bg-success">Đã thanh toán</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Các nút hành động -->
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="/courses/{{course.id}}/learn" class="btn btn-primary btn-lg">
+                    <i class="bi bi-play-circle"></i> Bắt đầu học ngay
+                </a>
+                <a href="/account/my-courses" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-collection-play"></i> Vào khóa học của tôi
+                </a>
+                <a href="/courses/{{course.id}}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại khóa học
+                </a>
+            </div>
+
+            <!-- Thông tin bổ sung -->
+            <div class="mt-5 p-4 bg-light rounded">
+                <h5><i class="bi bi-info-circle"></i> Tiếp theo bạn có thể:</h5>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check text-success"></i> Truy cập nội dung khóa học ngay lập tức</li>
+                    <li><i class="bi bi-check text-success"></i> Theo dõi tiến độ học tập</li>
+                    <li><i class="bi bi-check text-success"></i> Tương tác với giảng viên và học viên khác</li>
+                    <li><i class="bi bi-check text-success"></i> Đánh giá khóa học sau khi hoàn thành</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tự động redirect sau 10 giây (tùy chọn)
+    setTimeout(() => {
+        // window.location.href = '/account/my-courses';
+    }, 10000);
+</script>
