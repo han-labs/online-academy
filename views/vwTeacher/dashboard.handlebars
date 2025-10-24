@@ -1,6 +1,5 @@
 {{!-- vwTeacher/dashboard.handlebars --}}
 
-
 <div class="container my-5">
   <h2 class="mb-4 text-center text-primary fw-bold">Dashboard Giảng Viên</h2>
 
@@ -30,13 +29,15 @@
             {{title}}
           </a>
         </td>
-        <td>
-          {{#if is_completed}}
-            <span class="badge bg-success">Hoàn thành</span>
-          {{else}}
-            <span class="badge bg-warning text-dark">Chưa hoàn thành</span>
-          {{/if}}
-        </td>
+        <td class="text-center">
+  <form action="/teacher/course/{{id}}/toggle-status" method="POST">
+    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+      <option value="draft" {{#ifEquals status "draft"}}selected{{/ifEquals}}>Draft</option>
+      <option value="completed" {{#ifEquals status "completed"}}selected{{/ifEquals}}>Completed</option>
+      <option value="published" {{#ifEquals status "published"}}selected{{/ifEquals}}>Published</option>
+    </select>
+  </form>
+</td>
         <td>{{students}}</td>
         <td class="text-center">
           <a href="/teacher/course/{{id}}/detail" class="btn btn-info btn-sm">Chi tiết</a>

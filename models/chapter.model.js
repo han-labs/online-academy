@@ -1,26 +1,52 @@
-// models/chapter.model.js
+// course.model.js
 import db from '../utils/db.js';
 
-export default {
-    async findByCourseId(courseId) {
-        return db('chapters')
-            .where({ course_id: courseId })
-            .orderBy('chapter_order', 'asc');
+const courseModel = {
+    // Lấy tất cả khóa học của 1 instructor
+    findByInstructor: async (instructor_id) => {
+        return db('courses').where({ instructor_id });
     },
 
-    async findById(id) {
-        return db('chapters').where({ id }).first();
+    // Lấy chi tiết khóa học
+    detail: async (id) => {
+        return db('courses').where({ id }).first();
     },
 
-    async create(chapter) {
-        return db('chapters').insert(chapter).returning('*');
+    // Lấy curriculum: chapters + lectures
+    curriculum: async (course_id) => {
+        const chapters = await db('chapters')
+            .where('course_id', course_id)
+            .orderBy('chapter_order', 'asc')
+            .select('*');
+
+        const lectures = await db('lectures')
+            .whereIn('chapter_id', chapters.map(ch => ch.id))
+            .orderBy('lecture_order', 'asc')
+            .select('*');
+
+        return { chapters, lectures };
     },
 
-    async update(id, chapter) {
-        return db('chapters').where({ id }).update(chapter);
+    // Thêm chương mới
+    addChapter: async ({ title, course_id }) => {
+        const maxOrder = await db('chapters')
+            .where('course_id', course_id)
+            .max('chapter_order as max')
+            .first();
+        const nextOrder = (maxOrder?.max || 0) + 1;
+
+        return db('chapters').insert({ title, course_id, chapter_order: nextOrder });
     },
 
-    async delete(id) {
-        return db('chapters').where({ id }).del();
+    // Kiểm tra và update status course
+    checkAndUpdateStatus: async (course_id) => {
+        const chapters = await db('chapters').where({ course_id });
+        if (chapters.length > 0) {
+            await db('courses').where({ id: course_id }).update({ status: 'active' });
+        } else {
+            await db('courses').where({ id: course_id }).update({ status: 'draft' });
+        }
     }
 };
+
+export default courseModel;

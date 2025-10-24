@@ -168,7 +168,7 @@
                         <div class="accordion-item mb-2">
                             <h2 class="accordion-header" id="heading{{id}}">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{id}}">
-                                    <strong>Chương {{order}}: {{title}}</strong>
+                                    <strong>Chương {{chapter_order}}: {{title}}</strong>
                                     <span class="badge bg-primary ms-2">
                                         {{length (lookup ../lectures id)}} bài giảng
                                     </span>
@@ -187,9 +187,9 @@
                                                                 <i class="fas fa-video"></i> Video: {{video_url}}
                                                             </small>
                                                         {{/if}}
-                                                        {{#if duration}}
+                                                        {{#if duration_minutes}}
                                                             <small class="text-muted ms-2">
-                                                                <i class="fas fa-clock"></i> {{duration}} phút
+                                                                <i class="fas fa-clock"></i> {{duration_minutes}} phút
                                                             </small>
                                                         {{/if}}
                                                     </div>
