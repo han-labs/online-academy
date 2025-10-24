@@ -1,55 +1,82 @@
-<div class="container my-5">
-    <h3 class="mb-4">Danh sách khóa học yêu thích</h3>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1"><i class="bi bi-bookmark-heart"></i> Danh sách yêu thích</h1>
+            <p class="text-muted mb-0"><i class="bi bi-collection"></i> {{length courses}} khóa học</p>
+        </div>
+        <a href="/courses/search" class="btn btn-outline-primary">
+            <i class="bi bi-search"></i> Tìm khóa học mới
+        </a>
+    </div>
 
-    {{#if courses.length}}
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    {{#if flash}}
+    <div class="alert alert-{{flash.type}} alert-dismissible fade show">
+        {{flash.message}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {{/if}}
+
+    {{#if hasCourses}}
+    <div class="row g-3">
         {{#each courses}}
-        <div class="col">
-            <div class="card h-100 shadow-sm border-0">
-                <img src="{{this.image_url}}" class="card-img-top" alt="{{this.title}}">
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm position-relative">
+                <!-- Card content giống _courseCard -->
+                <a href="/courses/{{this.id}}">
+                    <img class="card-img-top" src="{{this.cover}}" alt="{{this.title}}">
+                </a>
                 <div class="card-body">
-                    <h5 class="card-title">{{this.title}}</h5>
-                    <p class="card-text">{{this.short_description}}</p>
-                    <p class="mb-1"><strong>Giảng viên:</strong> {{this.instructor_name}}</p>
-                    <p class="mb-2"><strong>Giá:</strong> 
-                        {{#if this.promo_price}}
-                            <span class="text-danger">{{this.promo_price}} VND</span>
-                            <del>{{this.price}} VND</del>
-                        {{else}}
-                            <span>{{this.price}} VND</span>
-                        {{/if}}
-                    </p>
-                    <button class="btn btn-sm btn-warning removeWatchlistBtn" data-course="{{this.id}}">
-                        Xoá khỏi yêu thích
-                    </button>
-                    <a href="/courses/{{this.id}}" class="btn btn-sm btn-primary ms-1">Xem chi tiết</a>
+                    <h6 class="card-title text-truncate" title="{{this.title}}">
+                        <a class="link-dark text-decoration-none" href="/courses/{{this.id}}">{{this.title}}</a>
+                    </h6>
+                    <div class="small text-muted">
+                        <i class="bi bi-tags"></i> {{this.category_name}} • <i class="bi bi-person"></i>
+                        {{this.instructor_name}}
+                    </div>
+                    <div class="small text-muted mb-2">
+                        <i class="bi bi-star-fill text-warning"></i> {{formatNumber this.rating}} ({{formatNumber
+                        this.rating_count}})
+                    </div>
+
+                    {{#if this.is_best_seller}}
+                    <span class="badge text-bg-warning mb-1">
+                        <i class="bi bi-award"></i> Best Seller
+                    </span>
+                    {{/if}}
+
+                    {{#ifPromo this.price this.promo_price}}
+                    <div>
+                        <span class="fw-bold text-danger">{{formatNumber this.promo_price}}₫</span>
+                        <span class="text-decoration-line-through text-muted ms-2">{{formatNumber this.price}}₫</span>
+                    </div>
+                    {{else}}
+                    <div class="fw-bold">{{formatNumber this.price}}₫</div>
+                    {{/ifPromo}}
+                </div>
+
+                <!-- Nút xóa watchlist -->
+                <div class="card-footer border-0 bg-transparent">
+                    <form action="/student/watchlist/remove" method="POST" class="w-100">
+                        <input type="hidden" name="course_id" value="{{this.id}}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                            <i class="bi bi-trash"></i> Xóa khỏi yêu thích
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
         {{/each}}
     </div>
     {{else}}
-    <p>Bạn chưa thêm khóa học nào vào yêu thích.</p>
+    <div class="text-center py-5">
+        <div class="display-1 text-muted mb-3">
+            <i class="bi bi-bookmark-x"></i>
+        </div>
+        <h3 class="text-muted">Danh sách yêu thích trống</h3>
+        <p class="text-muted mb-4">Hãy thêm khóa học bạn yêu thích vào đây!</p>
+        <a href="/courses/search" class="btn btn-primary btn-lg">
+            <i class="bi bi-compass"></i> Khám phá khóa học
+        </a>
+    </div>
     {{/if}}
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const buttons = document.querySelectorAll('.removeWatchlistBtn');
-    buttons.forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const courseId = btn.dataset.course;
-            try {
-                const res = await fetch(`/watchlist/${courseId}`, { method: 'DELETE' });
-                const data = await res.json();
-                if (data.success) {
-                    btn.closest('.col').remove();
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Có lỗi xảy ra, thử lại sau');
-            }
-        });
-    });
-});
-</script>

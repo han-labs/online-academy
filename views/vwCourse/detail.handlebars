@@ -5,7 +5,8 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-2">
                     <li class="breadcrumb-item"><a href="/" class="text-white-50">Trang chủ</a></li>
-                    <li class="breadcrumb-item"><a href="/categories/{{course.category_id}}" class="text-white-50">{{course.category_name}}</a></li>
+                    <li class="breadcrumb-item"><a href="/categories/{{course.category_id}}"
+                            class="text-white-50">{{course.category_name}}</a></li>
                     <li class="breadcrumb-item active text-white" aria-current="page">{{course.title}}</li>
                 </ol>
             </nav>
@@ -48,9 +49,23 @@
                     <button class="btn btn-primary w-100 mt-3 mb-2">
                         Đăng ký học
                     </button>
-                    <button class="btn btn-outline-secondary w-100">
-                        Thêm vào yêu thích
-                    </button>
+                    {{#if user}}
+                    {{#if isInWatchlist}}
+                    <form action="/student/watchlist/remove" method="POST" class="w-100">
+                        <input type="hidden" name="course_id" value="{{course.id}}">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            Đã thích
+                        </button>
+                    </form>
+                    {{else}}
+                    <form action="/student/watchlist/add" method="POST" class="w-100">
+                        <input type="hidden" name="course_id" value="{{course.id}}">
+                        <button type="submit" class="btn btn-outline-secondary w-100">
+                            Thêm vào yêu thích
+                        </button>
+                    </form>
+                    {{/if}}
+                    {{/if}}
                 </div>
             </div>
         </div>
@@ -83,17 +98,14 @@
                     {{#each chapters}}
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="accordion-button {{#unless @first}}collapsed{{/unless}}" 
-                                    type="button" 
-                                    data-bs-toggle="collapse" 
-                                    data-bs-target="#chapter{{id}}">
+                            <button class="accordion-button {{#unless @first}}collapsed{{/unless}}" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#chapter{{id}}">
                                 <strong>{{title}}</strong>
                                 <span class="text-muted ms-auto me-3">{{length lectures}} bài giảng</span>
                             </button>
                         </h2>
-                        <div id="chapter{{id}}" 
-                             class="accordion-collapse collapse {{#if @first}}show{{/if}}" 
-                             data-bs-parent="#curriculumAccordion">
+                        <div id="chapter{{id}}" class="accordion-collapse collapse {{#if @first}}show{{/if}}"
+                            data-bs-parent="#curriculumAccordion">
                             <div class="accordion-body p-0">
                                 <ul class="list-group list-group-flush">
                                     {{#each lectures}}
@@ -125,13 +137,11 @@
             <div class="card-body">
                 <div class="d-flex align-items-start">
                     {{#if course.instructor_avatar}}
-                    <img src="{{course.instructor_avatar}}" 
-                         alt="{{course.instructor_name}}" 
-                         class="rounded-circle me-3" 
-                         style="width: 80px; height: 80px; object-fit: cover;">
+                    <img src="{{course.instructor_avatar}}" alt="{{course.instructor_name}}" class="rounded-circle me-3"
+                        style="width: 80px; height: 80px; object-fit: cover;">
                     {{else}}
-                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3" 
-                         style="width: 80px; height: 80px; font-size: 2rem;">
+                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3"
+                        style="width: 80px; height: 80px; font-size: 2rem;">
                         {{substring course.instructor_name 0 1}}
                     </div>
                     {{/if}}
@@ -158,13 +168,11 @@
                 <div class="mb-3 pb-3 {{#unless @last}}border-bottom{{/unless}}">
                     <div class="d-flex align-items-center mb-2">
                         {{#if user_avatar}}
-                        <img src="{{user_avatar}}" 
-                             alt="{{user_name}}" 
-                             class="rounded-circle me-2" 
-                             style="width: 40px; height: 40px; object-fit: cover;">
+                        <img src="{{user_avatar}}" alt="{{user_name}}" class="rounded-circle me-2"
+                            style="width: 40px; height: 40px; object-fit: cover;">
                         {{else}}
-                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" 
-                             style="width: 40px; height: 40px;">
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
+                            style="width: 40px; height: 40px;">
                             {{substring user_name 0 1}}
                         </div>
                         {{/if}}

@@ -13,6 +13,8 @@ import courseRouter from './routes/course.route.js';
 import adminCategoryRouter from './routes/admin.category.route.js';
 import { requireAuth, checkAdmin } from './middlewares/auth.js';
 
+import studentRouter from './routes/student.route.js'; // 👈 THÊM VÀO ĐÂY
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -77,7 +79,7 @@ app.use('/account', accountRouter);
 app.use('/categories', categoryRouter);
 app.use('/courses', courseRouter);
 app.use('/admin/categories', requireAuth, checkAdmin, adminCategoryRouter); // 👉 đặt SAU khi có app
-
+app.use('/student', requireAuth, studentRouter); // 👈 THÊM VÀO ĐÂY
 // 404
 app.use((req, res) => res.status(404).render('vwAccount/404'));
 

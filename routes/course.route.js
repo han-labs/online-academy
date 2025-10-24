@@ -2,7 +2,7 @@ import { Router } from 'express';
 import courseModel from '../models/course.model.js';
 import categoryModel from '../models/category.model.js';
 import { requireAuth } from '../middlewares/auth.js';
-
+import watchlistModel from '../models/watchlist.model.js';
 const router = Router();
 
 // Search courses - Route này phải đặt TRƯỚC /:id
@@ -45,7 +45,9 @@ router.get('/search', async (req, res) => {
 // Course detail - Route này phải đặt SAU /search
 router.get('/:id', async (req, res) => {
     const id = Number(req.params.id);
-
+    console.log('=== COURSE DETAIL DEBUG ===');
+    console.log('Course ID:', id);
+    console.log('User session:', req.session.user);
     if (isNaN(id)) {
         return res.status(404).render('vwAccount/404');
     }
@@ -62,6 +64,20 @@ router.get('/:id', async (req, res) => {
         courseModel.relatedBestSellers(course.category_id, id, 5)
     ]);
 
+    let isInWatchlist = false;
+    if (req.session.user) {
+        console.log('Checking watchlist for user:', req.session.user.id);
+        try {
+            isInWatchlist = await watchlistModel.isInWatchlist(req.session.user.id, id);
+            console.log('Is in watchlist result:', isInWatchlist);
+        } catch (error) {
+            console.error('Watchlist check error:', error);
+        }
+    } else {
+        console.log('No user session - watchlist check skipped');
+    }
+    console.log('Final isInWatchlist:', isInWatchlist);
+    console.log('=== END DEBUG ===');
     // Group lectures by chapter
     const chaptersWithLectures = curriculum.chapters.map(chapter => ({
         ...chapter,
@@ -81,20 +97,21 @@ router.get('/:id', async (req, res) => {
         totalHours,
         remainingMinutes,
         reviews,
-        related
+        related,
+        isInWatchlist
     });
 });
 
 // Learn page - Route cho học viên đã đăng ký (student feature)
 router.get('/:id/learn', requireAuth, async (req, res) => {
     const id = Number(req.params.id);
-    
+
     if (isNaN(id)) {
         return res.status(404).render('vwAccount/404');
     }
 
     const course = await courseModel.detail(id);
-    
+
     if (!course) {
         return res.status(404).render('vwAccount/404');
     }
@@ -107,7 +124,7 @@ router.get('/:id/learn', requireAuth, async (req, res) => {
 
     const curriculum = await courseModel.curriculum(id);
 
-    res.render('vwCourse/learn', { 
+    res.render('vwCourse/learn', {
         course,
         chapters: curriculum.chapters,
         lectures: curriculum.lectures
