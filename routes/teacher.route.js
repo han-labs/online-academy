@@ -66,13 +66,10 @@ router.post('/course/:id/toggle-status', requireAuth, requireInstructor, async (
 
 // ---------------- Add Course ----------------
 router.get('/course/add', requireAuth, requireInstructor, async (req, res) => {
-    // Lấy categories con (có parent_id khác null)
-    const categories = await db('categories')
-        .whereNotNull('parent_id')
-        .select('*');
-
-    res.render('vwTeacher/addCourse', { categories });
+  const categoriesTree = await categoryModel.findTree();
+  res.render('vwTeacher/addCourse', { categoriesTree });
 });
+
 
 router.post('/course/add', requireAuth, requireInstructor, upload.single('image'), async (req, res) => {
     const userId = req.session.user.id;
@@ -125,16 +122,15 @@ router.get('/course/:id/detail', requireAuth, requireInstructor, async (req, res
 
 // ---------------- Edit Course ----------------
 router.get('/course/:id/edit', requireAuth, requireInstructor, async (req, res) => {
-    const id = Number(req.params.id);
-    const course = await courseModel.detail(id);
-    if (!course || course.instructor_id !== req.session.user.id)
-        return res.status(403).send('Không có quyền chỉnh sửa khóa học này.');
+  const id = Number(req.params.id);
+  const course = await courseModel.detail(id);
 
-    const categories = await db('categories')
-        .whereNotNull('parent_id')
-        .select('*');
+  if (!course || course.instructor_id !== req.session.user.id)
+    return res.status(403).send('Không có quyền chỉnh sửa khóa học này.');
 
-    // Lấy chapters
+  const categoriesTree = await categoryModel.findTree();
+
+  // Lấy chapters
     const chapters = await db('chapters')
         .where('course_id', id)
         .orderBy('chapter_order', 'asc')
@@ -155,13 +151,17 @@ router.get('/course/:id/edit', requireAuth, requireInstructor, async (req, res) 
         lecturesGrouped[l.chapter_id].push(l);
     });
 
-    res.render('vwTeacher/editCourse', { 
-        course, 
-        categories, 
-        chapters, 
-        lectures: lecturesGrouped
-    });
+course.category_id = Number(course.category_id);
+
+  res.render('vwTeacher/editCourse', { 
+      course,
+      categoriesTree,
+      selectedCategoryId: course.category_id, 
+      chapters,
+      lectures: lecturesGrouped
+  });
 });
+
 
 
 router.post('/course/:id/edit', requireAuth, requireInstructor, upload.single('image'), async (req, res) => {
@@ -179,8 +179,8 @@ router.post('/course/:id/edit', requireAuth, requireInstructor, upload.single('i
         detailed_description,
         price: parseFloat(price) || 0,
         promotional_price: promotional_price ? parseFloat(promotional_price) : null,
-        category_id: category_id || null,
-        image_url: image,
+        category_id: category_id ? Number(category_id) : null,
+         image_url: image,
         status,
         last_updated: db.fn.now()
     });

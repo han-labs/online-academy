@@ -14,15 +14,24 @@
       <input type="file" name="image" class="form-control">
     </div>
 
-    <div class="mb-3">
-      <label class="form-label">Danh mục</label>
-      <select name="category_id" class="form-select" required>
-        <option value="">-- Chọn danh mục --</option>
-        {{#each categories}}
-          <option value="{{id}}">{{name}}</option>
+   <div class="mb-3">
+  <label class="fw-semibold">Danh mục</label>
+  <select name="category_id" class="form-select" required>
+    <option value="" disabled>-- Chọn danh mục --</option>
+
+    {{#each categoriesTree}}
+      <optgroup label="📁 {{this.name}}">
+        {{#each this.children}}
+          <option value="{{this.id}}"
+            {{#if (eq ../../selectedCategoryId this.id)}}selected{{/if}}>
+            — {{this.name}}
+          </option>
         {{/each}}
-      </select>
-    </div>
+      </optgroup>
+    {{/each}}
+  </select>
+</div>
+
 
     <div class="row">
       <div class="col-md-6 mb-3">

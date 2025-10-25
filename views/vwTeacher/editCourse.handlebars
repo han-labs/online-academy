@@ -3,9 +3,7 @@
 <div class="container my-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="text-primary fw-bold">Chỉnh Sửa Khóa Học: {{course.title}}</h2>
-    <a href="/teacher/dashboard" class="btn btn-secondary">
-      <i class="bi bi-arrow-left"></i> Quay lại Dashboard
-    </a>
+    
   </div>
 
   {{!-- Thông tin cơ bản khóa học --}}
@@ -27,15 +25,20 @@
 
     <div class="mb-3">
       <label class="fw-semibold">Danh mục</label>
-      <select name="category_id" class="form-control">
-        <option value="">-- Chọn danh mục --</option>
-        {{#each categories}}
-          <option value="{{id}}" {{#ifEquals id ../course.category_id}}selected{{/ifEquals}}>{{name}}</option>
+      <select name="category_id" class="form-select" required>
+        <option value="" disabled>-- Chọn danh mục --</option>
+        {{#each categoriesTree}}
+          <optgroup label="📁 {{this.name}}">
+            {{#each this.children}}
+              <option value="{{this.id}}" {{#if (eq ../selectedCategoryId this.id)}}selected{{/if}}>
+                — {{this.name}}
+              </option>
+            {{/each}}
+          </optgroup>
         {{/each}}
       </select>
     </div>
-
-    <div class="row">
+ <div class="row">
       <div class="col-md-6 mb-3">
         <label class="fw-semibold">Giá gốc (VNĐ) <span class="text-danger">*</span></label>
         <input type="number" name="price" class="form-control" value="{{course.price}}" required min="0">
@@ -338,7 +341,15 @@
   </div>
 </div>
 
-
+{{!-- Nút quay lại Dashboard và Xem chi tiết (cuối cùng) --}}
+<div class="container my-4 d-flex gap-2">
+  <a href="/teacher/dashboard" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i> Quay lại Dashboard
+  </a>
+  <a href="/teacher/course/{{course.id}}/detail" class="btn btn-info">
+    <i class="bi bi-eye"></i> Xem chi tiết
+  </a>
+</div>
 {{!-- TinyMCE Editor --}}
 <script src="hw9pfh30njixlu4voz8ag8msnnnr4ofingpiklyaaie8hhdy" referrerpolicy="origin"></script>
 <script>

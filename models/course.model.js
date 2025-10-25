@@ -2,7 +2,7 @@ import db from '../utils/db.js';
 const baseCols = [
 'c.id', 'c.title', 'c.price',
 db.raw('c.promotional_price as promo_price'),
-db.raw('c.image_url as cover'),
+db.raw('c.image_url',),
 db.raw('cat.name as category_name'),
 db.raw('cat.id as category_id'),
 db.raw('u.full_name as instructor_name'),
