@@ -1,0 +1,92 @@
+<div class="container py-4">
+    <div class="row">
+        <!-- Sidebar (giống profile) -->
+        <div class="col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> Account</h6>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="/account/profile" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-gear"></i> Personal information
+                    </a>
+                    <a href="/account/change-password" class="list-group-item list-group-item-action">
+                        <i class="bi bi-shield-lock"></i> Change password
+                    </a>
+                    <a href="/student/watchlist" class="list-group-item list-group-item-action">
+                        <i class="bi bi-bookmark-heart"></i> Favorite Courses
+                    </a>
+                    <a href="/account/my-courses" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-collection-play"></i> My courses
+                        <span class="badge bg-primary rounded-pill float-end">{{courses.length}}</span>
+                    </a>
+                    <form action="/account/logout" method="post" class="list-group-item">
+                        <button type="submit" class="btn btn-link text-danger p-0 border-0 text-start w-100">
+                            <i class="bi bi-box-arrow-right"></i> Log out
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h2 mb-1"><i class="bi bi-collection-play"></i> My course</h1>
+                    <p class="text-muted mb-0">{{courses.length}} registered courses</p>
+                </div>
+                <a href="/courses/search" class="btn btn-outline-primary">
+                    <i class="bi bi-plus-circle"></i> Find a new course
+                </a>
+            </div>
+
+            {{#if hasCourses}}
+            <div class="row g-3">
+                {{#each courses}}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <a href="/courses/{{this.id}}/learn">
+                            <img class="card-img-top" src="{{this.cover}}" alt="{{this.title}}">
+                        </a>
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <a class="link-dark text-decoration-none" href="/courses/{{this.id}}/learn">
+                                    {{this.title}}
+                                </a>
+                            </h6>
+                            <div class="small text-muted">{{this.category_name}} • {{this.instructor_name}}</div>
+                            <div class="small text-muted mb-2"> {{formatNumber this.rating}} ({{formatNumber this.rating_count}})</div>
+
+                            {{#ifPromo this.price this.promo_price}}
+                            <div><span class="fw-bold text-danger">{{formatNumber this.promo_price}}₫</span>
+                                <span class="text-decoration-line-through text-muted ms-2">{{formatNumber this.price}}₫</span>
+                            </div>
+                            {{else}}
+                            <div class="fw-bold">{{formatNumber this.price}}₫</div>
+                            {{/ifPromo}}
+                        </div>
+                        <div class="card-footer border-0 bg-transparent">
+                            <a href="/courses/{{this.id}}/learn" class="btn btn-success btn-sm w-100">
+                                <i class="bi bi-play-circle"></i> Keep learning
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            {{else}}
+            <div class="text-center py-5">
+                <div class="display-1 text-muted mb-3">
+                    <i class="bi bi-collection"></i>
+                </div>
+                <h3 class="text-muted">There are no courses yet.</h3>
+                <p class="text-muted mb-4">Sign up for your first course!</p>
+                <a href="/courses/search" class="btn btn-primary btn-lg">
+                    <i class="bi bi-compass"></i> Explore the course
+                </a>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>

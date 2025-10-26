@@ -410,3 +410,379 @@ footer a {
 footer a:hover {
     color: #a435f0 !important;
 }
+
+/* VIDEO.JS CUSTOM STYLES */
+.video-js {
+    border-radius: 8px;
+}
+
+.vjs-poster {
+    border-radius: 8px;
+}
+
+.vjs-big-play-button {
+    background-color: rgba(86, 36, 208, 0.8) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 80px !important;
+    height: 80px !important;
+    line-height: 80px !important;
+}
+
+.vjs-big-play-button:hover {
+    background-color: rgba(86, 36, 208, 1) !important;
+}
+
+/* PLYR.IO CUSTOM STYLES */
+.plyr {
+    border-radius: 8px;
+}
+
+.plyr--video .plyr__controls {
+    background: linear-gradient(transparent, rgba(0,0,0,0.75));
+}
+
+.plyr__control--overlaid {
+    background: rgba(86, 36, 208, 0.8);
+}
+
+.plyr__control--overlaid:hover {
+    background: rgba(86, 36, 208, 1);
+}
+
+/* ============================================
+   PLYR VIDEO FIX - CRITICAL
+   ============================================ */
+
+/* Đảm bảo Plyr chiếm toàn bộ container */
+#plyr-player {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.plyr {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+}
+
+.plyr--video {
+    background: #000 !important;
+}
+
+.plyr__video-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    background: #000 !important;
+}
+
+.plyr__video-embed {
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.plyr__video-embed iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+}
+
+/* Override Bootstrap ratio conflicts */
+.ratio-16x9 {
+    position: relative !important;
+}
+
+.ratio-16x9::before {
+    display: none !important; /* Disable Bootstrap's padding */
+}
+
+/* ============================================
+   UDEMY-STYLE RATING SYSTEM - ĐÃ SỬA
+   ============================================ */
+
+/* Star Rating Modal - ĐÃ SỬA CSS */
+.star-rating-modal {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.star-rating-modal input {
+    display: none;
+}
+
+.star-rating-modal label {
+    font-size: 3rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+}
+
+.star-rating-modal label:hover {
+    color: #f4c150;
+    transform: scale(1.1);
+}
+
+/* QUAN TRỌNG: Sửa CSS selector cho đúng thứ tự */
+.star-rating-modal input:checked + label,
+.star-rating-modal input:checked ~ input + label {
+    color: #f4c150;
+    transform: scale(1.1);
+}
+
+.rating-labels {
+    display: flex;
+    justify-content: space-between;
+    max-width: 400px;
+    margin: 0 auto;
+    font-size: 0.8rem;
+}
+
+/* ============================================
+   UDEMY-STYLE LEARNING PAGE LAYOUT
+   ============================================ */
+
+/* Video Container */
+.video-container-wrapper {
+    background: #000;
+    position: relative;
+}
+
+.video-info-bar {
+    background: #1c1d1f !important;
+    border-top: 1px solid #3e4143 !important;
+}
+
+/* Tabs Section */
+.tabs-section {
+    background: #fff;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid #d1d7dc;
+}
+
+.nav-tabs .nav-link {
+    color: #6a6f73;
+    font-weight: 500;
+    border: none;
+    padding: 16px 20px;
+    position: relative;
+    font-size: 0.9rem;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #1c1d1f;
+    border: none;
+}
+
+.nav-tabs .nav-link.active {
+    color: #1c1d1f;
+    background: none;
+    border: none;
+    border-bottom: 2px solid #1c1d1f;
+}
+
+/* Lecture Details */
+.lecture-details {
+    animation: fadeIn 0.3s ease-in;
+}
+
+.lecture-meta .fw-medium {
+    color: #1c1d1f;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   REVIEWS SECTION STYLES
+   ============================================ */
+
+.star-rating-large {
+    font-size: 1.5rem;
+}
+
+.review-item {
+    border: 1px solid #e8e9eb !important;
+    border-radius: 8px;
+    transition: box-shadow 0.2s ease;
+}
+
+.review-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.rating-breakdown-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.rating-breakdown-item:hover {
+    background-color: #f7f9fa;
+}
+
+/* ============================================
+   SIDEBAR TOGGLE STYLES
+   ============================================ */
+.sidebar-toggle-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.sidebar-curriculum {
+    transition: all 0.3s ease;
+}
+
+/* Purple color for completed items */
+.text-purple {
+    color: #6f42c1 !important;
+}
+
+/* Course Content Tab Styles */
+.course-content-tab .chapter-card {
+    border-radius: 8px;
+}
+
+.course-content-tab .list-group-item {
+    border: none;
+    border-bottom: 1px solid #e8e9eb;
+    transition: background-color 0.2s ease;
+}
+
+.course-content-tab .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.course-content-tab .list-group-item:last-child {
+    border-bottom: none;
+}
+
+/* Progress bar purple */
+.progress-bar {
+    background-color: #6f42c1 !important;
+}
+
+/* ============================================
+   UDEMY-STYLE SIDEBAR TOGGLE BUTTON
+   ============================================ */
+.sidebar-toggle-container {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 1000;
+}
+
+.udemy-sidebar-toggle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    font-size: 1.2rem;
+}
+
+.udemy-sidebar-toggle:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* ============================================
+   PLYR QUALITY SELECTOR STYLES
+   ============================================ */
+.plyr__menu__container [data-plyr="quality"] {
+    font-size: 0.9rem;
+}
+
+.plyr__menu__container .plyr__control--forward {
+    padding: 8px 16px;
+}
+
+.plyr__menu__container .plyr__control--forward:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.plyr__menu__value {
+    color: #f4c150;
+    font-weight: 500;
+}
+
+/* Settings button styling */
+.plyr__controls .plyr__controls__item.plyr__control[data-plyr="settings"] {
+    background: transparent;
+    border: none;
+}
+
+.plyr__controls .plyr__controls__item.plyr__control[data-plyr="settings"]:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* Interactive Icons */
+.toggle-icon {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 3px;
+    padding: 2px;
+}
+
+.toggle-icon:hover {
+    transform: scale(1.1);
+    background-color: rgba(111, 66, 193, 0.1);
+}
+
+.toggle-icon.completed:hover {
+    opacity: 0.8;
+}
+
+.toggle-icon.not-completed:hover {
+    color: #6f42c1 !important;
+}
+
+/* Chapter Collapse Styles */
+.chapter-header {
+    transition: background-color 0.2s ease;
+    padding: 1rem 1.25rem;
+}
+
+.chapter-header:hover {
+    background-color: #f8f9fa !important;
+}
+
+.chapter-header.collapsed {
+    border-bottom: 1px solid #e8e9eb;
+}
+
+.chapter-content {
+    transition: all 0.3s ease;
+}
+
+.chapter-arrow {
+    transition: transform 0.3s ease;
+    font-size: 1.1rem;
+    color: #6a6f73;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Smooth collapse animation */
+.chapter-content {
+    overflow: hidden;
+}

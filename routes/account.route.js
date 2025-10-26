@@ -1,151 +1,102 @@
-// routes/account.route.js - UPDATED VERSION
+// routes/account.route.js - MERGED
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import db from '../utils/db.js';
 import { requireGuest, requireAuth } from '../middlewares/auth.js';
 import otpService from '../utils/otp.service.js';
 import emailService from '../utils/email.service.js';
-
+import enrollmentModel from '../models/enrollment.model.js';
 const router = Router();
 
-// ============================================
-// ĐĂNG KÝ VỚI OTP VERIFICATION
-// ============================================
+// ========== REGISTER with OTP ==========
 
 // GET /account/register
 router.get('/register', requireGuest, (req, res) => {
     res.render('vwAccount/register');
 });
 
-// POST /account/register - Step 1: Tạo tài khoản tạm + gửi OTP
+// POST /account/register
 router.post('/register', requireGuest, async (req, res) => {
     const { full_name, email, password, confirm_password } = req.body;
 
-    // Validation
     if (!full_name || !email || !password) {
-        return res.render('vwAccount/register', {
-            error: 'Vui lòng điền đầy đủ thông tin'
-        });
+        return res.render('vwAccount/register', { error: 'Please fill all required fields.' });
     }
-
     if (password !== confirm_password) {
-        return res.render('vwAccount/register', {
-            error: 'Mật khẩu xác nhận không khớp'
-        });
+        return res.render('vwAccount/register', { error: 'Password confirmation does not match.' });
     }
-
     if (password.length < 6) {
-        return res.render('vwAccount/register', {
-            error: 'Mật khẩu phải có ít nhất 6 ký tự'
-        });
+        return res.render('vwAccount/register', { error: 'Password must have at least 6 characters.' });
     }
 
-    // Check email exists
     const existed = await db('users').where({ email }).first();
     if (existed) {
-        return res.render('vwAccount/register', {
-            error: 'Email đã được sử dụng'
-        });
+        return res.render('vwAccount/register', { error: 'Email is already in use.' });
     }
 
     try {
-        // Hash password
         const password_hash = await bcrypt.hash(password, 10);
+        req.session.tempUser = { full_name, email, password_hash };
 
-        // Store temporary user data in session
-        req.session.tempUser = {
-            full_name,
-            email,
-            password_hash
-        };
-
-        // Generate and send OTP
         const otpCode = await otpService.create(email, 'register');
         await emailService.sendOTP(email, otpCode, 'register');
 
-        // Redirect to OTP verification
         return res.redirect(`/account/verify-otp?email=${encodeURIComponent(email)}`);
-
     } catch (error) {
         console.error('Register error:', error);
-        return res.render('vwAccount/register', {
-            error: 'Có lỗi xảy ra. Vui lòng thử lại.'
-        });
+        return res.render('vwAccount/register', { error: 'An error occurred. Please try again.' });
     }
 });
 
 // GET /account/verify-otp
 router.get('/verify-otp', requireGuest, (req, res) => {
     const email = req.query.email;
-
     if (!email || !req.session.tempUser || req.session.tempUser.email !== email) {
         return res.redirect('/account/register');
     }
-
     res.render('vwAccount/verify-otp', { email });
 });
 
-// POST /account/verify-otp - Step 2: Verify OTP và hoàn tất đăng ký
+// POST /account/verify-otp
 router.post('/verify-otp', requireGuest, async (req, res) => {
     const { email, otp_code } = req.body;
-
     if (!email || !otp_code || !req.session.tempUser) {
         return res.redirect('/account/register');
     }
 
     try {
-        // Verify OTP
         const isValid = await otpService.verify(email, otp_code, 'register');
-
         if (!isValid) {
             return res.render('vwAccount/verify-otp', {
-                email,
-                error: 'Mã OTP không đúng hoặc đã hết hạn'
+                email, error: 'OTP is invalid or expired.'
             });
         }
 
-        // Create user account
         const { full_name, password_hash } = req.session.tempUser;
-
         await db('users').insert({
-            full_name,
-            email,
-            password_hash,
-            role: 'student',
-            created_at: new Date()
+            full_name, email, password_hash, role: 'student', created_at: new Date()
         });
 
-        // Send welcome email
         await emailService.sendWelcome(email, full_name);
-
-        // Clear temp data
         delete req.session.tempUser;
 
-        // Redirect to login with success message
         req.session.registerSuccess = true;
         return res.redirect('/account/login?success=1');
-
     } catch (error) {
         console.error('OTP verification error:', error);
-        return res.render('vwAccount/verify-otp', {
-            email,
-            error: 'Có lỗi xảy ra. Vui lòng thử lại.'
-        });
+        return res.render('vwAccount/verify-otp', { email, error: 'An error occurred. Please try again.' });
     }
 });
 
 // POST /account/resend-otp
 router.post('/resend-otp', requireGuest, async (req, res) => {
     const { email } = req.body;
-
     if (!email || !req.session.tempUser) {
         return res.redirect('/account/register');
     }
-
     try {
         const otpCode = await otpService.create(email, 'register');
         await emailService.sendOTP(email, otpCode, 'register');
-
         return res.redirect(`/account/verify-otp?email=${encodeURIComponent(email)}&resent=1`);
     } catch (error) {
         console.error('Resend OTP error:', error);
@@ -153,44 +104,32 @@ router.post('/resend-otp', requireGuest, async (req, res) => {
     }
 });
 
-// ============================================
-// ĐĂNG NHẬP
-// ============================================
+// ========== LOGIN ==========
 
 // GET /account/login
 router.get('/login', requireGuest, (req, res) => {
-    const success = req.query.success === '1' ? 'Đăng ký thành công! Vui lòng đăng nhập.' : null;
+    const success = req.query.success === '1' ? 'Registration successful! Please log in.' : null;
     res.render('vwAccount/login', { success });
 });
 
 // POST /account/login
 router.post('/login', requireGuest, async (req, res) => {
     const { email, password, remember } = req.body;
-
     if (!email || !password) {
-        return res.render('vwAccount/login', {
-            error: 'Vui lòng nhập email và mật khẩu'
-        });
+        return res.render('vwAccount/login', { error: 'Please enter email and password.' });
     }
 
     try {
         const user = await db('users').where({ email }).first();
-
         if (!user) {
-            return res.render('vwAccount/login', {
-                error: 'Email hoặc mật khẩu không đúng'
-            });
+            return res.render('vwAccount/login', { error: 'Email or password is incorrect.' });
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password_hash || '');
-
         if (!isPasswordValid) {
-            return res.render('vwAccount/login', {
-                error: 'Email hoặc mật khẩu không đúng'
-            });
+            return res.render('vwAccount/login', { error: 'Email or password is incorrect.' });
         }
 
-        // Set session
         req.session.user = {
             id: user.id,
             name: user.full_name,
@@ -200,44 +139,29 @@ router.post('/login', requireGuest, async (req, res) => {
             permission: user.role === 'admin' ? 1 : 0
         };
 
-
-        // Remember me
-        if (remember) {
-            req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
-        }
+        if (remember) req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
 
         return res.redirect('/');
-
     } catch (error) {
         console.error('Login error:', error);
-        return res.render('vwAccount/login', {
-            error: 'Có lỗi xảy ra. Vui lòng thử lại.'
-        });
+        return res.render('vwAccount/login', { error: 'An error occurred. Please try again.' });
     }
 });
 
-// ============================================
-// ĐĂNG XUẤT
-// ============================================
+// ========== LOGOUT ==========
 
 router.post('/logout', (req, res) => {
     req.session.destroy(() => res.redirect('/'));
 });
 
-// ============================================
-// PROFILE
-// ============================================
+// ========== PROFILE ==========
 
 // GET /account/profile
 router.get('/profile', requireAuth, async (req, res) => {
     try {
         const me = await db('users').where({ id: req.session.user.id }).first();
+        if (!me) return res.redirect('/account/login');
 
-        if (!me) {
-            return res.redirect('/account/login');
-        }
-
-        // Get stats
         const [{ enr }] = await db('enrollments').where({ user_id: me.id }).count({ enr: '*' });
         const [{ wl }] = await db('watchlists').where({ user_id: me.id }).count({ wl: '*' }).catch(() => [{ wl: 0 }]);
 
@@ -254,116 +178,104 @@ router.get('/profile', requireAuth, async (req, res) => {
     }
 });
 
-// POST /account/profile - Update profile
+// POST /account/profile
 router.post('/profile', requireAuth, async (req, res) => {
     const { full_name, email } = req.body;
     const myId = req.session.user.id;
     const isGoogle = (req.session.user.auth_provider || 'local') === 'google';
 
-    // Nếu là Google: chỉ cần full_name
     if (!full_name || (!isGoogle && !email)) {
-        return res.redirect('/account/profile?error=2');
+        return res.redirect('/account/profile?error=2'); // missing fields
     }
 
     try {
         if (isGoogle) {
-            // Chỉ cập nhật tên, KHÔNG động vào email
+            // Google-linked: only allow name
             await db('users').where({ id: myId }).update({ full_name });
             req.session.user.name = full_name;
             return res.redirect('/account/profile?success=1');
         }
 
-        // Local: cho đổi email -> check trùng
         const existed = await db('users')
             .where({ email })
             .andWhereNot({ id: myId })
             .first();
-        if (existed) return res.redirect('/account/profile?error=1');
+        if (existed) return res.redirect('/account/profile?error=1'); // email exists
 
-        await db('users').where({ id: myId }).update({ full_name, email });
+        const updated = await db('users')
+            .where({ id: myId })
+            .update({ full_name, email });
+
+        if (updated === 0) {
+            return res.redirect('/account/profile?error=3'); // not found/failed
+        }
+
         req.session.user.name = full_name;
         req.session.user.email = email;
 
         return res.redirect('/account/profile?success=1');
-    } catch (err) {
-        console.error('Update profile error:', err);
+    } catch (error) {
+        console.error('Update profile error:', error);
         return res.redirect('/account/profile?error=3');
     }
 });
 
+// ========== CHANGE PASSWORD ==========
 
-
-// ============================================
-// ĐỔI MẬT KHẨU
-// ============================================
-
-// GET /account/change-password
 router.get('/change-password', requireAuth, (req, res) => {
     res.render('vwAccount/change-password');
 });
 
-// POST /account/change-password
 router.post('/change-password', requireAuth, async (req, res) => {
     const { current_password, new_password, confirm_password } = req.body;
     const userId = req.session.user.id;
 
-    // Validation
     if (!current_password || !new_password || !confirm_password) {
-        return res.render('vwAccount/change-password', {
-            error: 'Vui lòng điền đầy đủ thông tin'
-        });
+        return res.render('vwAccount/change-password', { error: 'Please fill all required fields.' });
     }
-
     if (new_password !== confirm_password) {
-        return res.render('vwAccount/change-password', {
-            error: 'Mật khẩu mới không khớp'
-        });
+        return res.render('vwAccount/change-password', { error: 'New password confirmation does not match.' });
     }
-
     if (new_password.length < 6) {
-        return res.render('vwAccount/change-password', {
-            error: 'Mật khẩu mới phải có ít nhất 6 ký tự'
-        });
+        return res.render('vwAccount/change-password', { error: 'New password must have at least 6 characters.' });
     }
 
     try {
-        // Get current user
         const user = await db('users').where({ id: userId }).first();
+        if (!user) return res.redirect('/account/login');
 
-        if (!user) {
-            return res.redirect('/account/login');
-        }
-
-        // Verify current password
         const isValid = await bcrypt.compare(current_password, user.password_hash || '');
-
         if (!isValid) {
-            return res.render('vwAccount/change-password', {
-                error: 'Mật khẩu hiện tại không đúng'
-            });
+            return res.render('vwAccount/change-password', { error: 'Current password is incorrect.' });
         }
 
-        // Hash new password
         const newPasswordHash = await bcrypt.hash(new_password, 10);
-
-        // Update password
         await db('users').where({ id: userId }).update({
             password_hash: newPasswordHash,
             updated_at: new Date()
         });
 
-        // Send notification email
         await emailService.sendPasswordResetSuccess(user.email);
-
-        return res.render('vwAccount/change-password', {
-            success: 'Đổi mật khẩu thành công!'
-        });
-
+        return res.render('vwAccount/change-password', { success: 'Password changed successfully!' });
     } catch (error) {
         console.error('Change password error:', error);
-        return res.render('vwAccount/change-password', {
-            error: 'Có lỗi xảy ra. Vui lòng thử lại.'
+        return res.render('vwAccount/change-password', { error: 'An error occurred. Please try again.' });
+    }
+});
+
+// ========== MY COURSES ==========
+router.get('/my-courses', requireAuth, async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+        const enrolledCourses = await enrollmentModel.getEnrolledCourses(userId);
+        res.render('vwAccount/my-courses', {
+            courses: enrolledCourses,
+            hasCourses: enrolledCourses.length > 0,
+            user: req.session.user
         });
+    } catch (error) {
+        console.error('My courses error:', error);
+        res.render('vwAccount/my-courses', { courses: [], hasCourses: false, user: req.session.user });
     }
 });
 

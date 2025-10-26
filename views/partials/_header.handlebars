@@ -10,7 +10,7 @@
         </button>
 
         <div id="navMain" class="collapse navbar-collapse">
-            <!-- Left Menu -->
+            <!-- Left: Categories -->
             <ul class="navbar-nav me-auto">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
@@ -30,17 +30,15 @@
                             </a>
                         </li>
                         {{/each}}
-                        {{#unless @last}}
-                        <li>
+                        {{#unless @last}}<li>
                             <hr class="dropdown-divider">
-                        </li>
-                        {{/unless}}
+                        </li>{{/unless}}
                         {{/each}}
                     </ul>
                 </li>
             </ul>
 
-            <!-- Search Form (with clear button) -->
+            <!-- Search with clear button -->
             <form class="d-flex mx-auto me-3" action="/courses/search" method="GET"
                 style="max-width: 400px; width: 100%;">
                 <div class="input-group position-relative">
@@ -58,16 +56,14 @@
                 </div>
             </form>
 
-            <!-- Right Menu -->
+            <!-- Right: User -->
             {{#if user}}
             <div class="d-flex align-items-center gap-2">
-                <!-- Notifications (optional) -->
+                <!-- (optional) Notifications -->
                 <a href="#" class="btn btn-link text-dark position-relative" title="Notifications">
                     <i class="bi bi-bell fs-5"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                        style="font-size: 0.6rem;">
-                        3
-                    </span>
+                        style="font-size: .6rem;">3</span>
                 </a>
 
                 <!-- User Dropdown -->
@@ -89,75 +85,48 @@
                             <hr class="dropdown-divider">
                         </li>
 
-                        <li>
-                            <a class="dropdown-item" href="/account/profile">
-                                <i class="bi bi-person"></i> Profile
-                            </a>
+                        <li><a class="dropdown-item" href="/account/profile"><i class="bi bi-person"></i> Profile</a>
                         </li>
 
                         {{#if (eq user.role 'student')}}
-                        <li>
-                            <a class="dropdown-item" href="/student/my-courses">
-                                <i class="bi bi-journal-bookmark"></i> My Courses
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/student/watchlist">
-                                <i class="bi bi-heart"></i> Favorites
-                            </a>
+                        <li><a class="dropdown-item" href="/student/my-courses"><i class="bi bi-journal-bookmark"></i>
+                                My Courses</a></li>
+                        <li><a class="dropdown-item" href="/student/watchlist"><i class="bi bi-heart"></i> Favorites</a>
                         </li>
                         {{/if}}
 
                         {{#if (eq user.role 'instructor')}}
-                        <li>
-                            <a class="dropdown-item" href="/teacher/dashboard">
-                                <i class="bi bi-speedometer2"></i> Instructor Dashboard
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/teacher/courses">
-                                <i class="bi bi-easel"></i> My Courses
-                            </a>
+                        <li><a class="dropdown-item" href="/teacher/dashboard"><i class="bi bi-speedometer2"></i>
+                                Instructor Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/teacher/courses"><i class="bi bi-easel"></i> My Courses</a>
                         </li>
                         {{/if}}
 
                         {{#if (eq user.role 'admin')}}
-                        <li>
-                            <a class="dropdown-item text-danger" href="/admin/dashboard">
-                                <i class="bi bi-shield-lock"></i> Admin Panel
-                            </a>
-                        </li>
+                        <li><a class="dropdown-item text-danger" href="/admin/dashboard"><i
+                                    class="bi bi-shield-lock"></i> Admin Panel</a></li>
                         {{/if}}
 
                         <li>
                             <hr class="dropdown-divider">
                         </li>
 
-                        <li>
-                            <a class="dropdown-item" href="/account/change-password">
-                                <i class="bi bi-key"></i> Change Password
-                            </a>
-                        </li>
-
+                        <li><a class="dropdown-item" href="/account/change-password"><i class="bi bi-key"></i> Change
+                                Password</a></li>
                         <li>
                             <form action="/account/logout" method="post" class="d-inline">
-                                <button class="dropdown-item text-danger">
-                                    <i class="bi bi-box-arrow-right"></i> Log Out
-                                </button>
+                                <button class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i> Log
+                                    Out</button>
                             </form>
                         </li>
                     </ul>
                 </div>
             </div>
             {{else}}
-            <!-- Guest Menu -->
             <div class="d-flex gap-2">
-                <a class="btn btn-outline-primary btn-sm" href="/account/login">
-                    <i class="bi bi-box-arrow-in-right"></i> Log In
-                </a>
-                <a class="btn btn-primary btn-sm" href="/account/register">
-                    <i class="bi bi-person-plus"></i> Sign Up
-                </a>
+                <a class="btn btn-outline-primary btn-sm" href="/account/login"><i class="bi bi-box-arrow-in-right"></i>
+                    Log In</a>
+                <a class="btn btn-primary btn-sm" href="/account/register"><i class="bi bi-person-plus"></i> Sign Up</a>
             </div>
             {{/if}}
         </div>
@@ -165,29 +134,24 @@
 </nav>
 
 <script>
-    // Clear search functionality
     document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.getElementById('searchInput');
         const clearBtn = document.getElementById('clearSearch');
+        if (!searchInput || !clearBtn) return;
 
-        if (searchInput && clearBtn) {
-            function toggleClearButton() {
-                if (searchInput.value.trim().length > 0) {
-                    clearBtn.classList.remove('d-none');
-                } else {
-                    clearBtn.classList.add('d-none');
-                }
-            }
-            searchInput.addEventListener('input', toggleClearButton);
-            searchInput.addEventListener('keyup', toggleClearButton);
-            clearBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                searchInput.value = '';
-                clearBtn.classList.add('d-none');
-                searchInput.focus();
-            });
-            toggleClearButton();
+        function toggleClearButton() {
+            if (searchInput.value.trim().length > 0) clearBtn.classList.remove('d-none');
+            else clearBtn.classList.add('d-none');
         }
+
+        searchInput.addEventListener('input', toggleClearButton);
+        searchInput.addEventListener('keyup', toggleClearButton);
+        clearBtn.addEventListener('click', function (e) {
+            e.preventDefault(); e.stopPropagation();
+            searchInput.value = '';
+            clearBtn.classList.add('d-none');
+            searchInput.focus();
+        });
+        toggleClearButton();
     });
 </script>

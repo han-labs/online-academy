@@ -1,4 +1,4 @@
-<!-- Alerts bằng SweetAlert2 qua query success/error -->
+<!-- Alerts via SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -12,9 +12,38 @@
 
 <div class="container py-4">
     <div class="row">
-        <div class="col-lg-8 offset-lg-2">
+        <!-- Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> Account</h6>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="/account/profile" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-person-gear"></i> Personal information
+                    </a>
+                    <a href="/account/change-password" class="list-group-item list-group-item-action">
+                        <i class="bi bi-shield-lock"></i> Change password
+                    </a>
+                    <a href="/student/watchlist" class="list-group-item list-group-item-action">
+                        <i class="bi bi-bookmark-heart"></i> Favorite Courses
+                        <span class="badge bg-primary rounded-pill float-end">{{stats.watchlists}}</span>
+                    </a>
+                    <a href="/account/my-courses" class="list-group-item list-group-item-action">
+                        <i class="bi bi-collection-play"></i> My courses
+                        <span class="badge bg-primary rounded-pill float-end">{{stats.enrollments}}</span>
+                    </a>
+                    <form action="/account/logout" method="post" class="list-group-item">
+                        <button type="submit" class="btn btn-link text-danger p-0 border-0 text-start w-100">
+                            <i class="bi bi-box-arrow-right"></i> Log out
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-            <!-- Header -->
+        <!-- Header card -->
+        <div class="col-lg-9">
             <div class="card mb-4">
                 <div class="card-body text-center">
                     <div class="mb-3">
@@ -27,7 +56,8 @@
                     </div>
                     <h3 class="mb-0">Hi, {{me.full_name}}</h3>
                     <p class="text-muted">{{me.email}}</p>
-                    <small class="badge {{#if (eq user.role 'admin')}}text-bg-success{{else}}text-bg-secondary{{/if}}">
+                    <small
+                        class="badge {{#if (eq user.role 'admin')}}text-bg-success{{else if (eq user.role 'instructor')}}text-bg-primary{{else}}text-bg-secondary{{/if}}">
                         {{#if (eq user.role 'admin')}}Administrator{{else if (eq user.role
                         'instructor')}}Instructor{{else}}Student{{/if}}
                     </small>
@@ -35,7 +65,7 @@
             </div>
 
             <div class="row">
-                <!-- Form thông tin -->
+                <!-- Profile form -->
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header">
@@ -71,7 +101,7 @@
                     </div>
                 </div>
 
-                <!-- Thống kê + nhanh -->
+                <!-- Stats & quick actions -->
                 <div class="col-md-4">
                     <div class="card">
                         <div class="card-header">
@@ -125,16 +155,15 @@
 
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 
 <script>
-    // validate đơn giản
     document.querySelector('#frmProfile')?.addEventListener('submit', (e) => {
         const name = document.querySelector('#txtName').value.trim();
-        const email = document.querySelector('#txtEmail').value.trim();
+        const emailEl = document.querySelector('#txtEmail');
+        const email = emailEl?.disabled ? 'placeholder@google.local' : (emailEl?.value.trim() || '');
         if (!name || !email) {
             e.preventDefault();
             Swal.fire({ title: 'Error', text: 'Full name and email are required.', icon: 'error' });
