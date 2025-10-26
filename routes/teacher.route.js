@@ -94,31 +94,72 @@ router.post('/course/add', requireAuth, requireInstructor, upload.single('image'
 
 // ---------------- View Course Detail ----------------
 router.get('/course/:id/detail', requireAuth, requireInstructor, async (req, res) => {
-    const id = Number(req.params.id);
+  const id = Number(req.params.id);
 
-    // Lấy thông tin khóa học
-    const course = await courseModel.detail(id);
+  const course = await db('courses')
+    .join('users', 'courses.instructor_id', 'users.id')
+    .leftJoin('categories', 'courses.category_id', 'categories.id')
+    .select(
+      'courses.*',
+      'users.full_name as instructor_name',
+      'users.profile_picture_url as instructor_avatar',
+      'users.email', // 👈 lấy email giảng viên
+      'users.instructor_bio',
+      'categories.name as category_name'
+    )
+    .where('courses.id', id)
+    .first();
 
-    if (!course || course.instructor_id !== req.session.user.id) {
-        return res.status(403).send('Không có quyền xem khóa học này.');
-    }
+  if (!course || course.instructor_id !== req.session.user.id) {
+    return res.status(403).send('Không có quyền xem khóa học này.');
+  }
 
-    // Lấy curriculum (chapters + lectures)
-    const curriculum = await courseModel.curriculum(id);
+  // --- Curriculum ---
+  const curriculum = await courseModel.curriculum(id);
+  const lecturesGrouped = {};
+  curriculum.lectures.forEach(l => {
+    if (!lecturesGrouped[l.chapter_id]) lecturesGrouped[l.chapter_id] = [];
+    lecturesGrouped[l.chapter_id].push(l);
+  });
 
-    // Nếu curriculum.lectures chưa group theo chapter, group ở đây
-    const lecturesGrouped = {};
-    curriculum.lectures.forEach(lecture => {
-        if (!lecturesGrouped[lecture.chapter_id]) lecturesGrouped[lecture.chapter_id] = [];
-        lecturesGrouped[lecture.chapter_id].push(lecture);
-    });
+  // --- 📊 Thống kê từ các bảng khác ---
+  const totalStudentsResult = await db('enrollments')
+    .where({ course_id: id })
+    .count('user_id as count')
+    .first();
+  const total_students = parseInt(totalStudentsResult.count) || 0;
 
-    res.render('vwTeacher/courseDetail', { 
-        course, 
-        chapters: curriculum.chapters, 
-        lectures: lecturesGrouped
-    });
+  const ratingStats = await db('reviews')
+    .where({ course_id: id })
+    .select(db.raw('AVG(rating)::numeric(10,2) as average_rating, COUNT(*) as rating_count'))
+    .first();
+
+  const average_rating = ratingStats?.average_rating || null;
+  const rating_count = parseInt(ratingStats?.rating_count) || 0;
+
+  const comments = await db('reviews')
+    .join('users', 'reviews.user_id', 'users.id')
+    .where('reviews.course_id', id)
+    .select('reviews.comment', 'reviews.rating', 'reviews.created_at', 'users.full_name', 'users.profile_picture_url')
+    .orderBy('reviews.created_at', 'desc');
+
+  const watchlist_count = await db('watchlists')
+    .where({ course_id: id })
+    .count('user_id as count')
+    .first();
+
+  res.render('vwTeacher/courseDetail', {
+    course,
+    chapters: curriculum.chapters,
+    lectures: lecturesGrouped,
+    total_students,
+    average_rating,
+    rating_count,
+    comments,
+    watchlist_count: parseInt(watchlist_count.count) || 0
+  });
 });
+
 
 // ---------------- Edit Course ----------------
 router.get('/course/:id/edit', requireAuth, requireInstructor, async (req, res) => {
@@ -434,29 +475,100 @@ router.post('/profile/course/:id/delete', requireAuth, requireInstructor, async 
 
 // ---------------- Profile ----------------
 router.get('/profile', requireAuth, requireInstructor, async (req, res) => {
+  try {
     const userId = req.session.user.id;
+
+    // ✅ Lấy user mới nhất từ DB thay vì session để đảm bảo dữ liệu cập nhật
+    const user = await db('users').where({ id: userId }).first();
+
     const courses = await courseModel.findByInstructor(userId);
-    res.render('vwTeacher/profile', { user: req.session.user, courses });
+
+    res.render('vwTeacher/profile', { user, courses });
+  } catch (err) {
+    console.error('Error loading teacher profile:', err);
+    res.status(500).send('Lỗi khi tải hồ sơ giảng viên');
+  }
 });
 
 router.post('/profile', requireAuth, requireInstructor, upload.single('profile_picture'), async (req, res) => {
+  try {
     const userId = req.session.user.id;
     const { full_name, email, bio } = req.body;
-    const profilePicture = req.file ? `/uploads/avatars/${req.file.filename}` : req.session.user.profile_picture_url;
 
-    await db('users').where({ id: userId }).update({
+    // ✅ Nếu có upload ảnh mới thì dùng ảnh mới, không thì giữ ảnh cũ
+    const profilePicture = req.file
+      ? `/uploads/avatars/${req.file.filename}`
+      : req.session.user.profile_picture_url;
+
+    // ✅ Cập nhật vào database
+    await db('users')
+      .where({ id: userId })
+      .update({
         full_name,
         email,
         instructor_bio: bio,
-        profile_picture_url: profilePicture
+        profile_picture_url: profilePicture,
+      });
+
+    // ✅ Cập nhật lại session user (để redirect không bị mất avatar mới)
+    req.session.user = {
+      ...req.session.user,
+      full_name,
+      email,
+      instructor_bio: bio,
+      profile_picture_url: profilePicture,
+    };
+
+    // ✅ Lưu session rồi mới redirect để tránh race condition
+    req.session.save(() => {
+      res.redirect('/teacher/profile');
     });
+  } catch (err) {
+    console.error('Error updating teacher profile:', err);
+    res.status(500).send('Lỗi khi cập nhật hồ sơ giảng viên');
+  }
+});
+// ---------------- API: Get current instructor info (for live avatar update) ----------------
+router.get('/api/user/profile', requireAuth, requireInstructor, async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const user = await db('users').where({ id: userId }).first();
 
-    req.session.user.full_name = full_name;
-    req.session.user.email = email;
-    req.session.user.instructor_bio = bio;
-    req.session.user.profile_picture_url = profilePicture;
+    if (!user) {
+      return res.status(404).json({ error: 'Không tìm thấy user' });
+    }
 
-    res.redirect('/teacher/profile');
+    res.json({
+      id: user.id,
+      name: user.full_name || user.name,
+      email: user.email,
+      profile_picture_url: user.profile_picture_url || '/static/images/default-avatar.png',
+    });
+  } catch (err) {
+    console.error('Lỗi khi lấy thông tin user:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+// ---------------- API: Lấy thông tin khóa học (cho live update ảnh bìa) ----------------
+router.get('/api/courses/:id', requireAuth, requireInstructor, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const course = await db('courses').where({ id }).first();
+
+    if (!course) {
+      return res.status(404).json({ error: 'Không tìm thấy khóa học' });
+    }
+
+    // Kiểm tra quyền: chỉ giảng viên sở hữu mới được xem
+    if (course.instructor_id !== req.session.user.id) {
+      return res.status(403).json({ error: 'Không có quyền truy cập khóa học này' });
+    }
+
+    res.json(course);
+  } catch (err) {
+    console.error('Lỗi khi lấy thông tin khóa học:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 export default router;

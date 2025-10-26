@@ -9,11 +9,17 @@
       <!-- Ảnh đại diện -->
       <div class="col-md-4 text-center mb-3">
         <label class="fw-semibold d-block mb-2">Ảnh đại diện</label>
-        {{#if user.profile_picture_url}}
-          <img src="{{user.profile_picture_url}}" alt="Avatar" class="img-thumbnail rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-        {{else}}
-          <img src="/static/images/default-avatar.png" alt="Avatar" class="img-thumbnail rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-        {{/if}}
+       {{#if user.profile_picture_url}}
+  <img src="{{user.profile_picture_url}}" 
+       alt="Avatar" 
+       class="img-thumbnail rounded-circle mb-3" 
+       style="width: 150px; height: 150px; object-fit: cover;">
+{{else}}
+  <img src="/images/default-avatar.png" 
+       alt="Avatar" 
+       class="img-thumbnail rounded-circle mb-3" 
+       style="width: 150px; height: 150px; object-fit: cover;">
+{{/if}}
         <input type="file" name="profile_picture" class="form-control" accept="image/*">
         <small class="text-muted">Ảnh sẽ hiển thị trong phần giới thiệu giảng viên</small>
       </div>
@@ -57,7 +63,6 @@
         <th>#</th>
         <th>Khóa học</th>
         <th>Trạng thái</th>
-        <th>Lượt học</th>
         <th>Hành động</th>
       </tr>
     </thead>
@@ -67,29 +72,24 @@
         <td>{{add @index 1}}</td>
         <td>{{title}}</td>
         <td>
-  {{#if (eq status "published")}}
-    <span class="badge bg-success">Published</span>
-  {{else if (eq status "completed")}}
-    <span class="badge bg-info">Completed</span>
-  {{else if (eq status "draft")}}
-    <span class="badge bg-warning text-dark">Draft</span>
-  {{else}}
-    <span class="badge bg-secondary">Không xác định</span>
-  {{/if}}
-</td>
-
-        <td>{{students}}</td>
-       <td>
-  <a href="/teacher/course/{{id}}/detail" class="btn btn-info btn-sm">Chi tiết</a>
-  <a href="/teacher/course/{{id}}/edit" class="btn btn-warning btn-sm">Sửa</a>
-
-  <form action="/teacher/profile/course/{{id}}/delete" method="POST" style="display:inline;"
-        onsubmit="return confirm('Bạn có chắc chắn muốn xóa khóa học này không?');">
-    <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
-  </form>
-</td>
-
-
+          {{#if (eq status "published")}}
+            <span class="badge bg-success">Published</span>
+          {{else if (eq status "completed")}}
+            <span class="badge bg-info">Completed</span>
+          {{else if (eq status "draft")}}
+            <span class="badge bg-warning text-dark">Draft</span>
+          {{else}}
+            <span class="badge bg-secondary">Không xác định</span>
+          {{/if}}
+        </td>
+        <td>
+          <a href="/teacher/course/{{id}}/detail" class="btn btn-info btn-sm">Chi tiết</a>
+          <a href="/teacher/course/{{id}}/edit" class="btn btn-warning btn-sm">Sửa</a>
+          <form action="/teacher/profile/course/{{id}}/delete" method="POST" style="display:inline;"
+                onsubmit="return confirm('Bạn có chắc chắn muốn xóa khóa học này không?');">
+            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+          </form>
+        </td>
       </tr>
       {{/each}}
     </tbody>
@@ -100,3 +100,22 @@
     </div>
   {{/if}}
 </div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.querySelector('input[name="profile_picture"]');
+    const avatarImg = document.querySelector('.img-thumbnail');
+
+    if (fileInput && avatarImg) {
+      fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            avatarImg.src = e.target.result; // Hiển thị ảnh vừa chọn
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  });
+</script>

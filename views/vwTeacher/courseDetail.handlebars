@@ -16,11 +16,12 @@
             <div class="row">
                 <!-- Ảnh bìa -->
                 <div class="col-md-4 mb-3">
-                    {{#if course.cover}}
-                        <img src="/static{{course.cover}}" alt="{{course.title}}" class="img-fluid rounded shadow">
-                    {{else}}
-                        <img src="/static/images/default-course.jpg" alt="Không có ảnh" class="img-fluid rounded shadow">
-                    {{/if}}
+                   {{#if course.image_url}}
+    <img src="{{course.image_url}}" alt="{{course.title}}" class="img-fluid rounded shadow">
+{{else}}
+    <img src="/static/images/default-course.jpg" alt="Không có ảnh" class="img-fluid rounded shadow">
+{{/if}}
+
                 </div>
                 
                 <!-- Thông tin chi tiết -->
@@ -71,22 +72,29 @@
                             </tr>
                             
                             <tr>
-                                <th>Lượt đăng ký:</th>
-                                <td><strong>{{course.total_students}}</strong> học viên</td>
-                            </tr>
-                            <tr>
-                                <th>Đánh giá:</th>
-                                <td>
-                                    {{#if course.average_rating}}
-                                        <span class="text-warning">
-                                            <i class="fas fa-star"></i> {{course.average_rating}}/5
-                                        </span>
-                                        <small class="text-muted">({{course.rating_count}} đánh giá)</small>
-                                    {{else}}
-                                        <span class="text-muted">Chưa có đánh giá</span>
-                                    {{/if}}
-                                </td>
-                            </tr>
+  <th>👥 Lượt đăng ký:</th>
+  <td><strong>{{total_students}}</strong> học viên</td>
+</tr>
+
+<tr>
+  <th>⭐ Đánh giá trung bình:</th>
+  <td>
+    {{#if average_rating}}
+      <span class="text-warning">
+        <i class="fas fa-star"></i> {{average_rating}} / 5
+      </span>
+      <small class="text-muted">({{rating_count}} đánh giá)</small>
+    {{else}}
+      <span class="text-muted">Chưa có đánh giá</span>
+    {{/if}}
+  </td>
+</tr>
+
+<tr>
+  <th>❤️ Yêu thích:</th>
+  <td>{{watchlist_count}} lượt thêm vào danh sách yêu thích</td>
+</tr>
+
                         </tbody>
                     </table>
                 </div>
@@ -109,44 +117,67 @@
             </div>
         </div>
     </div>
+    {{#if comments.length}}
+<div class="card mb-4">
+  <div class="card-header bg-secondary text-white">
+    <h4 class="mb-0"><i class="fas fa-comments"></i> Nhận xét của học viên</h4>
+  </div>
+  <div class="card-body">
+    {{#each comments}}
+      <div class="border-bottom pb-3 mb-3">
+        <div class="d-flex align-items-center mb-2">
+          <img src="{{this.profile_picture_url}}" alt="avatar" class="rounded-circle me-2" width="40" height="40">
+          <strong>{{this.full_name}}</strong>
+          <span class="ms-2 text-warning"><i class="fas fa-star"></i> {{this.rating}}</span>
+        </div>
+        <p class="mb-1">{{this.comment}}</p>
+        <small class="text-muted">{{this.created_at}}</small>
+      </div>
+    {{/each}}
+  </div>
+</div>
+{{/if}}
+
 <!-- Thông tin giảng viên -->
 <div class="card mb-4">
-    <div class="card-header bg-warning text-dark">
-        <h4 class="mb-0"><i class="fas fa-chalkboard-teacher"></i> Thông tin giảng viên</h4>
+  <div class="card-header bg-warning text-dark">
+    <h4 class="mb-0"><i class="fas fa-chalkboard-teacher"></i> Thông tin giảng viên</h4>
+  </div>
+  <div class="card-body">
+    <div class="row align-items-center">
+      <div class="col-md-2 text-center">
+        {{#if course.instructor_avatar}}
+          <img id="instructorAvatar" src="{{course.instructor_avatar}}" alt="{{course.instructor_name}}" 
+               class="rounded-circle img-thumbnail"
+               style="width: 100px; height: 100px; object-fit: cover;">
+        {{else}}
+          <img id="instructorAvatar" src="/static/images/default-avatar.png" alt="Avatar"
+               class="rounded-circle img-thumbnail"
+               style="width: 100px; height: 100px; object-fit: cover;">
+        {{/if}}
+      </div>
+
+      <div class="col-md-10">
+        <h5 class="fw-bold">{{course.instructor_name}}</h5>
+
+        {{#if course.email}}
+          <p class="text-muted mb-2">
+            <i class="fas fa-envelope"></i> <strong>Email:</strong> {{course.email}}
+          </p>
+        {{/if}}
+
+        {{#if course.instructor_bio}}
+          <div class="mt-3">
+            <strong>Giới thiệu:</strong>
+            <p class="mt-2">{{course.instructor_bio}}</p>
+          </div>
+        {{/if}}
+      </div>
     </div>
-    <div class="card-body">
-        <div class="row align-items-center">
-            <div class="col-md-2 text-center">
-                {{#if course.instructor_avatar}}
-                    <img src="/static{{course.instructor_avatar}}" alt="{{course.instructor_name}}" 
-                         class="rounded-circle img-thumbnail" 
-                         style="width: 100px; height: 100px; object-fit: cover;">
-                {{else}}
-                    <img src="/static/images/default-avatar.png" alt="Avatar" 
-                         class="rounded-circle img-thumbnail" 
-                         style="width: 100px; height: 100px; object-fit: cover;">
-                {{/if}}
-            </div>
-            <div class="col-md-10">
-                <h5 class="fw-bold">{{course.instructor_name}}</h5>
-                {{#if course.instructor_expertise}}
-                    <p class="text-muted mb-2">
-                        <i class="fas fa-graduation-cap"></i> <strong>Chuyên môn:</strong> {{course.instructor_expertise}}
-                    </p>
-                {{/if}}
-                <p class="mb-2">
-                    <i class="fas fa-book"></i> <strong>Tổng số khóa học:</strong> {{course.instructor_total_courses}} khóa học
-                </p>
-                {{#if course.instructor_bio}}
-                    <div class="mt-3">
-                        <strong>Giới thiệu:</strong>
-                        <p class="mt-2">{{course.instructor_bio}}</p>
-                    </div>
-                {{/if}}
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
+
+
     <!-- Nội dung khóa học (Chapters & Lectures) -->
     <div class="card mb-4">
         <div class="card-header bg-success text-white">
@@ -216,6 +247,46 @@
         </form>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const avatar = document.getElementById('instructorAvatar');
+  if (!avatar) return;
+
+  try {
+    const res = await fetch('/api/user/profile'); // Gọi API lấy thông tin người dùng hiện tại
+    if (!res.ok) return;
+
+    const data = await res.json();
+    if (data && data.profile_picture_url) {
+      avatar.src = data.profile_picture_url; // Cập nhật ảnh giảng viên mới nhất
+    }
+  } catch (err) {
+    console.error('Không thể tải ảnh giảng viên:', err);
+  }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const coverImg = document.querySelector('.img-fluid.rounded.shadow');
+  if (!coverImg) return;
+
+  try {
+    const courseId = "{{course.id}}"; // lấy id khóa học hiện tại
+    const res = await fetch(`/api/courses/${courseId}`); // gọi API để lấy thông tin mới nhất
+    if (!res.ok) return;
+
+    const data = await res.json();
+    if (data && data.image_url) {
+      // nếu có ảnh bìa mới thì cập nhật
+      coverImg.src = data.image_url.startsWith('/uploads/')
+        ? data.image_url
+        : `/uploads/${data.image_url}`;
+    }
+  } catch (err) {
+    console.error('Không thể tải ảnh bìa khóa học:', err);
+  }
+});
+</script>
 
 <style>
 .course-description {

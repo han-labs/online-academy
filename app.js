@@ -91,7 +91,13 @@ app.set("views", path.join(__dirname, "views"));
 
 // ✅ Middlewares
 app.use(express.urlencoded({ extended: true }));
+
+// ✅ Static folders
 app.use("/static", express.static(path.join(__dirname, "static")));
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
+app.use(express.static("public"));
+
+
 
 app.use(
   session({
