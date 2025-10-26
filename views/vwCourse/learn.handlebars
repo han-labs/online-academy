@@ -44,60 +44,93 @@
             </div>
         </div>
 
-        <!-- Main Video Area -->
-        <div class="col-lg-9">
-            <div class="p-4">
-                <!-- Course Header -->
-                <div class="mb-4">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                            <li class="breadcrumb-item"><a href="/courses/{{course.id}}">{{course.title}}</a></li>
-                            <li class="breadcrumb-item active">Học</li>
-                        </ol>
-                    </nav>
-                </div>
-
-                <!-- Video Player -->
-                <!-- Video Player -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h4 id="current-lecture-title" class="mb-0">Chọn bài học để bắt đầu</h4>
+        <!-- Main Content Area - UDEMY STYLE -->
+        <div class="col-lg-9 p-0">
+            
+            {{!-- VIDEO PLAYER - CHIẾM TOÀN BỘ WIDTH --}}
+            <div class="video-container-wrapper">
+                <div id="video-container" class="ratio ratio-16x9 bg-dark">
+                    <!-- Placeholder -->
+                    <div id="video-placeholder"
+                        class="d-flex flex-column justify-content-center align-items-center text-white w-100 h-100">
+                        <i class="bi bi-play-circle" style="font-size: 4rem;"></i>
+                        <h5 class="mt-3">Chọn bài học để bắt đầu</h5>
                     </div>
-                    <div class="card-body p-0">
-                        <!-- Plyr.io Player Container -->
-                        <div id="video-container" class="ratio ratio-16x9 bg-dark" >
-                            <!-- Placeholder -->
-                            <div id="video-placeholder"
-                                class="d-flex flex-column justify-content-center align-items-center text-white">
-                                
-                                
-                            </div>
 
-                            <!-- ✅ PLYR.IO PLAYER -->
-                            <div class="plyr__video-embed" id="plyr-player" style="display: none;">
-                                <iframe></iframe>
-                            </div>
+                    <!-- PLYR.IO PLAYER -->
+                    <div class="plyr__video-embed" id="plyr-player" style="display: none;">
+                        <iframe></iframe>
+                    </div>
+                </div>
+                
+                {{!-- VIDEO INFO BAR - HIỆN KHI CÓ VIDEO --}}
+                <div class="video-info-bar bg-dark text-white px-4 py-3 border-top" id="video-info-bar" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 id="current-lecture-title" class="mb-0">Chọn bài học để bắt đầu</h4>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Lecture Info -->
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Thông tin bài học</h5>
                         <div id="lecture-nav" style="display: none;">
-                            <button id="prev-lecture" class="btn btn-outline-primary btn-sm me-2">
+                            <button id="prev-lecture" class="btn btn-outline-light btn-sm me-2">
                                 <i class="bi bi-chevron-left"></i> Bài trước
                             </button>
-                            <button id="next-lecture" class="btn btn-primary btn-sm">
+                            <button id="next-lecture" class="btn btn-light btn-sm">
                                 Bài sau <i class="bi bi-chevron-right"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div id="lecture-info">
-                            <p class="text-muted mb-0">Chưa có bài học nào được chọn</p>
+                </div>
+            </div>
+
+            {{!-- TABS SECTION - NGAY DƯỚI VIDEO --}}
+            <div class="tabs-section px-4 pt-4">
+                <ul class="nav nav-tabs" id="learningTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" 
+                                data-bs-target="#overview" type="button" role="tab">
+                            <i class="bi bi-play-circle me-2"></i>Overview
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" 
+                                data-bs-target="#reviews" type="button" role="tab">
+                            <i class="bi bi-star me-2"></i>Reviews
+                            {{#if course.rating_count}}
+                            <span class="badge bg-secondary ms-1">{{course.rating_count}}</span>
+                            {{/if}}
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="resources-tab" data-bs-toggle="tab" 
+                                data-bs-target="#resources" type="button" role="tab">
+                            <i class="bi bi-file-earmark-text me-2"></i>Resources
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content py-4">
+                    <!-- Tab Overview -->
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                        <div id="lecture-content">
+                            <div class="text-center py-5 text-muted" id="default-lecture-message">
+                                <i class="bi bi-play-circle display-1"></i>
+                                <h4 class="mt-3">Chọn bài học để bắt đầu</h4>
+                                <p>Nội dung bài học sẽ hiển thị ở đây</p>
+                            </div>
+                            <div id="dynamic-lecture-info" style="display: none;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab Reviews -->
+                    <div class="tab-pane fade" id="reviews" role="tabpanel">
+                        {{> _reviewsSection }}
+                    </div>
+                    
+                    <!-- Tab Resources -->
+                    <div class="tab-pane fade" id="resources" role="tabpanel">
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-file-earmark-text display-1"></i>
+                            <h4 class="mt-3">Tài liệu khóa học</h4>
+                            <p>Không có tài liệu nào cho khóa học này</p>
                         </div>
                     </div>
                 </div>
@@ -107,7 +140,7 @@
 </div>
 
 <script>
-    // Debug logs - ĐÃ SỬA SYNTAX
+    // Debug logs
     console.log('🔍 DEBUG - completedLectureIds từ server:', [{{#each completedLectureIds}}{{this}},{{/each}}]);
     console.log('🔍 DEBUG - Progress data:', {
         completed: {{progress.completed}},
@@ -115,7 +148,7 @@
         percentage: {{progress.percentage}}
     });
 
-    // Global variables - ĐÃ SỬA SYNTAX
+    // Global variables
     const allLectures = [
         {{#each chapters}}
         {{#each this.lectures}}
@@ -294,6 +327,64 @@
         console.log('✅ Plyr.io + YouTube loaded successfully');
     }
 
+    // Update lecture UI khi click bài học
+    function updateLectureUI(lectureTitle, duration) {
+        // Hiện video info bar
+        document.getElementById('video-info-bar').style.display = 'block';
+        
+        // Cập nhật title
+        document.getElementById('current-lecture-title').textContent = lectureTitle;
+        document.getElementById('lecture-nav').style.display = 'flex';
+
+        // Cập nhật tab Overview
+        const lectureInfoHTML = `
+            <div class="lecture-details">
+                <h3 class="mb-3">${lectureTitle}</h3>
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <h5 class="mb-3">Mô tả bài học</h5>
+                        <p class="text-muted">Bài học này là một phần của chương trình khóa học "{{course.title}}". Thời lượng: ${duration} phút.</p>
+                        
+                        <div class="mt-4">
+                            <h5 class="mb-3">Nội dung chính</h5>
+                            <ul class="text-muted">
+                                <li>Kiến thức cơ bản về chủ đề</li>
+                                <li>Ví dụ thực tế và ứng dụng</li>
+                                <li>Bài tập thực hành</li>
+                                <li>Tips và best practices</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Thông tin bài học</h5>
+                                <div class="lecture-meta">
+                                    <div class="d-flex justify-content-between mb-2 py-2 border-bottom">
+                                        <span class="text-muted">Thời lượng:</span>
+                                        <span class="fw-medium">${duration} phút</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2 py-2 border-bottom">
+                                        <span class="text-muted">Trạng thái:</span>
+                                        <span class="text-success fw-medium">Đang học</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between py-2">
+                                        <span class="text-muted">Độ khó:</span>
+                                        <span class="fw-medium">Trung bình</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('default-lecture-message').style.display = 'none';
+        document.getElementById('dynamic-lecture-info').innerHTML = lectureInfoHTML;
+        document.getElementById('dynamic-lecture-info').style.display = 'block';
+    }
+
     // Load video when click lecture
     document.querySelectorAll('.lecture-link').forEach((link, index) => {
         link.addEventListener('click', function (e) {
@@ -306,14 +397,8 @@
 
             currentLectureIndex = allLectures.findIndex(lecture => lecture.id === lectureId);
 
-            document.getElementById('current-lecture-title').textContent = lectureTitle;
-            document.getElementById('lecture-nav').style.display = 'flex';
-
-            document.getElementById('lecture-info').innerHTML = `
-                <h6>${lectureTitle}</h6>
-                <p class="text-muted">Thời lượng: ${duration} phút</p>
-                <p>Bài học này là một phần của chương trình khóa học</p>
-            `;
+            // Cập nhật UI
+            updateLectureUI(lectureTitle, duration);
 
             if (videoUrl) {
                 loadVideoWithPlyr(lectureId, videoUrl, lectureTitle);

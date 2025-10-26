@@ -5,6 +5,7 @@ import { requireAuth } from '../middlewares/auth.js';
 import watchlistModel from '../models/watchlist.model.js';
 import enrollmentModel from '../models/enrollment.model.js';
 import progressModel from '../models/progress.model.js';
+import reviewModel from '../models/review.model.js'; // THÊM IMPORT
 const router = Router();
 
 // Search courses - Route này phải đặt TRƯỚC /:id
@@ -91,14 +92,14 @@ router.get('/:id', async (req, res) => {
     const totalHours = Math.floor(totalMinutes / 60);
     const remainingMinutes = totalMinutes % 60;
 
-    
+
 
     res.render('vwCourse/detail', {
         course,
         chapters: chaptersWithLectures,
         totalChapters: curriculum.chapters.length,
         totalLectures: curriculum.lectures.length,
-       
+
         totalHours,
         remainingMinutes,
         reviews,
@@ -144,13 +145,29 @@ router.get('/:id/learn', requireAuth, async (req, res) => {
         console.log('Progress data:', progress);
         console.log('Completed lectures:', completedLectureIds);
 
+         // LẤY REVIEWS DATA THỰC - THÊM VÀO ĐÂY
+        const reviews = await reviewModel.getByCourse(id, 10);
+        const ratingStats = await reviewModel.getRatingStats(id);
+        const userReview = await reviewModel.getUserReview(userId, id);
+
+        console.log('Reviews data:', {
+            reviewsCount: reviews.length,
+            ratingStats,
+            userReview: userReview ? 'exists' : 'none'
+        });
+
         res.render('vwCourse/learn', {
             course,
             chapters: chaptersWithLectures,
             lectures: curriculum.lectures,
             totalLectures: curriculum.lectures.length,
             progress, //  Truyền progress data
-            completedLectureIds //  Truyền completed lectures
+            completedLectureIds ,//  Truyền completed lectures
+            reviews,              // ← TRUYỀN REVIEWS THỰC
+            ratingStats,          // ← TRUYỀN RATING STATS  
+            userReview,           // ← TRUYỀN USER REVIEW
+            canReview: !userReview, // ← CÓ THỂ REVIEW KHÔNG
+            isLearningPage: true
         });
 
     } catch (error) {

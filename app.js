@@ -25,6 +25,23 @@ const app = express();
 // view engine
 app.engine('handlebars', engine({
   helpers: {
+     // THÊM HELPER STARS Ở ĐÂY
+    stars: function(rating) {
+      let stars = '';
+      for (let i = 1; i <= 5; i++) {
+        stars += i <= rating ? '★' : '☆';
+      }
+      return stars;
+    }, 
+    formatDate: function(date) {
+        if (!date) return '';
+        return new Date(date).toLocaleDateString('vi-VN', {
+            year: 'numeric',
+            month: 'long', 
+            day: 'numeric'
+        });
+    },
+
     formatNumber(v) { return new Intl.NumberFormat('en-US').format(v ?? 0); },
     eq(a, b) { return a === b; },
     add: (a, b) => (a || 0) + (b || 0),

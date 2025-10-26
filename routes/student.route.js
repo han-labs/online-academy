@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../middlewares/auth.js';
 import watchlistModel from '../models/watchlist.model.js';
-
+import reviewModel from '../models/review.model.js'; // ← ĐẢM BẢO CÓ DÒNG NÀY
 const router = Router();
 
 // GET /student/watchlist
@@ -76,5 +76,102 @@ router.post('/watchlist/remove', requireAuth, async (req, res) => {
 
     res.redirect(referer); 
 });
+
+// POST /student/reviews - Thêm đánh giá
+router.post('/reviews', requireAuth, async (req, res) => {
+    try {
+        const { course_id, rating, comment } = req.body;
+        const userId = req.session.user.id;
+
+        console.log('=== REVIEW SUBMISSION ===');
+        console.log('User:', userId);
+        console.log('Course:', course_id);
+        console.log('Rating:', rating);
+        console.log('Comment:', comment);
+
+        // Validation
+        if (!course_id || !rating || !comment) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Thiếu thông tin đánh giá' 
+            });
+        }
+
+        // Kiểm tra user đã review chưa
+        const existingReview = await reviewModel.getUserReview(userId, course_id);
+        if (existingReview) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Bạn đã đánh giá khóa học này rồi' 
+            });
+        }
+
+        // Tạo review mới
+        const newReview = await reviewModel.create({
+            user_id: userId,
+            course_id: parseInt(course_id),
+            rating: parseInt(rating),
+            comment: comment.trim()
+        });
+
+        // Cập nhật thống kê rating cho course
+        //await reviewModel.updateCourseRating(course_id);
+
+        console.log('New review created:', newReview);
+
+        res.json({ 
+            success: true, 
+            message: 'Cảm ơn đánh giá của bạn!',
+            review: newReview
+        });
+
+    } catch (error) {
+        console.error('Review submission error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Có lỗi xảy ra: ' + error.message 
+        });
+    }
+});
+
+// DELETE /student/reviews - Xóa đánh giá
+router.delete('/reviews', requireAuth, async (req, res) => {
+    try {
+        const { course_id } = req.body;
+        const userId = req.session.user.id;
+
+        if (!course_id) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Thiếu course_id' 
+            });
+        }
+
+        const deleted = await reviewModel.delete(userId, course_id);
+
+        if (deleted) {
+            // Cập nhật thống kê rating sau khi xóa
+            await reviewModel.updateCourseRating(course_id);
+            
+            res.json({ 
+                success: true, 
+                message: 'Đã xóa đánh giá' 
+            });
+        } else {
+            res.status(404).json({ 
+                success: false, 
+                message: 'Không tìm thấy đánh giá' 
+            });
+        }
+
+    } catch (error) {
+        console.error('Delete review error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Có lỗi xảy ra' 
+        });
+    }
+});
+
 
 export default router;

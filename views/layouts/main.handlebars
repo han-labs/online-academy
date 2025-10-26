@@ -13,15 +13,54 @@
 
 <body class="bg-light">
   {{> _header}}
-  <main class="container py-4">
+  
+  {{!-- UDEMY-STYLE NAV BAR CHO LEARNING PAGE --}}
+  {{#if isLearningPage}}
+  <nav class="navbar navbar-light bg-white border-bottom py-2">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center">
+        {{!-- Breadcrumb --}}
+        <a href="/" class="text-decoration-none text-muted small">
+          <i class="bi bi-house me-1"></i>Trang chủ
+        </a>
+        <span class="text-muted mx-2 small">›</span>
+        <a href="/courses/{{course.id}}" class="text-decoration-none text-dark small text-truncate" 
+           style="max-width: 300px;" title="{{course.title}}">
+          {{course.title}}
+        </a>
+      </div>
+      
+      {{!-- "LEAVE A RATING" BUTTON - CHỈ HIỆN KHI CÓ THỂ REVIEW --}}
+      {{#if canReview}}
+      <button class="btn btn-outline-primary btn-sm" 
+              data-bs-toggle="modal" 
+              data-bs-target="#ratingModal">
+        ⭐ Leave a Rating
+      </button>
+      {{/if}}
+    </div>
+  </nav>
+  {{/if}}
+
+  <main class="{{#if isLearningPage}}container-fluid{{else}}container{{/if}} py-4">
     {{{body}}}
   </main>
+  
   {{> _footer}}
+  
+  {{!-- RATING MODAL - CHỈ LOAD KHI Ở LEARNING PAGE --}}
+  {{#if isLearningPage}}
+  {{> _ratingModal }}
+  {{/if}}
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  
-  
   <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
   <script src="/static/js/main.js"></script>
+  
+  {{!-- LOAD RATING JS NẾU Ở LEARNING PAGE --}}
+  {{#if isLearningPage}}
+  <script src="/static/js/rating.js"></script>
+  {{/if}}
 </body>
 
 </html>

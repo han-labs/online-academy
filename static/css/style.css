@@ -496,3 +496,135 @@ footer a:hover {
 .ratio-16x9::before {
     display: none !important; /* Disable Bootstrap's padding */
 }
+
+/* ============================================
+   UDEMY-STYLE RATING SYSTEM - ĐÃ SỬA
+   ============================================ */
+
+/* Star Rating Modal - ĐÃ SỬA CSS */
+.star-rating-modal {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.star-rating-modal input {
+    display: none;
+}
+
+.star-rating-modal label {
+    font-size: 3rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+}
+
+.star-rating-modal label:hover {
+    color: #f4c150;
+    transform: scale(1.1);
+}
+
+/* QUAN TRỌNG: Sửa CSS selector cho đúng thứ tự */
+.star-rating-modal input:checked + label,
+.star-rating-modal input:checked ~ input + label {
+    color: #f4c150;
+    transform: scale(1.1);
+}
+
+.rating-labels {
+    display: flex;
+    justify-content: space-between;
+    max-width: 400px;
+    margin: 0 auto;
+    font-size: 0.8rem;
+}
+
+/* ============================================
+   UDEMY-STYLE LEARNING PAGE LAYOUT
+   ============================================ */
+
+/* Video Container */
+.video-container-wrapper {
+    background: #000;
+    position: relative;
+}
+
+.video-info-bar {
+    background: #1c1d1f !important;
+    border-top: 1px solid #3e4143 !important;
+}
+
+/* Tabs Section */
+.tabs-section {
+    background: #fff;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid #d1d7dc;
+}
+
+.nav-tabs .nav-link {
+    color: #6a6f73;
+    font-weight: 500;
+    border: none;
+    padding: 16px 20px;
+    position: relative;
+    font-size: 0.9rem;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #1c1d1f;
+    border: none;
+}
+
+.nav-tabs .nav-link.active {
+    color: #1c1d1f;
+    background: none;
+    border: none;
+    border-bottom: 2px solid #1c1d1f;
+}
+
+/* Lecture Details */
+.lecture-details {
+    animation: fadeIn 0.3s ease-in;
+}
+
+.lecture-meta .fw-medium {
+    color: #1c1d1f;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   REVIEWS SECTION STYLES
+   ============================================ */
+
+.star-rating-large {
+    font-size: 1.5rem;
+}
+
+.review-item {
+    border: 1px solid #e8e9eb !important;
+    border-radius: 8px;
+    transition: box-shadow 0.2s ease;
+}
+
+.review-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.rating-breakdown-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.rating-breakdown-item:hover {
+    background-color: #f7f9fa;
+}
