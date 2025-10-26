@@ -70,6 +70,10 @@ app.engine('handlebars', engine({
     const result = array.includes(value);
     console.log('✅ Contains result:', result);
     return result;
+},
+  calculateChapterDuration: function(lectures) {
+    if (!Array.isArray(lectures)) return 0;
+    return lectures.reduce((total, lecture) => total + (lecture.duration_minutes || 0), 0);
 }
 
   },

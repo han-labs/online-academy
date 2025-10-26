@@ -753,3 +753,36 @@ footer a:hover {
 .toggle-icon.not-completed:hover {
     color: #6f42c1 !important;
 }
+
+/* Chapter Collapse Styles */
+.chapter-header {
+    transition: background-color 0.2s ease;
+    padding: 1rem 1.25rem;
+}
+
+.chapter-header:hover {
+    background-color: #f8f9fa !important;
+}
+
+.chapter-header.collapsed {
+    border-bottom: 1px solid #e8e9eb;
+}
+
+.chapter-content {
+    transition: all 0.3s ease;
+}
+
+.chapter-arrow {
+    transition: transform 0.3s ease;
+    font-size: 1.1rem;
+    color: #6a6f73;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Smooth collapse animation */
+.chapter-content {
+    overflow: hidden;
+}

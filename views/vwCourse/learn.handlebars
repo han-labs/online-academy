@@ -141,69 +141,77 @@ console.log('=== END DEBUG ===');
                     </div>
 
                     <!-- Tab Course Content - TAB MỚI -->
-                    <div class="tab-pane fade" id="course-content" role="tabpanel">
-                        <div class="course-content-tab">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h5>Nội dung khóa học</h5>
-                                <div class="progress-info">
-                                    <small class="text-muted">{{progress.completed}}/{{progress.total}} bài học hoàn thành</small>
-                                    <div class="progress mt-1" style="height: 6px; width: 200px;">
-                                        <div class="progress-bar" style="width: {{progress.percentage}}%; background-color: #6f42c1;"></div>
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Tab Course Content - VỚI COLLAPSE FUNCTIONALITY -->
+<div class="tab-pane fade" id="course-content" role="tabpanel">
+    <div class="course-content-tab">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5>Nội dung khóa học</h5>
+            <div class="progress-info">
+                <small class="text-muted">{{progress.completed}}/{{progress.total}} bài học hoàn thành</small>
+                <div class="progress mt-1" style="height: 6px; width: 200px;">
+                    <div class="progress-bar" style="width: {{progress.percentage}}%; background-color: #6f42c1;"></div>
+                </div>
+            </div>
+        </div>
 
-                            {{#each chapters}}
-                            <div class="chapter-card mb-4">
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0 fw-bold">{{this.title}}</h6>
-                                        <small class="text-muted">{{length this.lectures}} bài giảng</small>
-                                    </div>
-                                    <div class="card-body p-0">
-                                        <div class="list-group list-group-flush">
-                                            {{#each this.lectures}}
-                                            <div class="list-group-item d-flex align-items-center py-3">
-                                               {{#if (contains @root.completedLectureIds this.id)}}
-    <i class="bi bi-check-square-fill text-purple me-3 toggle-icon completed" 
-       style="color: #6f42c1; font-size: 1.2rem;"
-       data-lecture-id="{{this.id}}"
-       title="Click để bỏ đánh dấu hoàn thành"></i>
-    {{else}}
-    <i class="bi bi-square text-muted me-3 toggle-icon not-completed"
-       style="font-size: 1.2rem;"
-       data-lecture-id="{{this.id}}"
-       title="Click để đánh dấu hoàn thành"></i>
-    {{/if}}
-                                                <div class="flex-grow-1">
-                                                    <a href="#" class="lecture-link text-decoration-none text-dark fw-medium"
-                                                        data-lecture-id="{{this.id}}" data-video-url="{{this.video_url}}"
-                                                        data-lecture-title="{{this.title}}" data-duration="{{this.duration_minutes}}">
-                                                        {{this.title}}
-                                                    </a>
-                                                    <div class="d-flex justify-content-between align-items-center mt-1">
-                                                        <small class="text-muted">
-                                                            {{#if is_preview_allowed}}
-                                                            <span class="badge bg-info me-2">Preview</span>
-                                                            {{/if}}
-                                                            {{duration_minutes}} phút
-                                                        </small>
-                                                        {{#if (contains @root.completedLectureIds this.id)}}
-<small class="text-success">
-    <i class="bi bi-check-circle me-1"></i>Đã hoàn thành
-</small>
-{{/if}}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {{/each}}
-                                        </div>
-                                    </div>
+        {{#each chapters}}
+        <div class="chapter-card mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center cursor-pointer chapter-header" 
+                     data-chapter-id="chapter-{{@index}}"
+                     style="cursor: pointer;">
+                    <div>
+                        <h6 class="mb-0 fw-bold">{{this.title}}</h6>
+                        <small class="text-muted">{{length this.lectures}} bài giảng • {{calculateChapterDuration this.lectures}} phút</small>
+                    </div>
+                    <i class="bi bi-chevron-down chapter-arrow" data-chapter-id="chapter-{{@index}}"></i>
+                </div>
+                <div class="card-body p-0 chapter-content" id="chapter-{{@index}}">
+                    <div class="list-group list-group-flush">
+                        {{#each this.lectures}}
+                        <div class="list-group-item d-flex align-items-center py-3">
+                            {{#if (contains @root.completedLectureIds this.id)}}
+                            <i class="bi bi-check-square-fill text-purple me-3 toggle-icon completed" 
+                               style="color: #6f42c1; font-size: 1.2rem;"
+                               data-lecture-id="{{this.id}}"
+                               title="Click để bỏ đánh dấu hoàn thành"></i>
+                            {{else}}
+                            <i class="bi bi-square text-muted me-3 toggle-icon not-completed"
+                               style="font-size: 1.2rem;"
+                               data-lecture-id="{{this.id}}"
+                               title="Click để đánh dấu hoàn thành"></i>
+                            {{/if}}
+                            <div class="flex-grow-1">
+                                <a href="#" class="lecture-link text-decoration-none text-dark fw-medium"
+                                    data-lecture-id="{{this.id}}" 
+                                    data-video-url="{{this.video_url}}"
+                                    data-lecture-title="{{this.title}}" 
+                                    data-duration="{{this.duration_minutes}}">
+                                    {{this.title}}
+                                </a>
+                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                    <small class="text-muted">
+                                        {{#if is_preview_allowed}}
+                                        <span class="badge bg-info me-2">Preview</span>
+                                        {{/if}}
+                                        {{duration_minutes}} phút
+                                    </small>
+                                    {{#if (contains @root.completedLectureIds this.id)}}
+                                    <small class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>Đã hoàn thành
+                                    </small>
+                                    {{/if}}
                                 </div>
                             </div>
-                            {{/each}}
                         </div>
+                        {{/each}}
                     </div>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>
                     
                     <!-- Tab Reviews -->
                     <div class="tab-pane fade" id="reviews" role="tabpanel">
@@ -619,10 +627,54 @@ console.log('=== END DEBUG ===');
     // Event listeners cho sidebar
     document.getElementById('toggleSidebar')?.addEventListener('click', toggleSidebar);
     document.getElementById('openSidebar')?.addEventListener('click', toggleSidebar);
+    // ==================== CHAPTER COLLAPSE FUNCTIONALITY ====================
 
+// Toggle chapter collapse
+function setupChapterCollapse() {
+    document.querySelectorAll('.chapter-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const chapterId = this.getAttribute('data-chapter-id');
+            const content = document.getElementById(chapterId);
+            const arrow = this.querySelector('.chapter-arrow');
+            
+            if (content.style.display === 'none') {
+                // Mở chương
+                content.style.display = 'block';
+                arrow.className = 'bi bi-chevron-down chapter-arrow';
+                this.classList.remove('collapsed');
+            } else {
+                // Đóng chương
+                content.style.display = 'none';
+                arrow.className = 'bi bi-chevron-right chapter-arrow';
+                this.classList.add('collapsed');
+            }
+        });
+    });
+}
+
+// Auto collapse chapters với nhiều bài học
+function autoCollapseLongChapters() {
+    document.querySelectorAll('.chapter-card').forEach((chapter, index) => {
+        const lectureCount = chapter.querySelectorAll('.list-group-item').length;
+        if (lectureCount > 5) { // Nếu có hơn 5 bài học, auto collapse
+            const chapterId = `chapter-${index}`;
+            const content = document.getElementById(chapterId);
+            const header = chapter.querySelector('.chapter-header');
+            const arrow = header.querySelector('.chapter-arrow');
+            
+            content.style.display = 'none';
+            arrow.className = 'bi bi-chevron-right chapter-arrow';
+            header.classList.add('collapsed');
+        }
+    });
+}
     // ==================== INITIALIZATION ====================
 
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Learning page initialized with manual toggle functionality');
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Learning page initialized with manual toggle functionality');
+    
+    // Khởi tạo chapter collapse
+    setupChapterCollapse();
+    autoCollapseLongChapters();
+});
 </script>
