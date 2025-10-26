@@ -3,6 +3,8 @@ import courseModel from '../models/course.model.js';
 import categoryModel from '../models/category.model.js';
 import { requireAuth } from '../middlewares/auth.js';
 import watchlistModel from '../models/watchlist.model.js';
+import enrollmentModel from '../models/enrollment.model.js';
+import progressModel from '../models/progress.model.js';
 const router = Router();
 
 // Search courses - Route này phải đặt TRƯỚC /:id
@@ -89,11 +91,14 @@ router.get('/:id', async (req, res) => {
     const totalHours = Math.floor(totalMinutes / 60);
     const remainingMinutes = totalMinutes % 60;
 
+    
+
     res.render('vwCourse/detail', {
         course,
         chapters: chaptersWithLectures,
         totalChapters: curriculum.chapters.length,
         totalLectures: curriculum.lectures.length,
+       
         totalHours,
         remainingMinutes,
         reviews,
@@ -103,32 +108,57 @@ router.get('/:id', async (req, res) => {
 });
 
 // Learn page - Route cho học viên đã đăng ký (student feature)
+// Learn page - Route cho học viên đã đăng ký (student feature)
 router.get('/:id/learn', requireAuth, async (req, res) => {
-    const id = Number(req.params.id);
+    try {
+        const id = Number(req.params.id);
+        const userId = req.session.user.id;
 
-    if (isNaN(id)) {
-        return res.status(404).render('vwAccount/404');
+        if (isNaN(id)) {
+            return res.status(404).render('vwAccount/404');
+        }
+
+        // KIỂM TRA ENROLLMENT - THÊM VÀO ĐÂY
+        const isEnrolled = await enrollmentModel.isEnrolled(userId, id);
+        if (!isEnrolled) {
+            return res.redirect(`/courses/${id}?error=not_enrolled`);
+        }
+
+        const course = await courseModel.detail(id);
+        if (!course) {
+            return res.status(404).render('vwAccount/404');
+        }
+
+        const curriculum = await courseModel.curriculum(id);
+
+        // NHÓM LECTURES THEO CHAPTERS 
+        const chaptersWithLectures = curriculum.chapters.map(chapter => ({
+            ...chapter,
+            lectures: curriculum.lectures.filter(l => l.chapter_id === chapter.id)
+        }));
+
+        const progress = await progressModel.getCourseProgress(userId, id);
+        const completedLectures = await progressModel.getCompletedLectures(userId, id);
+        const completedLectureIds = completedLectures.map(cl => cl.lecture_id);
+
+        console.log('Progress data:', progress);
+        console.log('Completed lectures:', completedLectureIds);
+
+        res.render('vwCourse/learn', {
+            course,
+            chapters: chaptersWithLectures,
+            lectures: curriculum.lectures,
+            totalLectures: curriculum.lectures.length,
+            progress, //  Truyền progress data
+            completedLectureIds //  Truyền completed lectures
+        });
+
+    } catch (error) {
+        console.error('Learning page error:', error);
+        res.status(500).render('vwAccount/404');
     }
-
-    const course = await courseModel.detail(id);
-
-    if (!course) {
-        return res.status(404).render('vwAccount/404');
-    }
-
-    // TODO: Kiểm tra xem user đã đăng ký khóa học này chưa
-    // const enrolled = await courseModel.checkEnrollment(req.session.user.id, id);
-    // if (!enrolled) {
-    //     return res.redirect(`/courses/${id}`);
-    // }
-
-    const curriculum = await courseModel.curriculum(id);
-
-    res.render('vwCourse/learn', {
-        course,
-        chapters: curriculum.chapters,
-        lectures: curriculum.lectures
-    });
 });
+
+
 
 export default router;

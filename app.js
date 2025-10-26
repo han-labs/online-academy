@@ -15,7 +15,7 @@ import { requireAuth, checkAdmin } from './middlewares/auth.js';
 //Them cac route cho chuc nang cua student
 import studentRouter from './routes/student.route.js'; // 
 import checkoutRouter from './routes/checkout.route.js';
-
+import progressRouter from './routes/progress.route.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -42,7 +42,11 @@ app.engine('handlebars', engine({
     },
     substring(str, start, end) {
       return (str || '').substring(start, end);
-    }
+    },
+    contains: (array, value) => {
+    if (!Array.isArray(array)) return false;
+    return array.includes(value);
+}
   },
   defaultLayout: 'main',
   layoutsDir: path.join(__dirname, 'views/layouts'),
@@ -53,8 +57,10 @@ app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
 
 // middleware
+//  THÊM MIDDLEWARE NÀY - QUAN TRỌNG!
+app.use(express.json()); // ← THÊM DÒNG NÀY để parse JSON body
 app.use(express.urlencoded({ extended: true }));
-app.use('/static', express.static(path.join(__dirname, 'static'))); // ✅ không dùng ../static
+app.use('/static', express.static(path.join(__dirname, 'static'))); //  không dùng ../static
 
 app.use(session({
   secret: 'exam-secret',
@@ -82,6 +88,7 @@ app.use('/courses', courseRouter);
 app.use('/admin/categories', requireAuth, checkAdmin, adminCategoryRouter); // 👉 đặt SAU khi có app
 app.use('/student', requireAuth, studentRouter); 
 app.use('/checkout', requireAuth, checkoutRouter);
+app.use('/api/progress', progressRouter);
 // 404
 app.use((req, res) => res.status(404).render('vwAccount/404'));
 

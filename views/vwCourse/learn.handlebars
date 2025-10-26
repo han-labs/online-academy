@@ -1,4 +1,352 @@
-<h4>Học: {{course.title}}</h4>
-<div class="ratio ratio-16x9 bg-dark rounded">
-    <div class="text-white d-flex align-items-center justify-content-center">Video player (demo)</div>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Curriculum -->
+        <div class="col-lg-3 bg-light border-end" style="height: 100vh; overflow-y: auto;">
+            <div class="p-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Nội dung khóa học</h5>
+                    <a href="/courses/{{course.id}}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+
+                <div class="progress mb-3" style="height: 6px;">
+                    <div class="progress-bar" role="progressbar" style="width: {{progress.percentage}}%"
+                        aria-valuenow="{{progress.percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <small class="text-muted">{{progress.completed}}/{{progress.total}} bài học
+                    ({{progress.percentage}}%)</small>
+
+                <div class="mt-4">
+                    {{#each chapters}}
+                    <div class="mb-3">
+                        <h6 class="fw-bold">{{this.title}}</h6>
+                        <div class="ps-3">
+                            {{#each this.lectures}}
+                            <div class="d-flex align-items-center mb-2">
+                                {{#if (contains ../completedLectureIds this.id)}}
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                {{else}}
+                                <i class="bi bi-play-circle text-muted me-2"></i>
+                                {{/if}}
+                                <a href="#" class="lecture-link text-decoration-none text-dark small"
+                                    data-lecture-id="{{this.id}}" data-video-url="{{this.video_url}}"
+                                    data-lecture-title="{{this.title}}" data-duration="{{this.duration_minutes}}">
+                                    {{this.title}}
+                                </a>
+                                <span class="text-muted small ms-2">{{this.duration_minutes}} phút</span>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Video Area -->
+        <div class="col-lg-9">
+            <div class="p-4">
+                <!-- Course Header -->
+                <div class="mb-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                            <li class="breadcrumb-item"><a href="/courses/{{course.id}}">{{course.title}}</a></li>
+                            <li class="breadcrumb-item active">Học</li>
+                        </ol>
+                    </nav>
+                </div>
+
+                <!-- Video Player -->
+                <!-- Video Player -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 id="current-lecture-title" class="mb-0">Chọn bài học để bắt đầu</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <!-- Plyr.io Player Container -->
+                        <div id="video-container" class="ratio ratio-16x9 bg-dark" >
+                            <!-- Placeholder -->
+                            <div id="video-placeholder"
+                                class="d-flex flex-column justify-content-center align-items-center text-white">
+                                
+                                
+                            </div>
+
+                            <!-- ✅ PLYR.IO PLAYER -->
+                            <div class="plyr__video-embed" id="plyr-player" style="display: none;">
+                                <iframe></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lecture Info -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Thông tin bài học</h5>
+                        <div id="lecture-nav" style="display: none;">
+                            <button id="prev-lecture" class="btn btn-outline-primary btn-sm me-2">
+                                <i class="bi bi-chevron-left"></i> Bài trước
+                            </button>
+                            <button id="next-lecture" class="btn btn-primary btn-sm">
+                                Bài sau <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="lecture-info">
+                            <p class="text-muted mb-0">Chưa có bài học nào được chọn</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    // Debug logs - ĐÃ SỬA SYNTAX
+    console.log('🔍 DEBUG - completedLectureIds từ server:', [{{#each completedLectureIds}}{{this}},{{/each}}]);
+    console.log('🔍 DEBUG - Progress data:', {
+        completed: {{progress.completed}},
+        total: {{progress.total}}, 
+        percentage: {{progress.percentage}}
+    });
+
+    // Global variables - ĐÃ SỬA SYNTAX
+    const allLectures = [
+        {{#each chapters}}
+        {{#each this.lectures}}
+        {
+            id: {{this.id}},
+            title: "{{this.title}}",
+            video_url: "{{this.video_url}}",
+            duration: {{this.duration_minutes}},
+            chapter_id: {{this.chapter_id}}
+        },
+        {{/each}}
+        {{/each}}
+    ];
+
+    let completedLectureIds = [{{#each completedLectureIds}}{{this}},{{/each}}];
+    let currentLectureIndex = -1;
+    let currentLectureId = null;
+
+    console.log('🔍 DEBUG - completedLectureIds sau init:', completedLectureIds);
+    console.log('🔍 DEBUG - allLectures:', allLectures);
+
+    // Extract YouTube ID từ URL
+    function getYouTubeId(url) {
+        const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+    }
+
+    // Mark lecture as completed
+    function markLectureAsCompleted(lectureId) {
+        fetch('/api/progress/complete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                lecture_id: lectureId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('✅ Bài học đã được đánh dấu hoàn thành');
+                updateProgressUI(lectureId);
+                updateProgressBar();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Update progress bar
+    async function updateProgressBar() {
+        try {
+            const response = await fetch(`/api/progress/{{course.id}}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                const progress = data.data;
+                
+                const progressBar = document.querySelector('.progress-bar');
+                const progressText = document.querySelector('.text-muted');
+                
+                if (progressBar) {
+                    progressBar.style.width = `${progress.percentage}%`;
+                    progressBar.setAttribute('aria-valuenow', progress.percentage);
+                }
+                
+                if (progressText) {
+                    progressText.textContent = `${progress.completed}/${progress.total} bài học (${progress.percentage}%)`;
+                }
+                
+                console.log('📊 Progress bar updated:', progress);
+            }
+        } catch (error) {
+            console.error('Error updating progress bar:', error);
+        }
+    }
+
+    // Refresh completed lectures
+    async function refreshCompletedLectures() {
+        try {
+            const response = await fetch(`/api/progress/completed/{{course.id}}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                completedLectureIds = data.data;
+                console.log('🔄 Completed lectures refreshed:', completedLectureIds);
+                
+                document.querySelectorAll('.lecture-link').forEach(link => {
+                    const lectureId = parseInt(link.getAttribute('data-lecture-id'));
+                    if (completedLectureIds.includes(lectureId)) {
+                        const lectureItem = link.closest('.d-flex');
+                        const icon = lectureItem.querySelector('i');
+                        if (icon) {
+                            icon.className = 'bi bi-check-circle-fill text-success me-2';
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error refreshing completed lectures:', error);
+        }
+    }
+
+    // Update UI
+    function updateProgressUI(lectureId) {
+        const lectureLink = document.querySelector(`[data-lecture-id="${lectureId}"]`);
+        if (lectureLink) {
+            const lectureItem = lectureLink.closest('.d-flex');
+            const icon = lectureItem.querySelector('i');
+            if (icon) {
+                icon.className = 'bi bi-check-circle-fill text-success me-2';
+            }
+        }
+        
+        if (!completedLectureIds.includes(lectureId)) {
+            completedLectureIds.push(lectureId);
+            console.log('📝 Completed lectures updated:', completedLectureIds);
+        }
+    }
+
+    // Load video với Plyr.io + YouTube
+    function loadVideoWithPlyr(lectureId, videoUrl, lectureTitle) {
+        console.log('🔍 DEBUG - Loading video with Plyr:', lectureId, videoUrl);
+        
+        document.getElementById('video-placeholder').style.display = 'none';
+        document.getElementById('plyr-player').style.display = 'block';
+
+        const youtubeId = getYouTubeId(videoUrl);
+        console.log('🔍 DEBUG - YouTube ID:', youtubeId);
+        
+        if (!youtubeId) {
+            console.error('❌ Invalid YouTube URL:', videoUrl);
+            return;
+        }
+
+        // YouTube embed URL cho Plyr
+        const embedUrl = `https://www.youtube.com/embed/${youtubeId}`;
+        
+        // Khởi tạo Plyr player
+        if (window.coursePlayer) {
+            window.coursePlayer.destroy();
+        }
+
+        const iframe = document.querySelector('#plyr-player iframe');
+        iframe.src = embedUrl;
+
+        window.coursePlayer = new Plyr('#plyr-player', {
+            youtube: {
+                noCookie: true,
+                rel: 0,
+                showinfo: 0,
+                iv_load_policy: 3,
+                modestbranding: 1
+            },
+            autoplay: true
+        });
+
+        // Auto mark completed khi video ends
+        window.coursePlayer.on('ended', () => {
+            console.log('🎬 Video ended - Auto marking completed');
+            if (currentLectureId) {
+                markLectureAsCompleted(currentLectureId);
+                
+                // Auto advance to next lecture
+                if (currentLectureIndex < allLectures.length - 1) {
+                    setTimeout(() => {
+                        const nextLecture = allLectures[currentLectureIndex + 1];
+                        simulateLectureClick(nextLecture.id);
+                    }, 2000);
+                }
+            }
+        });
+
+        currentLectureId = lectureId;
+        console.log('✅ Plyr.io + YouTube loaded successfully');
+    }
+
+    // Load video when click lecture
+    document.querySelectorAll('.lecture-link').forEach((link, index) => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const lectureId = parseInt(this.getAttribute('data-lecture-id'));
+            const videoUrl = this.getAttribute('data-video-url');
+            const lectureTitle = this.getAttribute('data-lecture-title');
+            const duration = this.getAttribute('data-duration');
+
+            currentLectureIndex = allLectures.findIndex(lecture => lecture.id === lectureId);
+
+            document.getElementById('current-lecture-title').textContent = lectureTitle;
+            document.getElementById('lecture-nav').style.display = 'flex';
+
+            document.getElementById('lecture-info').innerHTML = `
+                <h6>${lectureTitle}</h6>
+                <p class="text-muted">Thời lượng: ${duration} phút</p>
+                <p>Bài học này là một phần của chương trình khóa học</p>
+            `;
+
+            if (videoUrl) {
+                loadVideoWithPlyr(lectureId, videoUrl, lectureTitle);
+            }
+
+            markLectureAsCompleted(lectureId);
+        });
+    });
+
+    // Navigation
+    document.getElementById('prev-lecture').addEventListener('click', () => {
+        if (currentLectureIndex > 0) {
+            const prevLecture = allLectures[currentLectureIndex - 1];
+            simulateLectureClick(prevLecture.id);
+        }
+    });
+
+    document.getElementById('next-lecture').addEventListener('click', () => {
+        if (currentLectureIndex < allLectures.length - 1) {
+            const nextLecture = allLectures[currentLectureIndex + 1];
+            simulateLectureClick(nextLecture.id);
+        }
+    });
+
+    function simulateLectureClick(lectureId) {
+        const lectureLink = document.querySelector(`[data-lecture-id="${lectureId}"]`);
+        if (lectureLink) {
+            lectureLink.click();
+        }
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', function() {
+        refreshCompletedLectures();
+    });
+</script>

@@ -410,3 +410,89 @@ footer a {
 footer a:hover {
     color: #a435f0 !important;
 }
+
+/* VIDEO.JS CUSTOM STYLES */
+.video-js {
+    border-radius: 8px;
+}
+
+.vjs-poster {
+    border-radius: 8px;
+}
+
+.vjs-big-play-button {
+    background-color: rgba(86, 36, 208, 0.8) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 80px !important;
+    height: 80px !important;
+    line-height: 80px !important;
+}
+
+.vjs-big-play-button:hover {
+    background-color: rgba(86, 36, 208, 1) !important;
+}
+
+/* PLYR.IO CUSTOM STYLES */
+.plyr {
+    border-radius: 8px;
+}
+
+.plyr--video .plyr__controls {
+    background: linear-gradient(transparent, rgba(0,0,0,0.75));
+}
+
+.plyr__control--overlaid {
+    background: rgba(86, 36, 208, 0.8);
+}
+
+.plyr__control--overlaid:hover {
+    background: rgba(86, 36, 208, 1);
+}
+
+/* ============================================
+   PLYR VIDEO FIX - CRITICAL
+   ============================================ */
+
+/* Đảm bảo Plyr chiếm toàn bộ container */
+#plyr-player {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.plyr {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+}
+
+.plyr--video {
+    background: #000 !important;
+}
+
+.plyr__video-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    background: #000 !important;
+}
+
+.plyr__video-embed {
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.plyr__video-embed iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+}
+
+/* Override Bootstrap ratio conflicts */
+.ratio-16x9 {
+    position: relative !important;
+}
+
+.ratio-16x9::before {
+    display: none !important; /* Disable Bootstrap's padding */
+}
