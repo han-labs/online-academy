@@ -13,7 +13,7 @@
             <ul class="navbar-nav me-auto">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
-                        Danh mục
+                        Categories
                     </a>
                     <ul class="dropdown-menu">
                         {{#each global_categories_tree}}
@@ -44,7 +44,7 @@
                            type="text" 
                            name="q" 
                            id="searchInput"
-                           placeholder="Tìm kiếm..." 
+                           placeholder="Search..." 
                            aria-label="Search">
                     <button class="btn btn-link text-secondary position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent d-none" 
                             type="button" 
@@ -66,24 +66,24 @@
                         {{user.full_name}}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="/account/profile">Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="/account/my-courses">Khóa học của tôi</a></li>
-                        <li><a class="dropdown-item" href="/account/watchlist">Yêu thích</a></li>
+                        <li><a class="dropdown-item" href="/account/profile">Profile</a></li>
+                        <li><a class="dropdown-item" href="/account/my-courses">My Courses</a></li>
+                        <li><a class="dropdown-item" href="/account/watchlist">Favorites</a></li>
                         {{#if (eq user.role 'admin')}}
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/admin">Quản trị</a></li>
+                        <li><a class="dropdown-item" href="/admin">Admin</a></li>
                         {{/if}}
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/account/logout">Đăng xuất</a></li>
+                        <li><a class="dropdown-item" href="/account/logout">Log Out</a></li>
                     </ul>
                 </li>
                 {{else}}
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="/account/login">Đăng nhập</a>
+                    <a class="nav-link text-dark" href="/account/login">Log In</a>
                 </li>
                 <li class="nav-item">
                     <a class="btn btn-dark text-white ms-2 px-3" href="/account/register">
-                        Đăng ký
+                        Register
                     </a>
                 </li>
                 {{/if}}

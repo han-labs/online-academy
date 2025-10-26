@@ -39,6 +39,19 @@ app.engine('handlebars', engine({
     },
     substring(str, start, end) {
       return (str || '').substring(start, end);
+    },
+        formatDate(date) {
+      if (!date) return '';
+      const d = new Date(date);
+      return d.toLocaleString('en-GB', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'Asia/Ho_Chi_Minh'
+      });
     }
   },
   defaultLayout: 'main',

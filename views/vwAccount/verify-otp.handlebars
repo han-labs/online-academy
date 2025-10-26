@@ -5,8 +5,8 @@
         <div class="auth-card">
             <div class="auth-logo">
                 <i class="bi bi-envelope-check" style="font-size: 3rem; color: #5624d0;"></i>
-                <h2 class="mt-3">Xác thực Email</h2>
-                <p>Chúng tôi đã gửi mã OTP đến email</p>
+                <h2 class="mt-3">Email Verification</h2>
+                <p>We have sent a verification code to</p>
                 <p class="fw-bold text-primary">{{email}}</p>
             </div>
 
@@ -31,23 +31,23 @@
                 <input type="hidden" name="otp_code" id="otp_code">
 
                 <button type="submit" class="btn btn-primary" id="btnVerify">
-                    <i class="bi bi-check-circle"></i> Xác thực
+                    <i class="bi bi-check-circle"></i> Verify
                 </button>
             </form>
 
             <div class="resend-otp">
-                <p class="mb-2">Không nhận được mã?</p>
+                <p class="mb-2">Didn't receive the code?</p>
                 <form method="post" action="/account/resend-otp" id="resendForm" class="d-inline">
                     <input type="hidden" name="email" value="{{email}}">
                     <button type="submit" id="btnResend" class="border-0 bg-transparent">
-                        Gửi lại mã (<span id="countdown">60</span>s)
+                        Resend code (<span id="countdown">60</span>s)
                     </button>
                 </form>
             </div>
 
             <div class="auth-footer">
                 <a href="/account/register">
-                    <i class="bi bi-arrow-left"></i> Quay lại đăng ký
+                    <i class="bi bi-arrow-left"></i> Back to Register
                 </a>
             </div>
         </div>
@@ -106,7 +106,7 @@
 
         if (otpCode.length !== 6) {
             e.preventDefault();
-            alert('Vui lòng nhập đầy đủ 6 số');
+            alert('Please enter all 6 digits.');
             return false;
         }
 
@@ -115,7 +115,7 @@
         // Loading state
         btn.disabled = true;
         btn.classList.add('btn-loading');
-        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xác thực...';
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Verifying...';
     });
 
     // Countdown for resend
@@ -132,14 +132,14 @@
         if (countdown <= 0) {
             clearInterval(timer);
             btnResend.disabled = false;
-            btnResend.innerHTML = 'Gửi lại mã';
+            btnResend.innerHTML = 'Resend code';
         }
     }, 1000);
 
     // Resend OTP
     document.getElementById('resendForm')?.addEventListener('submit', function (e) {
         btnResend.disabled = true;
-        btnResend.innerHTML = 'Đang gửi...';
+        btnResend.innerHTML = 'Sending...';
 
         // Reset countdown after form submits
         setTimeout(() => {
@@ -150,7 +150,7 @@
                 if (countdown <= 0) {
                     clearInterval(newTimer);
                     btnResend.disabled = false;
-                    btnResend.innerHTML = 'Gửi lại mã';
+                    btnResend.innerHTML = 'Resend code';
                 }
             }, 1000);
         }, 1000);
