@@ -1,76 +1,113 @@
-{{!-- Carousel “Nổi bật tuần” kiểu Udemy --}}
-<section class="mb-4">
-    <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+{{!-- Hero Slideshow --}}
+{{#if featured}}
+<section class="mb-5">
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
         <div class="carousel-inner">
             {{#each featured}}
             <div class="carousel-item {{#if @first}}active{{/if}}">
-                <div class="row g-3 align-items-center">
-                    <div class="col-md-5">
-                        <img src="{{cover}}" class="d-block w-100 rounded" alt="{{title}}">
-                    </div>
-                    <div class="col-md-7">
-                        <h3 class="mb-2">{{title}}</h3>
-                        <div class="mb-2">⭐ {{formatNumber rating}} ({{formatNumber rating_count}})</div>
-                        {{#ifPromo price promo_price}}
-                        <div class="h4 text-danger">{{formatNumber promo_price}}₫
-                            <span class="h6 text-muted text-decoration-line-through ms-2">{{formatNumber price}}₫</span>
+                <div class="hero-slide" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="row align-items-center g-0">
+                        <div class="col-md-6 p-5">
+                            <span class="badge bg-warning text-dark mb-3">
+                                <i class="bi bi-lightning-fill"></i> Featured Course
+                            </span>
+                            <h1 class="text-white mb-3">{{title}}</h1>
+                            <p class="text-white-50 mb-4">{{short_description}}</p>
+                            
+                            <div class="d-flex gap-3 mb-3 text-white">
+                                <span><i class="bi bi-star-fill text-warning"></i> {{formatNumber rating}}</span>
+                                <span><i class="bi bi-people-fill"></i> {{formatNumber students}} students</span>
+                            </div>
+                            
+                            <div class="mb-4">
+                                {{#ifPromo price promo_price}}
+                                <span class="h2 text-white">{{formatNumber promo_price}}₫</span>
+                                <span class="text-white-50 text-decoration-line-through ms-2">{{formatNumber price}}₫</span>
+                                {{else}}
+                                <span class="h2 text-white">{{formatNumber price}}₫</span>
+                                {{/ifPromo}}
+                            </div>
+                            
+                            <a href="/courses/{{id}}" class="btn btn-light btn-lg">
+                                View Details <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
                         </div>
-                        {{else}}
-                        <div class="h4">{{formatNumber price}}₫</div>
-                        {{/ifPromo}}
-                        <a class="btn btn-primary mt-2" href="/courses/{{id}}">Xem khoá học</a>
+                        <div class="col-md-6 d-none d-md-block p-4">
+                            <img src="{{cover}}" class="img-fluid rounded shadow" alt="{{title}}" style="max-height: 350px; width: 100%; object-fit: cover;">
+                        </div>
                     </div>
                 </div>
             </div>
             {{/each}}
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+        
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon"></span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
             <span class="carousel-control-next-icon"></span>
         </button>
+        
+        <div class="carousel-indicators">
+            {{#each featured}}
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{@index}}" {{#if @first}}class="active"{{/if}}></button>
+            {{/each}}
+        </div>
     </div>
 </section>
+{{/if}}
 
-<section class="mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <h4 class="mb-0">Xem nhiều</h4>
-        <a class="small" href="#">Tất cả</a>
+{{!-- Most Viewed Courses --}}
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">
+            <i class="bi bi-graph-up-arrow text-primary"></i> Most Viewed Courses
+        </h3>
+        <a href="/courses/search?sort=best_seller" class="text-decoration-none">
+            View All <i class="bi bi-arrow-right"></i>
+        </a>
     </div>
     <div class="row g-3">
         {{#each mostViewed}}
-        <div class="col-6 col-md-4 col-lg-3">
+        <div class="col-6 col-md-4 col-lg-3 col-xl-2">
             {{> _courseCard}}
         </div>
         {{/each}}
     </div>
 </section>
 
-<section class="mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <h4 class="mb-0">Mới nhất</h4>
-        <a class="small" href="#">Tất cả</a>
+{{!-- Newest Courses --}}
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">
+            <i class="bi bi-stars text-warning"></i> Newest Courses
+        </h3>
+        <a href="/courses/search?sort=newest" class="text-decoration-none">
+            View All <i class="bi bi-arrow-right"></i>
+        </a>
     </div>
     <div class="row g-3">
         {{#each newest}}
-        <div class="col-6 col-md-4 col-lg-3">
+        <div class="col-6 col-md-4 col-lg-3 col-xl-2">
             {{> _courseCard}}
         </div>
         {{/each}}
     </div>
 </section>
 
-
-<section class="mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <h4 class="mb-0">Danh mục học nhiều tuần này</h4>
+{{!-- Hot Categories --}}
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">
+            <i class="bi bi-fire text-danger"></i> Most Popular Categories This Week
+        </h3>
     </div>
-    <div class="row g-2">
+    <div class="row g-3">
         {{#each hotCats}}
-        <div class="col-6 col-md-3 col-lg-2">
-            <a class="btn btn-outline-dark w-100" href="/categories/{{id}}">
-                {{name}} <span class="badge text-bg-secondary ms-1">{{enroll_count}}</span>
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/categories/{{id}}" class="btn btn-outline-dark w-100 py-3">
+                <i class="bi bi-folder-fill me-2"></i>{{name}} 
+                <span class="badge bg-dark ms-2">{{enroll_count}}</span>
             </a>
         </div>
         {{/each}}

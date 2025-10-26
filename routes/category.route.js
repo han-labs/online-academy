@@ -20,8 +20,12 @@ router.get('/:id', async (req, res) => {
         return res.status(404).render('vwAccount/404');
     }
 
-    const { rows, total } = await courseModel.search({
-        categoryId: id,
+    // Lấy tất cả category IDs (bao gồm cả children nếu có)
+    const categoryIds = await categoryModel.getCategoryWithChildren(id);
+
+    // Search courses trong tất cả categories (parent + children)
+    const { rows, total } = await courseModel.searchByCategories({
+        categoryIds,
         page,
         pageSize,
         sort
@@ -29,7 +33,7 @@ router.get('/:id', async (req, res) => {
 
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-    // Get subcategories if this is a parent category
+    // Get subcategories nếu là parent category
     const subcategories = await categoryModel.getSubcategories(id);
 
     res.render('vwCategory/list', {
