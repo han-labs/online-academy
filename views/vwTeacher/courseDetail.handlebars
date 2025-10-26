@@ -1,100 +1,95 @@
 <div class="container my-5">
-    <!-- Header với nút quay lại -->
+    <!-- Header with back button -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-primary">Chi tiết khóa học</h1>
+        <h1 class="text-primary">Course Details</h1>
         <a href="/teacher/dashboard" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Quay lại Dashboard
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
     </div>
 
-    <!-- Thông tin cơ bản -->
+    <!-- Basic Information -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h4 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin cơ bản</h4>
+            <h4 class="mb-0"><i class="fas fa-info-circle"></i> Basic Information</h4>
         </div>
         <div class="card-body">
             <div class="row">
-                <!-- Ảnh bìa -->
+                <!-- Cover Image -->
                 <div class="col-md-4 mb-3">
-                   {{#if course.image_url}}
-    <img src="{{course.image_url}}" alt="{{course.title}}" class="img-fluid rounded shadow">
-{{else}}
-    <img src="/static/images/default-course.jpg" alt="Không có ảnh" class="img-fluid rounded shadow">
-{{/if}}
-
+                    {{#if course.image_url}}
+                        <img src="{{course.image_url}}" alt="{{course.title}}" class="img-fluid rounded shadow">
+                    {{else}}
+                        <img src="/static/images/default-course.jpg" alt="No image" class="img-fluid rounded shadow">
+                    {{/if}}
                 </div>
                 
-                <!-- Thông tin chi tiết -->
+                <!-- Detailed Information -->
                 <div class="col-md-8">
                     <table class="table table-bordered">
                         <tbody>
                             <tr>
-                                <th width="200">Tên khóa học:</th>
+                                <th width="200">Course Title:</th>
                                 <td><strong>{{course.title}}</strong></td>
                             </tr>
                             <tr>
-                                <th>Mô tả ngắn:</th>
+                                <th>Short Description:</th>
                                 <td>{{course.short_description}}</td>
                             </tr>
                             <tr>
-                                <th>Danh mục:</th>
+                                <th>Category:</th>
                                 <td>
                                     {{#if course.category_name}}
                                         <span class="badge bg-info">{{course.category_name}}</span>
                                     {{else}}
-                                        <span class="text-muted">Chưa phân loại</span>
+                                        <span class="text-muted">Uncategorized</span>
                                     {{/if}}
                                 </td>
                             </tr>
                             <tr>
-                                <th>Giá gốc:</th>
-                                <td><strong class="text-success">{{formatNumber course.price}} VNĐ</strong></td>
+                                <th>Original Price:</th>
+                                <td><strong class="text-success">{{formatNumber course.price}} VND</strong></td>
                             </tr>
                             <tr>
-                                <th>Giá khuyến mãi:</th>
+                                <th>Promotional Price:</th>
                                 <td>
                                     {{#if course.promotional_price}}
-                                        <strong class="text-danger">{{formatNumber course.promotional_price}} VNĐ</strong>
+                                        <strong class="text-danger">{{formatNumber course.promotional_price}} VND</strong>
                                     {{else}}
-                                        <span class="text-muted">Không có</span>
+                                        <span class="text-muted">None</span>
                                     {{/if}}
                                 </td>
                             </tr>
                             <tr>
-                                <th>Trạng thái:</th>
+                                <th>Status:</th>
                                 <td>
                                     {{#ifEquals course.status "published"}}
-                                        <span class="badge bg-success">Đã xuất bản</span>
+                                        <span class="badge bg-success">Published</span>
                                     {{else}}
-                                        <span class="badge bg-warning">Nháp</span>
+                                        <span class="badge bg-warning">Draft</span>
                                     {{/ifEquals}}
                                 </td>
                             </tr>
-                            
                             <tr>
-  <th>👥 Lượt đăng ký:</th>
-  <td><strong>{{total_students}}</strong> học viên</td>
-</tr>
-
-<tr>
-  <th>⭐ Đánh giá trung bình:</th>
-  <td>
-    {{#if average_rating}}
-      <span class="text-warning">
-        <i class="fas fa-star"></i> {{average_rating}} / 5
-      </span>
-      <small class="text-muted">({{rating_count}} đánh giá)</small>
-    {{else}}
-      <span class="text-muted">Chưa có đánh giá</span>
-    {{/if}}
-  </td>
-</tr>
-
-<tr>
-  <th>❤️ Yêu thích:</th>
-  <td>{{watchlist_count}} lượt thêm vào danh sách yêu thích</td>
-</tr>
-
+                                <th>👥 Enrollments:</th>
+                                <td><strong>{{total_students}}</strong> students</td>
+                            </tr>
+                            <tr>
+                                <th>⭐ Average Rating:</th>
+                                <td>
+                                    {{#if average_rating}}
+                                        <span class="text-warning">
+                                            <i class="fas fa-star"></i> {{average_rating}} / 5
+                                        </span>
+                                        <small class="text-muted">({{rating_count}} reviews)</small>
+                                    {{else}}
+                                        <span class="text-muted">No reviews yet</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>❤️ Favorites:</th>
+                                <td>{{watchlist_count}} times added to wishlist</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -102,86 +97,86 @@
         </div>
     </div>
 
-    <!-- Mô tả chi tiết -->
+    <!-- Detailed Description -->
     <div class="card mb-4">
         <div class="card-header bg-info text-white">
-            <h4 class="mb-0"><i class="fas fa-align-left"></i> Mô tả chi tiết</h4>
+            <h4 class="mb-0"><i class="fas fa-align-left"></i> Detailed Description</h4>
         </div>
         <div class="card-body">
             <div class="course-description">
                 {{#if course.detailed_description}}
                     {{{course.detailed_description}}}
                 {{else}}
-                    <p class="text-muted">Chưa có mô tả chi tiết</p>
+                    <p class="text-muted">No detailed description available</p>
                 {{/if}}
             </div>
         </div>
     </div>
+
     {{#if comments.length}}
-<div class="card mb-4">
-  <div class="card-header bg-secondary text-white">
-    <h4 class="mb-0"><i class="fas fa-comments"></i> Nhận xét của học viên</h4>
-  </div>
-  <div class="card-body">
-    {{#each comments}}
-      <div class="border-bottom pb-3 mb-3">
-        <div class="d-flex align-items-center mb-2">
-          <img src="{{this.profile_picture_url}}" alt="avatar" class="rounded-circle me-2" width="40" height="40">
-          <strong>{{this.full_name}}</strong>
-          <span class="ms-2 text-warning"><i class="fas fa-star"></i> {{this.rating}}</span>
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0"><i class="fas fa-comments"></i> Student Reviews</h4>
         </div>
-        <p class="mb-1">{{this.comment}}</p>
-        <small class="text-muted">{{this.created_at}}</small>
-      </div>
-    {{/each}}
-  </div>
-</div>
-{{/if}}
-
-<!-- Thông tin giảng viên -->
-<div class="card mb-4">
-  <div class="card-header bg-warning text-dark">
-    <h4 class="mb-0"><i class="fas fa-chalkboard-teacher"></i> Thông tin giảng viên</h4>
-  </div>
-  <div class="card-body">
-    <div class="row align-items-center">
-      <div class="col-md-2 text-center">
-        {{#if course.instructor_avatar}}
-          <img id="instructorAvatar" src="{{course.instructor_avatar}}" alt="{{course.instructor_name}}" 
-               class="rounded-circle img-thumbnail"
-               style="width: 100px; height: 100px; object-fit: cover;">
-        {{else}}
-          <img id="instructorAvatar" src="/static/images/default-avatar.png" alt="Avatar"
-               class="rounded-circle img-thumbnail"
-               style="width: 100px; height: 100px; object-fit: cover;">
-        {{/if}}
-      </div>
-
-      <div class="col-md-10">
-        <h5 class="fw-bold">{{course.instructor_name}}</h5>
-
-        {{#if course.email}}
-          <p class="text-muted mb-2">
-            <i class="fas fa-envelope"></i> <strong>Email:</strong> {{course.email}}
-          </p>
-        {{/if}}
-
-        {{#if course.instructor_bio}}
-          <div class="mt-3">
-            <strong>Giới thiệu:</strong>
-            <p class="mt-2">{{course.instructor_bio}}</p>
-          </div>
-        {{/if}}
-      </div>
+        <div class="card-body">
+            {{#each comments}}
+                <div class="border-bottom pb-3 mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <img src="{{this.profile_picture_url}}" alt="avatar" class="rounded-circle me-2" width="40" height="40">
+                        <strong>{{this.full_name}}</strong>
+                        <span class="ms-2 text-warning"><i class="fas fa-star"></i> {{this.rating}}</span>
+                    </div>
+                    <p class="mb-1">{{this.comment}}</p>
+                    <small class="text-muted">{{this.created_at}}</small>
+                </div>
+            {{/each}}
+        </div>
     </div>
-  </div>
-</div>
+    {{/if}}
 
+    <!-- Instructor Information -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0"><i class="fas fa-chalkboard-teacher"></i> Instructor Information</h4>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    {{#if course.instructor_avatar}}
+                        <img id="instructorAvatar" src="{{course.instructor_avatar}}" alt="{{course.instructor_name}}" 
+                             class="rounded-circle img-thumbnail"
+                             style="width: 100px; height: 100px; object-fit: cover;">
+                    {{else}}
+                        <img id="instructorAvatar" src="/static/images/default-avatar.png" alt="Avatar"
+                             class="rounded-circle img-thumbnail"
+                             style="width: 100px; height: 100px; object-fit: cover;">
+                    {{/if}}
+                </div>
 
-    <!-- Nội dung khóa học (Chapters & Lectures) -->
+                <div class="col-md-10">
+                    <h5 class="fw-bold">{{course.instructor_name}}</h5>
+
+                    {{#if course.email}}
+                        <p class="text-muted mb-2">
+                            <i class="fas fa-envelope"></i> <strong>Email:</strong> {{course.email}}
+                        </p>
+                    {{/if}}
+
+                    {{#if course.instructor_bio}}
+                        <div class="mt-3">
+                            <strong>Bio:</strong>
+                            <p class="mt-2">{{course.instructor_bio}}</p>
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Content (Chapters & Lectures) -->
     <div class="card mb-4">
         <div class="card-header bg-success text-white">
-            <h4 class="mb-0"><i class="fas fa-book"></i> Nội dung khóa học</h4>
+            <h4 class="mb-0"><i class="fas fa-book"></i> Course Content</h4>
         </div>
         <div class="card-body">
             {{#if chapters}}
@@ -190,9 +185,9 @@
                         <div class="accordion-item mb-2">
                             <h2 class="accordion-header" id="heading{{id}}">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{id}}">
-                                    <strong>Chương {{chapter_order}}: {{title}}</strong>
+                                    <strong>Chapter {{chapter_order}}: {{title}}</strong>
                                     <span class="badge bg-primary ms-2">
-                                        {{length (lookup ../lectures id)}} bài giảng
+                                        {{length (lookup ../lectures id)}} lectures
                                     </span>
                                 </button>
                             </h2>
@@ -211,7 +206,7 @@
                                                         {{/if}}
                                                         {{#if duration_minutes}}
                                                             <small class="text-muted ms-2">
-                                                                <i class="fas fa-clock"></i> {{duration_minutes}} phút
+                                                                <i class="fas fa-clock"></i> {{duration_minutes}} minutes
                                                             </small>
                                                         {{/if}}
                                                     </div>
@@ -219,7 +214,7 @@
                                             {{/each}}
                                         </ol>
                                     {{else}}
-                                        <p class="text-muted mb-0">Chưa có bài giảng nào trong chương này</p>
+                                        <p class="text-muted mb-0">No lectures in this chapter yet</p>
                                     {{/if}}
                                 </div>
                             </div>
@@ -228,62 +223,63 @@
                 </div>
             {{else}}
                 <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i> Khóa học chưa có chương nào. Hãy thêm chương và bài giảng!
+                    <i class="fas fa-exclamation-triangle"></i> No chapters yet. Please add chapters and lectures!
                 </div>
             {{/if}}
         </div>
     </div>
 
-    <!-- Nút hành động -->
+    <!-- Action Buttons -->
     <div class="d-flex gap-2 justify-content-end">
         <a href="/teacher/course/{{course.id}}/edit" class="btn btn-primary btn-lg">
-            <i class="fas fa-edit"></i> Chỉnh sửa khóa học
+            <i class="fas fa-edit"></i> Edit Course
         </a>
         <form method="POST" action="/teacher/course/{{course.id}}/delete" style="display: inline;" 
-              onsubmit="return confirm('⚠️ Bạn có chắc chắn muốn xóa khóa học này?\n\nToàn bộ chương, bài giảng và dữ liệu liên quan sẽ bị xóa vĩnh viễn!');">
+              onsubmit="return confirm('⚠️ Are you sure you want to delete this course?\n\nAll chapters, lectures, and related data will be permanently deleted!');">
             <button type="submit" class="btn btn-danger btn-lg">
-                <i class="fas fa-trash"></i> Xóa khóa học
+                <i class="fas fa-trash"></i> Delete Course
             </button>
         </form>
     </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
   const avatar = document.getElementById('instructorAvatar');
   if (!avatar) return;
 
   try {
-    const res = await fetch('/api/user/profile'); // Gọi API lấy thông tin người dùng hiện tại
+    const res = await fetch('/api/user/profile'); 
     if (!res.ok) return;
 
     const data = await res.json();
     if (data && data.profile_picture_url) {
-      avatar.src = data.profile_picture_url; // Cập nhật ảnh giảng viên mới nhất
+      avatar.src = data.profile_picture_url;
     }
   } catch (err) {
-    console.error('Không thể tải ảnh giảng viên:', err);
+    console.error('Failed to load instructor avatar:', err);
   }
 });
 </script>
+
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
   const coverImg = document.querySelector('.img-fluid.rounded.shadow');
   if (!coverImg) return;
 
   try {
-    const courseId = "{{course.id}}"; // lấy id khóa học hiện tại
-    const res = await fetch(`/api/courses/${courseId}`); // gọi API để lấy thông tin mới nhất
+    const courseId = "{{course.id}}"; 
+    const res = await fetch(`/api/courses/${courseId}`); 
     if (!res.ok) return;
 
     const data = await res.json();
     if (data && data.image_url) {
-      // nếu có ảnh bìa mới thì cập nhật
       coverImg.src = data.image_url.startsWith('/uploads/')
         ? data.image_url
         : `/uploads/${data.image_url}`;
     }
   } catch (err) {
-    console.error('Không thể tải ảnh bìa khóa học:', err);
+    console.error('Failed to load course cover image:', err);
   }
 });
 </script>

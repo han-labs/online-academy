@@ -2,21 +2,20 @@
 
 <div class="container my-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-primary fw-bold">Chỉnh Sửa Khóa Học: {{course.title}}</h2>
-    
+    <h2 class="text-primary fw-bold">Edit Course: {{course.title}}</h2>
   </div>
 
-  {{!-- Thông tin cơ bản khóa học --}}
+  {{!-- Basic Course Info --}}
   <form action="/teacher/course/{{course.id}}/edit" method="POST" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
-    <h4 class="text-info mb-3"><i class="bi bi-info-circle"></i> Thông tin cơ bản</h4>
+    <h4 class="text-info mb-3"><i class="bi bi-info-circle"></i> Basic Information</h4>
     
     <div class="mb-3">
-      <label class="fw-semibold">Tiêu đề khóa học <span class="text-danger">*</span></label>
+      <label class="fw-semibold">Course Title <span class="text-danger">*</span></label>
       <input type="text" name="title" class="form-control" value="{{course.title}}" required>
     </div>
 
     <div class="mb-3">
-      <label class="fw-semibold">Ảnh bìa</label>
+      <label class="fw-semibold">Cover Image</label>
       <input type="file" name="image" class="form-control mb-2" accept="image/*">
       {{#if course.cover}}
         <img src="/static{{course.cover}}" alt="cover" width="200" class="rounded border shadow-sm">
@@ -24,9 +23,9 @@
     </div>
 
     <div class="mb-3">
-      <label class="fw-semibold">Danh mục</label>
+      <label class="fw-semibold">Category</label>
       <select name="category_id" class="form-select" required>
-        <option value="" disabled>-- Chọn danh mục --</option>
+        <option value="" disabled>-- Select Category --</option>
         {{#each categoriesTree}}
           <optgroup label="📁 {{this.name}}">
             {{#each this.children}}
@@ -38,48 +37,49 @@
         {{/each}}
       </select>
     </div>
- <div class="row">
+
+    <div class="row">
       <div class="col-md-6 mb-3">
-        <label class="fw-semibold">Giá gốc (VNĐ) <span class="text-danger">*</span></label>
+        <label class="fw-semibold">Original Price (VND) <span class="text-danger">*</span></label>
         <input type="number" name="price" class="form-control" value="{{course.price}}" required min="0">
       </div>
       <div class="col-md-6 mb-3">
-        <label class="fw-semibold">Giá khuyến mãi (VNĐ)</label>
+        <label class="fw-semibold">Promotional Price (VND)</label>
         <input type="number" name="promotional_price" class="form-control" value="{{course.promotional_price}}" min="0">
       </div>
     </div>
 
     <div class="mb-3">
-      <label class="fw-semibold">Mô tả ngắn <span class="text-danger">*</span></label>
+      <label class="fw-semibold">Short Description <span class="text-danger">*</span></label>
       <textarea name="short_description" class="form-control" rows="3" required>{{course.short_description}}</textarea>
     </div>
 
     <div class="mb-3">
-      <label class="fw-semibold">Mô tả chi tiết</label>
+      <label class="fw-semibold">Detailed Description</label>
       <textarea name="detailed_description" id="editor" class="form-control" rows="3">{{course.detailed_description}}</textarea>
     </div>
 
     <div class="mb-3">
-      <label class="fw-semibold">Trạng thái xuất bản</label>
+      <label class="fw-semibold">Publication Status</label>
       <select name="status" class="form-control">
-        <option value="draft" {{#ifEquals course.status "draft"}}selected{{/ifEquals}}>Nháp (Chưa công khai)</option>
-        <option value="published" {{#ifEquals course.status "published"}}selected{{/ifEquals}}>Đã xuất bản</option>
+        <option value="draft" {{#ifEquals course.status "draft"}}selected{{/ifEquals}}>Draft (Not Published)</option>
+        <option value="published" {{#ifEquals course.status "published"}}selected{{/ifEquals}}>Published</option>
       </select>
     </div>
 
     <button type="submit" class="btn btn-success w-100 mt-3">
-      <i class="bi bi-check-circle"></i> Cập nhật thông tin khóa học
+      <i class="bi bi-check-circle"></i> Update Course Information
     </button>
   </form>
 
-  {{!-- Quản lý nội dung khóa học --}}
+  {{!-- Course Content Management --}}
   <hr class="my-5">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="text-secondary mb-0">
-      <i class="bi bi-book"></i> Nội dung khóa học (Chapters & Lectures)
+      <i class="bi bi-book"></i> Course Content (Chapters & Lectures)
     </h3>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addChapterModal">
-      <i class="bi bi-plus-circle"></i> Thêm chương mới
+      <i class="bi bi-plus-circle"></i> Add New Chapter
     </button>
   </div>
 
@@ -88,21 +88,21 @@
       <div class="card mb-3 shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
           <div>
-            <strong>Chương {{chapter_order}}: {{title}}</strong>
+            <strong>Chapter {{chapter_order}}: {{title}}</strong>
             <span class="badge bg-light text-dark ms-2">
               {{#if (lookup ../lectures id)}}
-                {{length (lookup ../lectures id)}} bài giảng
+                {{length (lookup ../lectures id)}} lectures
               {{else}}
-                0 bài giảng
+                0 lectures
               {{/if}}
             </span>
           </div>
           <div>
             <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editChapterModal{{id}}">
-              <i class="bi bi-pencil"></i> Sửa
+              <i class="bi bi-pencil"></i> Edit
             </button>
             <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteChapterModal{{id}}">
-              <i class="bi bi-trash"></i> Xóa
+              <i class="bi bi-trash"></i> Delete
             </button>
           </div>
         </div>
@@ -113,10 +113,10 @@
               <thead class="table-light">
                 <tr>
                   <th width="50">#</th>
-                  <th>Tên bài giảng</th>
-                  <th width="120">Thời lượng</th>
-                  <th width="100">Xem trước</th>
-                  <th width="150">Hành động</th>
+                  <th>Lecture Name</th>
+                  <th width="120">Duration</th>
+                  <th width="100">Preview</th>
+                  <th width="150">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -124,12 +124,12 @@
                   <tr>
                     <td>{{lecture_order}}</td>
                     <td>{{title}}</td>
-                    <td>{{#if duration_minutes}}{{duration_minutes}} phút{{else}}-{{/if}}</td>
+                    <td>{{#if duration_minutes}}{{duration_minutes}} min{{else}}-{{/if}}</td>
                     <td>
                       {{#if is_preview_allowed}}
-                        <span class="badge bg-success">Có</span>
+                        <span class="badge bg-success">Yes</span>
                       {{else}}
-                        <span class="badge bg-secondary">Không</span>
+                        <span class="badge bg-secondary">No</span>
                       {{/if}}
                     </td>
                     <td>
@@ -142,61 +142,61 @@
                     </td>
                   </tr>
 
-                  {{!-- Modal Sửa Lecture --}}
+                  {{!-- Edit Lecture Modal --}}
                   <div class="modal fade" id="editLectureModal{{id}}" tabindex="-1">
                     <div class="modal-dialog">
                       <div class="modal-content">
                         <form action="/teacher/lecture/{{id}}/edit" method="POST" enctype="multipart/form-data">
                           <div class="modal-header">
-                            <h5 class="modal-title">Sửa bài giảng: {{title}}</h5>
+                            <h5 class="modal-title">Edit Lecture: {{title}}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                           </div>
                           <div class="modal-body">
                             <div class="mb-3">
-                              <label class="fw-semibold">Tên bài giảng</label>
+                              <label class="fw-semibold">Lecture Name</label>
                               <input type="text" name="title" class="form-control" value="{{title}}" required>
                             </div>
                             <div class="mb-3">
-                              <label class="fw-semibold">Video mới (để trống nếu không đổi)</label>
+                              <label class="fw-semibold">New Video (leave blank if no change)</label>
                               <input type="file" name="video" class="form-control" accept="video/*">
-                              <small class="text-muted">Video hiện tại: {{video_url}}</small>
+                              <small class="text-muted">Current video: {{video_url}}</small>
                             </div>
                             <div class="mb-3">
-                              <label class="fw-semibold">Thời lượng (phút)</label>
+                              <label class="fw-semibold">Duration (minutes)</label>
                               <input type="number" name="duration_minutes" class="form-control" value="{{duration_minutes}}" min="0">
                             </div>
                             <div class="form-check">
                               <input class="form-check-input" type="checkbox" name="is_preview_allowed" id="preview{{id}}" {{#if is_preview_allowed}}checked{{/if}}>
                               <label class="form-check-label" for="preview{{id}}">
-                                Cho phép xem trước miễn phí
+                                Allow free preview
                               </label>
                             </div>
                           </div>
                           <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
                           </div>
                         </form>
                       </div>
                     </div>
                   </div>
 
-                  {{!-- Modal Xóa Lecture --}}
+                  {{!-- Delete Lecture Modal --}}
                   <div class="modal fade" id="deleteLectureModal{{id}}" tabindex="-1">
                     <div class="modal-dialog">
                       <div class="modal-content">
                         <form action="/teacher/lecture/{{id}}/delete" method="POST">
                           <div class="modal-header bg-danger text-white">
-                            <h5 class="modal-title">Xác nhận xóa</h5>
+                            <h5 class="modal-title">Confirm Delete</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                           </div>
                           <div class="modal-body">
-                            <p>Bạn có chắc chắn muốn xóa bài giảng <strong>"{{title}}"</strong>?</p>
-                            <p class="text-danger"><i class="bi bi-exclamation-triangle"></i> Hành động này không thể hoàn tác!</p>
+                            <p>Are you sure you want to delete the lecture <strong>"{{title}}"</strong>?</p>
+                            <p class="text-danger"><i class="bi bi-exclamation-triangle"></i> This action cannot be undone!</p>
                           </div>
                           <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button type="submit" class="btn btn-danger">Xóa</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Delete</button>
                           </div>
                         </form>
                       </div>
@@ -207,98 +207,97 @@
               </tbody>
             </table>
           {{else}}
-            <p class="text-muted">Chưa có bài giảng nào.</p>
+            <p class="text-muted">No lectures yet.</p>
           {{/if}}
 
-          {{!-- Nút thêm Lecture --}}
+          {{!-- Add Lecture Button --}}
           <div class="border-top pt-3 mt-3">
             <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addLectureModal{{id}}">
-              <i class="bi bi-plus-circle"></i> Thêm bài giảng vào chương này
+              <i class="bi bi-plus-circle"></i> Add Lecture to This Chapter
             </button>
           </div>
 
-          {{!-- Modal Thêm Lecture --}}
+          {{!-- Add Lecture Modal --}}
           <div class="modal fade" id="addLectureModal{{id}}" tabindex="-1">
             <div class="modal-dialog">
               <div class="modal-content">
                 <form action="/teacher/chapter/{{id}}/lecture/add" method="POST" enctype="multipart/form-data">
                   <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">Thêm bài giảng vào Chương {{chapter_order}}</h5>
+                    <h5 class="modal-title">Add Lecture to Chapter {{chapter_order}}</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                   </div>
                   <div class="modal-body">
                     <div class="mb-3">
-                      <label class="fw-semibold">Tên bài giảng <span class="text-danger">*</span></label>
-                      <input type="text" name="title" class="form-control" placeholder="VD: Giới thiệu về React Hooks" required>
+                      <label class="fw-semibold">Lecture Name <span class="text-danger">*</span></label>
+                      <input type="text" name="title" class="form-control" placeholder="Ex: Introduction to React Hooks" required>
                     </div>
                     <div class="mb-3">
                       <label class="fw-semibold">Video <span class="text-danger">*</span></label>
                       <input type="file" name="video" class="form-control" accept="video/*" required>
-                      <small class="text-muted">Định dạng: MP4, AVI, MOV, WebM</small>
+                      <small class="text-muted">Formats: MP4, AVI, MOV, WebM</small>
                     </div>
                     <div class="mb-3">
-                      <label class="fw-semibold">Thời lượng (phút)</label>
-                      <input type="number" name="duration_minutes" class="form-control" placeholder="VD: 15" min="0">
+                      <label class="fw-semibold">Duration (minutes)</label>
+                      <input type="number" name="duration_minutes" class="form-control" placeholder="Ex: 15" min="0">
                     </div>
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" name="is_preview_allowed" id="previewNew{{id}}">
                       <label class="form-check-label" for="previewNew{{id}}">
-                        Cho phép xem trước miễn phí
+                        Allow free preview
                       </label>
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success">Thêm bài giảng</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Lecture</button>
                   </div>
                 </form>
               </div>
             </div>
           </div>
 
-          {{!-- Modal Sửa Chapter --}}
+          {{!-- Edit Chapter Modal --}}
           <div class="modal fade" id="editChapterModal{{id}}" tabindex="-1">
             <div class="modal-dialog">
               <div class="modal-content">
                 <form action="/teacher/chapter/{{id}}/edit" method="POST">
                   <div class="modal-header">
-                    <h5 class="modal-title">Sửa Chương {{chapter_order}}</h5>
+                    <h5 class="modal-title">Edit Chapter {{chapter_order}}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                   </div>
                   <div class="modal-body">
                     <div class="mb-3">
-                      <label class="fw-semibold">Tên chương</label>
+                      <label class="fw-semibold">Chapter Name</label>
                       <input type="text" name="title" class="form-control" value="{{title}}" required>
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                   </div>
                 </form>
               </div>
             </div>
           </div>
 
-          {{!-- Modal Xóa Chapter --}}
+          {{!-- Delete Chapter Modal --}}
           <div class="modal fade" id="deleteChapterModal{{id}}" tabindex="-1">
             <div class="modal-dialog">
               <div class="modal-content">
                 <form action="/teacher/chapter/{{id}}/delete" method="POST">
                   <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Xác nhận xóa chương</h5>
+                    <h5 class="modal-title">Confirm Chapter Delete</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                   </div>
                   <div class="modal-body">
-                    <p>Bạn có chắc chắn muốn xóa <strong>Chương {{chapter_order}}: {{title}}</strong>?</p>
+                    <p>Are you sure you want to delete <strong>Chapter {{chapter_order}}: {{title}}</strong>?</p>
                     <p class="text-danger">
-                      <i class="bi bi-exclamation-triangle"></i> 
-                      Tất cả bài giảng trong chương này cũng sẽ bị xóa!
+                      <i class="bi bi-exclamation-triangle"></i> All lectures in this chapter will also be deleted!
                     </p>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-danger">Xóa chương</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete Chapter</button>
                   </div>
                 </form>
               </div>
@@ -309,47 +308,48 @@
     {{/each}}
   {{else}}
     <div class="alert alert-info text-center">
-      <i class="bi bi-info-circle"></i> Chưa có chương nào được tạo. Hãy thêm chương đầu tiên!
+      <i class="bi bi-info-circle"></i> No chapters have been created yet. Add your first chapter!
     </div>
   {{/if}}
 </div>
 
-{{!-- Modal Thêm Chapter --}}
+{{!-- Add Chapter Modal --}}
 <div class="modal fade" id="addChapterModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <form action="/teacher/course/{{course.id}}/chapter/add" method="POST">
         <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title">Thêm chương mới</h5>
+          <h5 class="modal-title">Add New Chapter</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="fw-semibold">Tên chương <span class="text-danger">*</span></label>
-            <input type="text" name="title" class="form-control" placeholder="VD: Giới thiệu về khóa học" required>
+            <label class="fw-semibold">Chapter Name <span class="text-danger">*</span></label>
+            <input type="text" name="title" class="form-control" placeholder="Ex: Course Introduction" required>
           </div>
           <small class="text-muted">
-            <i class="bi bi-info-circle"></i> Chương sẽ được tự động đánh số thứ tự
+            <i class="bi bi-info-circle"></i> Chapters will be numbered automatically
           </small>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-          <button type="submit" class="btn btn-primary">Thêm chương</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Chapter</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-{{!-- Nút quay lại Dashboard và Xem chi tiết (cuối cùng) --}}
+{{!-- Back to Dashboard & View Details --}}
 <div class="container my-4 d-flex gap-2">
   <a href="/teacher/dashboard" class="btn btn-secondary">
-    <i class="bi bi-arrow-left"></i> Quay lại Dashboard
+    <i class="bi bi-arrow-left"></i> Back to Dashboard
   </a>
   <a href="/teacher/course/{{course.id}}/detail" class="btn btn-info">
-    <i class="bi bi-eye"></i> Xem chi tiết
+    <i class="bi bi-eye"></i> View Details
   </a>
 </div>
+
 {{!-- TinyMCE Editor --}}
 <script src="hw9pfh30njixlu4voz8ag8msnnnr4ofingpiklyaaie8hhdy" referrerpolicy="origin"></script>
 <script>
