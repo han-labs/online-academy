@@ -4,26 +4,26 @@
         <div class="col-lg-3 mb-4">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> Tài khoản</h6>
+                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> Account</h6>
                 </div>
                 <div class="list-group list-group-flush">
                     <a href="/account/profile" class="list-group-item list-group-item-action active">
-                        <i class="bi bi-person-gear"></i> Thông tin cá nhân
+                        <i class="bi bi-person-gear"></i> Personal information
                     </a>
                     <a href="/account/change-password" class="list-group-item list-group-item-action">
-                        <i class="bi bi-shield-lock"></i> Đổi mật khẩu
+                        <i class="bi bi-shield-lock"></i> Change password
                     </a>
                     <a href="/student/watchlist" class="list-group-item list-group-item-action">
-                        <i class="bi bi-bookmark-heart"></i> Khóa học yêu thích
+                        <i class="bi bi-bookmark-heart"></i> Favorite Courses
                         <span class="badge bg-primary rounded-pill float-end">{{stats.watchlists}}</span>
                     </a>
                     <a href="/account/my-courses" class="list-group-item list-group-item-action">
-                        <i class="bi bi-collection-play"></i> Khóa học của tôi
+                        <i class="bi bi-collection-play"></i> My courses
                         <span class="badge bg-primary rounded-pill float-end">{{stats.enrollments}}</span>
                     </a>
                     <form action="/account/logout" method="post" class="list-group-item">
                         <button type="submit" class="btn btn-link text-danger p-0 border-0 text-start w-100">
-                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                            <i class="bi bi-box-arrow-right"></i> Log out
                         </button>
                     </form>
                 </div>
@@ -34,13 +34,13 @@
         <div class="col-lg-9">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-person-gear"></i> Thông tin cá nhân</h5>
+                    <h5 class="mb-0"><i class="bi bi-person-gear"></i> Personal information</h5>
                 </div>
                 <div class="card-body">
                     <!-- Giữ nguyên form hiện tại -->
                     <form id="frmProfile" method="post" action="/account/profile">
                         <div class="mb-3">
-                            <label class="form-label">Họ tên</label>
+                            <label class="form-label">Full name</label>
                             <input class="form-control" id="txtName" name="full_name" value="{{me.full_name}}" required>
                         </div>
                         <div class="mb-3">
@@ -50,10 +50,10 @@
                         </div>
                         <div class="d-flex gap-2 justify-content-end">
                             <button class="btn btn-primary">
-                                <i class="bi bi-check2-circle"></i> Cập nhật
+                                <i class="bi bi-check2-circle"></i> Update
                             </button>
                             <a class="btn btn-secondary" href="/">
-                                <i class="bi bi-house"></i> Về trang chủ
+                                <i class="bi bi-house"></i> Back to home page
                             </a>
                         </div>
                     </form>
@@ -63,17 +63,17 @@
             <!-- Thống kê (di chuyển xuống đây) -->
             <div class="card mt-4">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Thống kê tài khoản</h6>
+                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Account statistics</h6>
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
                         <div class="col-6">
                             <div class="h4 text-primary">{{stats.enrollments}}</div>
-                            <small class="text-muted">Khóa học đã ghi danh</small>
+                            <small class="text-muted">Enrolled courses</small>
                         </div>
                         <div class="col-6">
                             <div class="h4 text-success">{{stats.watchlists}}</div>
-                            <small class="text-muted">Khóa học yêu thích</small>
+                            <small class="text-muted">Favorite Course</small>
                         </div>
                     </div>
                 </div>

@@ -43,13 +43,13 @@ router.post('/watchlist/add', requireAuth, async (req, res) => {
         console.log(' Watchlist add result:', success);
         
         if (success) {
-            req.session.flash = { type: 'success', message: 'Đã thêm vào danh sách yêu thích' };
+            req.session.flash = { type: 'success', message: 'Added to favorites list' };
         } else {
-            req.session.flash = { type: 'info', message: 'Khóa học đã có trong danh sách yêu thích' };
+            req.session.flash = { type: 'info', message: 'The course is already in your favorites list.' };
         }
     } catch (error) {
         console.error(' Watchlist add error:', error);
-        req.session.flash = { type: 'error', message: 'Có lỗi xảy ra: ' + error.message };
+        req.session.flash = { type: 'error', message: 'an error occurred: ' + error.message };
     }
 
     res.redirect(referer); 
@@ -67,11 +67,11 @@ router.post('/watchlist/remove', requireAuth, async (req, res) => {
         const success = await watchlistModel.removeFromWatchlist(userId, course_id);
         req.session.flash = { 
             type: success ? 'success' : 'error', 
-            message: success ? 'Đã xóa khỏi danh sách yêu thích' : 'Không tìm thấy khóa học' 
+            message: success ? 'Removed from favorites list' : 'No course found' 
         };
     } catch (error) {
         console.error('Remove from watchlist error:', error);
-        req.session.flash = { type: 'error', message: 'Có lỗi xảy ra' };
+        req.session.flash = { type: 'error', message: 'an error occurred' };
     }
 
     res.redirect(referer); 
@@ -93,7 +93,7 @@ router.post('/reviews', requireAuth, async (req, res) => {
         if (!course_id || !rating || !comment) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Thiếu thông tin đánh giá' 
+                message: 'Lack of assessment information' 
             });
         }
 
@@ -102,7 +102,7 @@ router.post('/reviews', requireAuth, async (req, res) => {
         if (existingReview) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Bạn đã đánh giá khóa học này rồi' 
+                message: 'You have already rated this course' 
             });
         }
 
@@ -121,7 +121,7 @@ router.post('/reviews', requireAuth, async (req, res) => {
 
         res.json({ 
             success: true, 
-            message: 'Cảm ơn đánh giá của bạn!',
+            message: 'Thanks for your review!',
             review: newReview
         });
 
@@ -129,7 +129,7 @@ router.post('/reviews', requireAuth, async (req, res) => {
         console.error('Review submission error:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Có lỗi xảy ra: ' + error.message 
+            message: 'an error occurred: ' + error.message 
         });
     }
 });
@@ -143,7 +143,7 @@ router.delete('/reviews', requireAuth, async (req, res) => {
         if (!course_id) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Thiếu course_id' 
+                message: 'Loss course_id' 
             });
         }
 
@@ -155,12 +155,12 @@ router.delete('/reviews', requireAuth, async (req, res) => {
             
             res.json({ 
                 success: true, 
-                message: 'Đã xóa đánh giá' 
+                message: 'Review deleted' 
             });
         } else {
             res.status(404).json({ 
                 success: false, 
-                message: 'Không tìm thấy đánh giá' 
+                message: 'No reviews found' 
             });
         }
 
@@ -168,7 +168,7 @@ router.delete('/reviews', requireAuth, async (req, res) => {
         console.error('Delete review error:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Có lỗi xảy ra' 
+            message: 'an error occurred' 
         });
     }
 });

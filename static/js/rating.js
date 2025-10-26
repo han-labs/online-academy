@@ -84,7 +84,7 @@ async function submitReview() {
 
         if (result.success) {
             // HIỆN THÔNG BÁO THÀNH CÔNG
-            alert('Đánh giá của bạn đã được gửi thành công!');
+            alert('Your review has been submitted successfully!');
             
             // Đóng modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('ratingModal'));

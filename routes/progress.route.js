@@ -14,14 +14,14 @@ router.post('/complete', requireAuth, async (req, res) => {
         
         res.json({ 
             success: true, 
-            message: 'Bài học đã được đánh dấu hoàn thành'
+            message: 'The lesson has been marked complete.'
         });
 
     } catch (error) {
         console.error('Progress complete error:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Có lỗi xảy ra' 
+            message: 'An error occurred.' 
         });
     }
 });
@@ -43,7 +43,7 @@ router.get('/completed/:courseId', requireAuth, async (req, res) => {
         console.error('Get completed lectures error:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Có lỗi xảy ra' 
+            message: 'An error occurred.' 
         });
     }
 });
@@ -68,7 +68,7 @@ router.get('/:courseId', requireAuth, async (req, res) => {
         console.error('Get progress error:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Có lỗi xảy ra' 
+            message: 'An error occurred.' 
         });
     }
 });
@@ -82,7 +82,7 @@ router.post('/toggle', requireAuth, async (req, res) => {
         if (!lecture_id) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Thiếu lecture_id' 
+                message: 'Loss lecture_id' 
             });
         }
 
@@ -90,7 +90,7 @@ router.post('/toggle', requireAuth, async (req, res) => {
         
         res.json({ 
             success: true, 
-            message: result.completed ? 'Đã đánh dấu hoàn thành' : 'Đã bỏ đánh dấu hoàn thành',
+            message: result.completed ? 'Marked complete' : 'Unmarked complete',
             data: result
         });
 
@@ -98,7 +98,7 @@ router.post('/toggle', requireAuth, async (req, res) => {
         console.error('Toggle progress error:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Có lỗi xảy ra' 
+            message: 'An error occurred.' 
         });
     }
 });

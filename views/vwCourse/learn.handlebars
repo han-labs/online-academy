@@ -9,8 +9,8 @@ console.log('=== END DEBUG ===');
         <div class="col-lg-3 bg-light border-end sidebar-curriculum" id="sidebarCurriculum" style="height: 100vh; overflow-y: auto;">
             <div class="p-3">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Nội dung khóa học</h5>
-                    <button class="btn btn-outline-secondary btn-sm" id="toggleSidebar" title="Đóng nội dung">
+                    <h5 class="mb-0">Course content</h5>
+                    <button class="btn btn-outline-secondary btn-sm" id="toggleSidebar" title="Close content">
                         <i class="bi bi-chevron-left"></i>
                     </button>
                 </div>
@@ -19,7 +19,7 @@ console.log('=== END DEBUG ===');
                     <div class="progress-bar" role="progressbar" style="width: {{progress.percentage}}%; background-color: #6f42c1;"
                         aria-valuenow="{{progress.percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <small class="text-muted">{{progress.completed}}/{{progress.total}} bài học ({{progress.percentage}}%)</small>
+                <small class="text-muted">{{progress.completed}}/{{progress.total}} lesson ({{progress.percentage}}%)</small>
 
                 <div class="mt-4">
                     {{#each chapters}}
@@ -32,18 +32,18 @@ console.log('=== END DEBUG ===');
     <i class="bi bi-check-square-fill text-purple me-2 toggle-icon completed" 
        style="color: #6f42c1;"
        data-lecture-id="{{this.id}}"
-       title="Click để bỏ đánh dấu hoàn thành"></i>
+       title="Click to unmark completed"></i>
     {{else}}
     <i class="bi bi-square text-muted me-2 toggle-icon not-completed"
        data-lecture-id="{{this.id}}"
-       title="Click để đánh dấu hoàn thành"></i>
+       title="Click to mark complete"></i>
     {{/if}}
                                 <a href="#" class="lecture-link text-decoration-none text-dark small"
                                     data-lecture-id="{{this.id}}" data-video-url="{{this.video_url}}"
                                     data-lecture-title="{{this.title}}" data-duration="{{this.duration_minutes}}">
                                     {{this.title}}
                                 </a>
-                                <span class="text-muted small ms-2">{{this.duration_minutes}} phút</span>
+                                <span class="text-muted small ms-2">{{this.duration_minutes}} minute</span>
                             </div>
                             {{/each}}
                         </div>
@@ -59,7 +59,7 @@ console.log('=== END DEBUG ===');
             <div class="video-container-wrapper position-relative">
                 <!-- TOGGLE SIDEBAR BUTTON - UDEMY STYLE -->
                 <div class="sidebar-toggle-container" id="sidebarToggleContainer" style="display: none;">
-                    <button class="btn udemy-sidebar-toggle" id="openSidebar" title="Mở nội dung khóa học">
+                    <button class="btn udemy-sidebar-toggle" id="openSidebar" title="Open course content">
                         <i class="bi bi-chevron-right"></i>
                     </button>
                 </div>
@@ -68,7 +68,7 @@ console.log('=== END DEBUG ===');
                     <!-- Placeholder -->
                     <div id="video-placeholder"
                         class="d-flex flex-column justify-content-center align-items-center text-white w-100 h-100">
-                        <h5>Chọn bài học để bắt đầu</h5>
+                        <h5>Select a lesson to start</h5>
                     </div>
 
                     <!-- PLYR.IO PLAYER -->
@@ -81,14 +81,14 @@ console.log('=== END DEBUG ===');
                 <div class="video-info-bar bg-dark text-white px-4 py-3 border-top" id="video-info-bar" style="display: none;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h4 id="current-lecture-title" class="mb-0">Chọn bài học để bắt đầu</h4>
+                            <h4 id="current-lecture-title" class="mb-0">Select a lesson to start</h4>
                         </div>
                         <div id="lecture-nav" style="display: none;">
                             <button id="prev-lecture" class="btn btn-outline-light btn-sm me-2">
-                                <i class="bi bi-chevron-left"></i> Bài trước
+                                <i class="bi bi-chevron-left"></i> Previous
                             </button>
                             <button id="next-lecture" class="btn btn-light btn-sm">
-                                Bài sau <i class="bi bi-chevron-right"></i>
+                                Next <i class="bi bi-chevron-right"></i>
                             </button>
                         </div>
                     </div>
@@ -133,8 +133,8 @@ console.log('=== END DEBUG ===');
                         <div id="lecture-content">
                             <div class="text-center py-5 text-muted" id="default-lecture-message">
                                 <i class="bi bi-play-circle display-1"></i>
-                                <h4 class="mt-3">Chọn bài học để bắt đầu</h4>
-                                <p>Nội dung bài học sẽ hiển thị ở đây</p>
+                                <h4 class="mt-3">Select a lesson to start</h4>
+                                <p>Lesson content will be displayed here</p>
                             </div>
                             <div id="dynamic-lecture-info" style="display: none;"></div>
                         </div>
@@ -145,9 +145,9 @@ console.log('=== END DEBUG ===');
 <div class="tab-pane fade" id="course-content" role="tabpanel">
     <div class="course-content-tab">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5>Nội dung khóa học</h5>
+            <h5>Course content</h5>
             <div class="progress-info">
-                <small class="text-muted">{{progress.completed}}/{{progress.total}} bài học hoàn thành</small>
+                <small class="text-muted">{{progress.completed}}/{{progress.total}} lesson completed</small>
                 <div class="progress mt-1" style="height: 6px; width: 200px;">
                     <div class="progress-bar" style="width: {{progress.percentage}}%; background-color: #6f42c1;"></div>
                 </div>
@@ -162,7 +162,7 @@ console.log('=== END DEBUG ===');
                      style="cursor: pointer;">
                     <div>
                         <h6 class="mb-0 fw-bold">{{this.title}}</h6>
-                        <small class="text-muted">{{length this.lectures}} bài giảng • {{calculateChapterDuration this.lectures}} phút</small>
+                        <small class="text-muted">{{length this.lectures}} lesson • {{calculateChapterDuration this.lectures}} minute</small>
                     </div>
                     <i class="bi bi-chevron-down chapter-arrow" data-chapter-id="chapter-{{@index}}"></i>
                 </div>
@@ -194,11 +194,11 @@ console.log('=== END DEBUG ===');
                                         {{#if is_preview_allowed}}
                                         <span class="badge bg-info me-2">Preview</span>
                                         {{/if}}
-                                        {{duration_minutes}} phút
+                                        {{duration_minutes}} minute
                                     </small>
                                     {{#if (contains @root.completedLectureIds this.id)}}
                                     <small class="text-success">
-                                        <i class="bi bi-check-circle me-1"></i>Đã hoàn thành
+                                        <i class="bi bi-check-circle me-1"></i>Completed
                                     </small>
                                     {{/if}}
                                 </div>
@@ -222,8 +222,8 @@ console.log('=== END DEBUG ===');
                     <div class="tab-pane fade" id="resources" role="tabpanel">
                         <div class="text-center py-5 text-muted">
                             <i class="bi bi-file-earmark-text display-1"></i>
-                            <h4 class="mt-3">Tài liệu khóa học</h4>
-                            <p>Không có tài liệu nào cho khóa học này</p>
+                            <h4 class="mt-3">Course materials</h4>
+                            <p>There are no materials for this course.</p>
                         </div>
                     </div>
                 </div>
@@ -283,12 +283,12 @@ console.log('=== END DEBUG ===');
                 updateProgressBar();
                 showNotification(data.message, 'success');
             } else {
-                showNotification(data.message || 'Có lỗi xảy ra', 'error');
+                showNotification(data.message || 'An error occurred.', 'error');
             }
         })
         .catch(error => {
             console.error('Toggle error:', error);
-            showNotification('Có lỗi kết nối đến server', 'error');
+            showNotification('There was an error connecting to the server.', 'error');
         });
     }
 
@@ -310,14 +310,14 @@ console.log('=== END DEBUG ===');
                         ? 'bi bi-check-square-fill text-purple me-3 toggle-icon completed'
                         : 'bi bi-check-square-fill text-purple me-2 toggle-icon completed';
                     icon.style.color = '#6f42c1';
-                    icon.title = 'Click để bỏ đánh dấu hoàn thành';
+                    icon.title = 'Click to unmark completed';
                 } else {
                     // Chuyển sang trạng thái chưa hoàn thành
                     icon.className = lectureItem.classList.contains('list-group-item') 
                         ? 'bi bi-square text-muted me-3 toggle-icon not-completed'
                         : 'bi bi-square text-muted me-2 toggle-icon not-completed';
                     icon.style.color = '';
-                    icon.title = 'Click để đánh dấu hoàn thành';
+                    icon.title = 'Click to mark complete';
                 }
             }
         });
@@ -367,7 +367,7 @@ console.log('=== END DEBUG ===');
         
         if (!youtubeId) {
             console.error('❌ Invalid YouTube URL:', videoUrl);
-            showNotification('URL video không hợp lệ', 'error');
+            showNotification('Invalid video URL', 'error');
             return;
         }
 
@@ -456,21 +456,21 @@ console.log('=== END DEBUG ===');
                 <h3 class="mb-3">${lectureTitle}</h3>
                 <div class="row mt-4">
                     <div class="col-md-8">
-                        <h5 class="mb-3">Mô tả bài học</h5>
-                        <p class="text-muted">Bài học này là một phần của chương trình khóa học "{{course.title}}". Thời lượng: ${duration} phút.</p>
+                        <h5 class="mb-3">Lesson description</h5>
+                        <p class="text-muted">This lesson is part of the course curriculum:"{{course.title}}". Thời lượng: ${duration} phút.</p>
                     </div>
                     <div class="col-md-4">
                         <div class="card border-0 shadow-sm">
                             <div class="card-body">
-                                <h5 class="card-title">Thông tin bài học</h5>
+                                <h5 class="card-title">Lesson information</h5>
                                 <div class="lecture-meta">
                                     <div class="d-flex justify-content-between mb-2 py-2 border-bottom">
-                                        <span class="text-muted">Thời lượng:</span>
-                                        <span class="fw-medium">${duration} phút</span>
+                                        <span class="text-muted">Duration:</span>
+                                        <span class="fw-medium">${duration} minute</span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-2 py-2 border-bottom">
-                                        <span class="text-muted">Trạng thái:</span>
-                                        <span class="text-success fw-medium">Đang học</span>
+                                        <span class="text-muted">Status:</span>
+                                        <span class="text-success fw-medium">Studying</span>
                                     </div>
                                 </div>
                             </div>
@@ -528,7 +528,7 @@ console.log('=== END DEBUG ===');
                 }
                 
                 if (progressText) {
-                    progressText.textContent = `${progress.completed}/${progress.total} bài học (${progress.percentage}%)`;
+                    progressText.textContent = `${progress.completed}/${progress.total} lesson (${progress.percentage}%)`;
                 }
                 
                 console.log('📊 Progress bar updated:', progress);
