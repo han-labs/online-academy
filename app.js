@@ -38,6 +38,22 @@ app.engine('handlebars', engine({
       const s = Number(start) || 0, e = Number(end) || 0, out = [];
       for (let i = s; i <= e; i++) out.push(i);
       return out;
+    },
+    substring(str, start, end) {
+      return (str || '').substring(start, end);
+    },
+    formatDate(date) {
+      if (!date) return '';
+      const d = new Date(date);
+      return d.toLocaleString('en-GB', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'Asia/Ho_Chi_Minh'
+      });
     }
   },
   defaultLayout: 'main',
