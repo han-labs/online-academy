@@ -1,21 +1,23 @@
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar Curriculum -->
-        <div class="col-lg-3 bg-light border-end" style="height: 100vh; overflow-y: auto;">
+        <!-- Sidebar Curriculum - CÓ THỂ ĐÓNG MỞ -->
+        <div class="col-lg-3 bg-light border-end sidebar-curriculum" id="sidebarCurriculum" style="height: 100vh; overflow-y: auto;">
             <div class="p-3">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0">Nội dung khóa học</h5>
-                    <a href="/courses/{{course.id}}" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-x-lg"></i>
-                    </a>
+                    <div>
+                        <button class="btn btn-outline-secondary btn-sm me-2" id="toggleSidebar">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                       
+                    </div>
                 </div>
 
                 <div class="progress mb-3" style="height: 6px;">
-                    <div class="progress-bar" role="progressbar" style="width: {{progress.percentage}}%"
+                    <div class="progress-bar" role="progressbar" style="width: {{progress.percentage}}%; background-color: #6f42c1;"
                         aria-valuenow="{{progress.percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <small class="text-muted">{{progress.completed}}/{{progress.total}} bài học
-                    ({{progress.percentage}}%)</small>
+                <small class="text-muted">{{progress.completed}}/{{progress.total}} bài học ({{progress.percentage}}%)</small>
 
                 <div class="mt-4">
                     {{#each chapters}}
@@ -25,9 +27,9 @@
                             {{#each this.lectures}}
                             <div class="d-flex align-items-center mb-2">
                                 {{#if (contains ../completedLectureIds this.id)}}
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <i class="bi bi-check-square-fill text-purple me-2" style="color: #6f42c1;"></i>
                                 {{else}}
-                                <i class="bi bi-play-circle text-muted me-2"></i>
+                                <i class="bi bi-square text-muted me-2"></i>
                                 {{/if}}
                                 <a href="#" class="lecture-link text-decoration-none text-dark small"
                                     data-lecture-id="{{this.id}}" data-video-url="{{this.video_url}}"
@@ -45,15 +47,21 @@
         </div>
 
         <!-- Main Content Area - UDEMY STYLE -->
-        <div class="col-lg-9 p-0">
-            
+        <div class="col-lg-9 p-0 main-content" id="mainContent">
             {{!-- VIDEO PLAYER - CHIẾM TOÀN BỘ WIDTH --}}
-            <div class="video-container-wrapper">
+            <div class="video-container-wrapper position-relative">
+                <!-- TOGGLE SIDEBAR BUTTON - UDEMY STYLE -->
+                <div class="sidebar-toggle-container" id="sidebarToggleContainer" style="display: none;">
+                    <button class="btn udemy-sidebar-toggle" id="openSidebar" title="Mở nội dung khóa học">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+                
                 <div id="video-container" class="ratio ratio-16x9 bg-dark">
                     <!-- Placeholder -->
                     <div id="video-placeholder"
                         class="d-flex flex-column justify-content-center align-items-center text-white w-100 h-100">
-                        <i class="bi bi-play-circle" style="font-size: 4rem;"></i>
+                        
                         <h5 class="mt-3">Chọn bài học để bắt đầu</h5>
                     </div>
 
@@ -91,6 +99,12 @@
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="course-content-tab" data-bs-toggle="tab" 
+                                data-bs-target="#course-content" type="button" role="tab">
+                            <i class="bi bi-list-ul me-2"></i>Course Content
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" 
                                 data-bs-target="#reviews" type="button" role="tab">
                             <i class="bi bi-star me-2"></i>Reviews
@@ -117,6 +131,65 @@
                                 <p>Nội dung bài học sẽ hiển thị ở đây</p>
                             </div>
                             <div id="dynamic-lecture-info" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Course Content - TAB MỚI -->
+                    <div class="tab-pane fade" id="course-content" role="tabpanel">
+                        <div class="course-content-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5>Nội dung khóa học</h5>
+                                <div class="progress-info">
+                                    <small class="text-muted">{{progress.completed}}/{{progress.total}} bài học hoàn thành</small>
+                                    <div class="progress mt-1" style="height: 6px; width: 200px;">
+                                        <div class="progress-bar" style="width: {{progress.percentage}}%; background-color: #6f42c1;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{#each chapters}}
+                            <div class="chapter-card mb-4">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0 fw-bold">{{this.title}}</h6>
+                                        <small class="text-muted">{{length this.lectures}} bài giảng</small>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="list-group list-group-flush">
+                                            {{#each this.lectures}}
+                                            <div class="list-group-item d-flex align-items-center py-3">
+                                                {{#if (contains ../completedLectureIds this.id)}}
+                                                <i class="bi bi-check-square-fill text-purple me-3" style="color: #6f42c1; font-size: 1.2rem;"></i>
+                                                {{else}}
+                                                <i class="bi bi-square text-muted me-3" style="font-size: 1.2rem;"></i>
+                                                {{/if}}
+                                                <div class="flex-grow-1">
+                                                    <a href="#" class="lecture-link text-decoration-none text-dark fw-medium"
+                                                        data-lecture-id="{{this.id}}" data-video-url="{{this.video_url}}"
+                                                        data-lecture-title="{{this.title}}" data-duration="{{this.duration_minutes}}">
+                                                        {{this.title}}
+                                                    </a>
+                                                    <div class="d-flex justify-content-between align-items-center mt-1">
+                                                        <small class="text-muted">
+                                                            {{#if is_preview_allowed}}
+                                                            <span class="badge bg-info me-2">Preview</span>
+                                                            {{/if}}
+                                                            {{duration_minutes}} phút
+                                                        </small>
+                                                        {{#if (contains ../completedLectureIds this.id)}}
+                                                        <small class="text-success">
+                                                            <i class="bi bi-check-circle me-1"></i>Đã hoàn thành
+                                                        </small>
+                                                        {{/if}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {{/each}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{/each}}
                         </div>
                     </div>
                     
@@ -240,10 +313,19 @@
                 document.querySelectorAll('.lecture-link').forEach(link => {
                     const lectureId = parseInt(link.getAttribute('data-lecture-id'));
                     if (completedLectureIds.includes(lectureId)) {
-                        const lectureItem = link.closest('.d-flex');
+                        const lectureItem = link.closest('.d-flex, .list-group-item');
                         const icon = lectureItem.querySelector('i');
                         if (icon) {
-                            icon.className = 'bi bi-check-circle-fill text-success me-2';
+                            if (lectureItem.classList.contains('list-group-item')) {
+                                // Tab course content
+                                icon.className = 'bi bi-check-square-fill text-purple me-3';
+                                icon.style.color = '#6f42c1';
+                                icon.style.fontSize = '1.2rem';
+                            } else {
+                                // Sidebar
+                                icon.className = 'bi bi-check-square-fill text-purple me-2';
+                                icon.style.color = '#6f42c1';
+                            }
                         }
                     }
                 });
@@ -255,12 +337,36 @@
 
     // Update UI
     function updateProgressUI(lectureId) {
-        const lectureLink = document.querySelector(`[data-lecture-id="${lectureId}"]`);
-        if (lectureLink) {
-            const lectureItem = lectureLink.closest('.d-flex');
+        // Cập nhật sidebar
+        const sidebarLectureLink = document.querySelector(`.sidebar-curriculum [data-lecture-id="${lectureId}"]`);
+        if (sidebarLectureLink) {
+            const lectureItem = sidebarLectureLink.closest('.d-flex');
             const icon = lectureItem.querySelector('i');
-            if (icon) {
-                icon.className = 'bi bi-check-circle-fill text-success me-2';
+           if (tabIcon) {
+            tabIcon.className = 'bi bi-check-square-fill text-purple me-2';
+            tabIcon.style.color = '#6f42c1';
+            tabIcon.style.fontSize = '1.2rem';
+        }
+        }
+
+        // Cập nhật tab course content
+        const tabLectureLink = document.querySelector(`#course-content [data-lecture-id="${lectureId}"]`);
+        if (tabLectureLink) {
+            const tabLectureItem = tabLectureLink.closest('.list-group-item');
+            const tabIcon = tabLectureItem.querySelector('i');
+            const statusText = tabLectureItem.querySelector('.text-success');
+            
+            if (tabIcon) {
+                tabIcon.className = 'bi bi-check-square-fill text-purple me-3';
+                tabIcon.style.color = '#6f42c1';
+                tabIcon.style.fontSize = '1.2rem';
+            }
+            
+            if (!statusText) {
+                const statusDiv = document.createElement('small');
+                statusDiv.className = 'text-success';
+                statusDiv.innerHTML = '<i class="bi bi-check-circle me-1"></i>Đã hoàn thành';
+                tabLectureItem.querySelector('.flex-grow-1 .d-flex').appendChild(statusDiv);
             }
         }
         
@@ -429,6 +535,37 @@
             lectureLink.click();
         }
     }
+
+    // SIDEBAR TOGGLE FUNCTIONALITY
+    let sidebarOpen = true;
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebarCurriculum');
+        const mainContent = document.getElementById('mainContent');
+        const toggleContainer = document.getElementById('sidebarToggleContainer');
+        
+        if (sidebarOpen) {
+            // Đóng sidebar
+            sidebar.classList.remove('col-lg-3');
+            sidebar.style.display = 'none';
+            mainContent.classList.remove('col-lg-9');
+            mainContent.classList.add('col-lg-12');
+            toggleContainer.style.display = 'block';
+        } else {
+            // Mở sidebar
+            sidebar.classList.add('col-lg-3');
+            sidebar.style.display = 'block';
+            mainContent.classList.remove('col-lg-12');
+            mainContent.classList.add('col-lg-9');
+            toggleContainer.style.display = 'none';
+        }
+        
+        sidebarOpen = !sidebarOpen;
+    }
+
+    // Event listeners cho sidebar
+    document.getElementById('toggleSidebar')?.addEventListener('click', toggleSidebar);
+    document.getElementById('openSidebar')?.addEventListener('click', toggleSidebar);
 
     // Initialize on load
     document.addEventListener('DOMContentLoaded', function() {

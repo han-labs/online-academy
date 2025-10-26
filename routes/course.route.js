@@ -64,6 +64,7 @@ router.get('/:id', async (req, res) => {
     const [curriculum, reviews, related] = await Promise.all([
         courseModel.curriculum(id),
         courseModel.reviews(id, 10),
+        
         courseModel.relatedBestSellers(course.category_id, id, 5)
     ]);
 
