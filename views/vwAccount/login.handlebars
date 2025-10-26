@@ -4,8 +4,8 @@
     <div class="container">
         <div class="auth-card">
             <div class="auth-logo">
-                <h2>Đăng nhập</h2>
-                <p>Chào mừng bạn quay lại!</p>
+                <h2>Sign in</h2>
+                <p>Welcome back</p>
             </div>
 
             {{#if error}}
@@ -25,17 +25,17 @@
                     <label class="form-label" for="email">
                         <i class="bi bi-envelope"></i> Email
                     </label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="example@email.com"
+                    <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com"
                         required autofocus>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label" for="password">
-                        <i class="bi bi-lock"></i> Mật khẩu
+                        <i class="bi bi-lock"></i> Password
                     </label>
                     <div class="password-toggle">
                         <input type="password" class="form-control" id="password" name="password"
-                            placeholder="Nhập mật khẩu" required>
+                            placeholder="Enter your password" required>
                         <i class="bi bi-eye toggle-icon" id="togglePassword"></i>
                     </div>
                 </div>
@@ -44,25 +44,25 @@
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="remember" name="remember">
                         <label class="form-check-label small" for="remember">
-                            Ghi nhớ đăng nhập
+                            Remember me
                         </label>
                     </div>
                     <a href="/account/forgot-password" class="small text-decoration-none">
-                        Quên mật khẩu?
+                        Forgot password?
                     </a>
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="btnSubmit">
-                    <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
+                    <i class="bi bi-box-arrow-in-right"></i> Sign in
                 </button>
             </form>
 
             <div class="auth-divider">
-                <span>hoặc</span>
+                <span>or</span>
             </div>
 
             <div class="social-login">
-                <button type="button" class="btn-google" onclick="alert('Tính năng đang phát triển')">
+                <a class="btn-google" href="/auth/google">
                     <svg width="18" height="18" viewBox="0 0 18 18">
                         <path fill="#4285F4"
                             d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z" />
@@ -74,15 +74,11 @@
                             d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z" />
                     </svg>
                     Google
-                </button>
-                <button type="button" class="btn-facebook" onclick="alert('Tính năng đang phát triển')">
-                    <i class="bi bi-facebook"></i>
-                    Facebook
-                </button>
+                </a>
             </div>
 
             <div class="auth-footer">
-                Chưa có tài khoản? <a href="/account/register">Đăng ký ngay</a>
+                New to Online Academy? <a href="/account/register">Create an account</a>
             </div>
         </div>
     </div>
@@ -117,6 +113,6 @@
 
         btn.disabled = true;
         btn.classList.add('btn-loading');
-        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang đăng nhập...';
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Signing in...';
     });
 </script>

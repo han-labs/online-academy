@@ -4,8 +4,8 @@
         <div class="container">
                 <div class="auth-card">
                         <div class="auth-logo">
-                                <h2>Đăng ký tài khoản</h2>
-                                <p>Tham gia cùng hàng triệu học viên trên Online Academy</p>
+                                <h2>Create your account</h2>
+                                <p>Join millions of learners on Online Academy</p>
                         </div>
 
                         {{#if error}}
@@ -23,11 +23,11 @@
                         <form method="post" action="/account/register" class="auth-form" id="registerForm">
                                 <div class="mb-3">
                                         <label class="form-label" for="full_name">
-                                                <i class="bi bi-person"></i> Họ và tên
+                                                <i class="bi bi-person"></i> Full name
                                         </label>
                                         <input type="text" class="form-control" id="full_name" name="full_name"
-                                                placeholder="Nguyễn Văn A" required minlength="3">
-                                        <div class="invalid-feedback">Họ tên phải có ít nhất 3 ký tự</div>
+                                                placeholder="John Doe" required minlength="3">
+                                        <div class="invalid-feedback">Full name must be at least 3 characters</div>
                                 </div>
 
                                 <div class="mb-3">
@@ -35,53 +35,54 @@
                                                 <i class="bi bi-envelope"></i> Email
                                         </label>
                                         <input type="email" class="form-control" id="email" name="email"
-                                                placeholder="example@email.com" required>
-                                        <div class="invalid-feedback">Email không hợp lệ</div>
+                                                placeholder="name@example.com" required>
+                                        <div class="invalid-feedback">Invalid email address</div>
                                 </div>
 
                                 <div class="mb-3">
                                         <label class="form-label" for="password">
-                                                <i class="bi bi-lock"></i> Mật khẩu
+                                                <i class="bi bi-lock"></i> Password
                                         </label>
                                         <div class="password-toggle">
                                                 <input type="password" class="form-control" id="password"
-                                                        name="password" placeholder="Tối thiểu 6 ký tự" required
+                                                        name="password" placeholder="At least 6 characters" required
                                                         minlength="6">
                                                 <i class="bi bi-eye toggle-icon" id="togglePassword"></i>
                                         </div>
-                                        <div class="invalid-feedback">Mật khẩu phải có ít nhất 6 ký tự</div>
-                                        <small class="text-muted">Mật khẩu nên bao gồm chữ hoa, chữ thường và số</small>
+                                        <div class="invalid-feedback">Password must be at least 6 characters</div>
+                                        <small class="text-muted">Use a mix of uppercase, lowercase, and
+                                                numbers.</small>
                                 </div>
 
                                 <div class="mb-3">
                                         <label class="form-label" for="confirm_password">
-                                                <i class="bi bi-lock-fill"></i> Xác nhận mật khẩu
+                                                <i class="bi bi-lock-fill"></i> Confirm password
                                         </label>
                                         <div class="password-toggle">
                                                 <input type="password" class="form-control" id="confirm_password"
-                                                        name="confirm_password" placeholder="Nhập lại mật khẩu"
+                                                        name="confirm_password" placeholder="Re-enter your password"
                                                         required>
                                                 <i class="bi bi-eye toggle-icon" id="toggleConfirmPassword"></i>
                                         </div>
-                                        <div class="invalid-feedback">Mật khẩu không khớp</div>
+                                        <div class="invalid-feedback">Passwords do not match</div>
                                 </div>
 
                                 <div class="mb-3 form-check">
                                         <input type="checkbox" class="form-check-input" id="terms" required>
                                         <label class="form-check-label small" for="terms">
-                                                Tôi đồng ý với <a href="#" class="text-decoration-none">Điều khoản sử
-                                                        dụng</a> và
-                                                <a href="#" class="text-decoration-none">Chính sách bảo mật</a>
+                                                I agree to the <a href="#" class="text-decoration-none">Terms of Use</a>
+                                                and
+                                                <a href="#" class="text-decoration-none">Privacy Policy</a>
                                         </label>
                                 </div>
 
                                 <button type="submit" class="btn btn-primary" id="btnSubmit">
-                                        <i class="bi bi-person-plus"></i> Tạo tài khoản
+                                        <i class="bi bi-person-plus"></i> Create account
                                 </button>
                         </form>
 
                         <div class="auth-footer">
-                                Đã có tài khoản? <a href="/account/login">Đăng nhập ngay</a>
+                                Already have an account? <a href="/account/login">Sign in</a>
                         </div>
                 </div>
         </div>
@@ -141,7 +142,7 @@
                 // Loading state
                 btn.disabled = true;
                 btn.classList.add('btn-loading');
-                btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
+                btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
         });
 
         // Remove invalid class on input

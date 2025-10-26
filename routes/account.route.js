@@ -196,8 +196,10 @@ router.post('/login', requireGuest, async (req, res) => {
             name: user.full_name,
             email: user.email,
             role: user.role,
+            auth_provider: user.auth_provider || 'local',
             permission: user.role === 'admin' ? 1 : 0
         };
+
 
         // Remember me
         if (remember) {
@@ -256,40 +258,40 @@ router.get('/profile', requireAuth, async (req, res) => {
 router.post('/profile', requireAuth, async (req, res) => {
     const { full_name, email } = req.body;
     const myId = req.session.user.id;
+    const isGoogle = (req.session.user.auth_provider || 'local') === 'google';
 
-    if (!full_name || !email) {
-        return res.redirect('/account/profile?error=2'); // Missing fields
+    // Nếu là Google: chỉ cần full_name
+    if (!full_name || (!isGoogle && !email)) {
+        return res.redirect('/account/profile?error=2');
     }
 
     try {
-        // Check email unique (except current user)
+        if (isGoogle) {
+            // Chỉ cập nhật tên, KHÔNG động vào email
+            await db('users').where({ id: myId }).update({ full_name });
+            req.session.user.name = full_name;
+            return res.redirect('/account/profile?success=1');
+        }
+
+        // Local: cho đổi email -> check trùng
         const existed = await db('users')
             .where({ email })
             .andWhereNot({ id: myId })
             .first();
+        if (existed) return res.redirect('/account/profile?error=1');
 
-        if (existed) {
-            return res.redirect('/account/profile?error=1'); // Email exists
-        }
-
-        // Update user
-        await db('users').where({ id: myId }).update({
-            full_name,
-            email,
-            updated_at: new Date()
-        });
-
-        // Update session
+        await db('users').where({ id: myId }).update({ full_name, email });
         req.session.user.name = full_name;
         req.session.user.email = email;
 
         return res.redirect('/account/profile?success=1');
-
-    } catch (error) {
-        console.error('Update profile error:', error);
-        return res.redirect('/account/profile?error=3'); // Server error
+    } catch (err) {
+        console.error('Update profile error:', err);
+        return res.redirect('/account/profile?error=3');
     }
 });
+
+
 
 // ============================================
 // ĐỔI MẬT KHẨU

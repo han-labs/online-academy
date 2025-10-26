@@ -3,8 +3,10 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const p = new URLSearchParams(location.search);
-        if (p.get('success') === '1') Swal.fire({ title: 'Thành công', text: 'Cập nhật hồ sơ xong.', icon: 'success' });
-        if (p.get('error') === '1') Swal.fire({ title: 'Lỗi', text: 'Email đã tồn tại.', icon: 'error' });
+        if (p.get('success') === '1') Swal.fire({ title: 'Success', text: 'Profile updated.', icon: 'success' });
+        if (p.get('error') === '1') Swal.fire({ title: 'Error', text: 'Email is already in use.', icon: 'error' });
+        if (p.get('error') === '2') Swal.fire({ title: 'Error', text: 'Full name and email are required.', icon: 'error' });
+        if (p.get('error') === '3') Swal.fire({ title: 'Error', text: 'A server error occurred. Please try again.', icon: 'error' });
     });
 </script>
 
@@ -16,9 +18,14 @@
             <div class="card mb-4">
                 <div class="card-body text-center">
                     <div class="mb-3">
+                        {{#if me.profile_picture_url}}
+                        <img src="{{me.profile_picture_url}}" class="rounded-circle"
+                            style="width:96px;height:96px;object-fit:cover;" alt="avatar">
+                        {{else}}
                         <i class="bi bi-person-circle" style="font-size:4rem;color:#6c757d;"></i>
+                        {{/if}}
                     </div>
-                    <h3 class="mb-0">{{me.full_name}}</h3>
+                    <h3 class="mb-0">Hi, {{me.full_name}}</h3>
                     <p class="text-muted">{{me.email}}</p>
                     <small class="badge {{#if (eq user.role 'admin')}}text-bg-success{{else}}text-bg-secondary{{/if}}">
                         {{#if (eq user.role 'admin')}}Administrator{{else if (eq user.role
@@ -32,24 +39,32 @@
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-person-gear"></i> Thông tin cá nhân</h5>
+                            <h5 class="mb-0"><i class="bi bi-person-gear"></i> Personal info</h5>
                         </div>
                         <div class="card-body">
                             <form id="frmProfile" method="post" action="/account/profile">
                                 <div class="mb-3">
-                                    <label class="form-label">Họ tên</label>
+                                    <label class="form-label">Full name</label>
                                     <input class="form-control" id="txtName" name="full_name" value="{{me.full_name}}"
                                         required>
                                 </div>
+
                                 <div class="mb-3">
                                     <label class="form-label">Email</label>
                                     <input class="form-control" id="txtEmail" type="email" name="email"
-                                        value="{{me.email}}" required>
+                                        value="{{me.email}}" {{#if (eq me.auth_provider 'google' )}}disabled{{/if}}
+                                        required>
+                                    {{#if (eq me.auth_provider 'google')}}
+                                    <small class="text-muted d-block mt-1">
+                                        Your email is linked with Google and can’t be changed here.
+                                    </small>
+                                    {{/if}}
                                 </div>
+
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <button class="btn btn-primary"><i class="bi bi-check2-circle"></i> Cập
-                                        nhật</button>
-                                    <a class="btn btn-secondary" href="/">Về trang chủ</a>
+                                    <button class="btn btn-primary"><i class="bi bi-check2-circle"></i> Save
+                                        changes</button>
+                                    <a class="btn btn-secondary" href="/">Back to Home</a>
                                 </div>
                             </form>
                         </div>
@@ -60,7 +75,7 @@
                 <div class="col-md-4">
                     <div class="card">
                         <div class="card-header">
-                            <h6 class="mb-0"><i class="bi bi-info-circle"></i> Tài khoản</h6>
+                            <h6 class="mb-0"><i class="bi bi-info-circle"></i> Account</h6>
                         </div>
                         <div class="card-body">
                             <div class="mb-2">
@@ -68,7 +83,7 @@
                                 <div class="fw-semibold text-break">{{me.id}}</div>
                             </div>
                             <div class="mb-2">
-                                <small class="text-muted">Loại tài khoản</small>
+                                <small class="text-muted">Account type</small>
                                 <div>
                                     <span
                                         class="badge {{#if (eq user.role 'admin')}}text-bg-success{{else if (eq user.role 'instructor')}}text-bg-primary{{else}}text-bg-secondary{{/if}}">
@@ -78,31 +93,31 @@
                                 </div>
                             </div>
                             <div class="mb-2">
-                                <small class="text-muted">Tham gia</small>
+                                <small class="text-muted">Joined</small>
                                 <div>{{me.created_at}}</div>
                             </div>
                             <div class="mb-2">
-                                <small class="text-muted">Đã ghi danh</small>
-                                <div><span class="badge text-bg-dark">{{stats.enrollments}}</span> khóa học</div>
+                                <small class="text-muted">Enrolled</small>
+                                <div><span class="badge text-bg-dark">{{stats.enrollments}}</span> courses</div>
                             </div>
                             <div class="mb-2">
                                 <small class="text-muted">Watchlist</small>
-                                <div><span class="badge text-bg-dark">{{stats.watchlists}}</span> khóa</div>
+                                <div><span class="badge text-bg-dark">{{stats.watchlists}}</span> courses</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="card mt-3">
                         <div class="card-header">
-                            <h6 class="mb-0"><i class="bi bi-lightning"></i> Nhanh</h6>
+                            <h6 class="mb-0"><i class="bi bi-lightning"></i> Quick actions</h6>
                         </div>
                         <div class="card-body">
                             <div class="d-grid gap-2">
                                 <a href="/categories/1" class="btn btn-outline-primary btn-sm"><i
-                                        class="bi bi-collection"></i> Khóa học</a>
+                                        class="bi bi-collection"></i> Courses</a>
                                 <form action="/account/logout" method="post" class="d-inline">
                                     <button class="btn btn-outline-danger btn-sm w-100"><i
-                                            class="bi bi-box-arrow-right"></i> Đăng xuất</button>
+                                            class="bi bi-box-arrow-right"></i> Sign out</button>
                                 </form>
                             </div>
                         </div>
@@ -122,7 +137,7 @@
         const email = document.querySelector('#txtEmail').value.trim();
         if (!name || !email) {
             e.preventDefault();
-            Swal.fire({ title: 'Lỗi', text: 'Họ tên và Email bắt buộc.', icon: 'error' });
+            Swal.fire({ title: 'Error', text: 'Full name and email are required.', icon: 'error' });
         }
     });
 </script>
