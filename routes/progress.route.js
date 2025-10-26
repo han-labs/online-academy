@@ -73,4 +73,33 @@ router.get('/:courseId', requireAuth, async (req, res) => {
     }
 });
 
+// POST /api/progress/toggle - Toggle trạng thái hoàn thành
+router.post('/toggle', requireAuth, async (req, res) => {
+    try {
+        const { lecture_id } = req.body;
+        const userId = req.session.user.id;
+
+        if (!lecture_id) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Thiếu lecture_id' 
+            });
+        }
+
+        const result = await progressModel.toggleCompletion(userId, lecture_id);
+        
+        res.json({ 
+            success: true, 
+            message: result.completed ? 'Đã đánh dấu hoàn thành' : 'Đã bỏ đánh dấu hoàn thành',
+            data: result
+        });
+
+    } catch (error) {
+        console.error('Toggle progress error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Có lỗi xảy ra' 
+        });
+    }
+});
 export default router;

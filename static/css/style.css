@@ -703,5 +703,53 @@ footer a:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
+/* ============================================
+   PLYR QUALITY SELECTOR STYLES
+   ============================================ */
+.plyr__menu__container [data-plyr="quality"] {
+    font-size: 0.9rem;
+}
 
+.plyr__menu__container .plyr__control--forward {
+    padding: 8px 16px;
+}
 
+.plyr__menu__container .plyr__control--forward:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.plyr__menu__value {
+    color: #f4c150;
+    font-weight: 500;
+}
+
+/* Settings button styling */
+.plyr__controls .plyr__controls__item.plyr__control[data-plyr="settings"] {
+    background: transparent;
+    border: none;
+}
+
+.plyr__controls .plyr__controls__item.plyr__control[data-plyr="settings"]:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* Interactive Icons */
+.toggle-icon {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 3px;
+    padding: 2px;
+}
+
+.toggle-icon:hover {
+    transform: scale(1.1);
+    background-color: rgba(111, 66, 193, 0.1);
+}
+
+.toggle-icon.completed:hover {
+    opacity: 0.8;
+}
+
+.toggle-icon.not-completed:hover {
+    color: #6f42c1 !important;
+}

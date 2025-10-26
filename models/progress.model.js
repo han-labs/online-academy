@@ -34,7 +34,7 @@ export default {
             .select('lectures.id as lecture_id');
 
         const lectureIds = lectures.map(l => l.lecture_id);
-        
+
         if (lectureIds.length === 0) return { completed: 0, total: 0, percentage: 0 };
 
         // Đếm số bài đã hoàn thành
@@ -59,5 +59,31 @@ export default {
             .where('lecture_progress.user_id', userId)
             .where('chapters.course_id', courseId)
             .select('lecture_progress.lecture_id');
+    },
+
+    async toggleCompletion(userId, lectureId) {
+        try {
+            // Kiểm tra xem đã hoàn thành chưa
+            const existing = await this.isCompleted(userId, lectureId);
+
+            if (existing) {
+                // Nếu đã hoàn thành → xóa (bỏ tích)
+                await db('lecture_progress')
+                    .where({ user_id: userId, lecture_id: lectureId })
+                    .del();
+                return { action: 'removed', completed: false };
+            } else {
+                // Nếu chưa hoàn thành → thêm (tích)
+                await db('lecture_progress').insert({
+                    user_id: userId,
+                    lecture_id: lectureId,
+                    completed_at: new Date()
+                });
+                return { action: 'added', completed: true };
+            }
+        } catch (error) {
+            console.error('Toggle progress error:', error);
+            throw error;
+        }
     }
 };

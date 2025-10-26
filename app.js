@@ -60,10 +60,18 @@ app.engine('handlebars', engine({
     substring(str, start, end) {
       return (str || '').substring(start, end);
     },
-    contains: (array, value) => {
-    if (!Array.isArray(array)) return false;
-    return array.includes(value);
+   // Trong app.js, sửa helper contains
+  contains: function(array, value) {
+    console.log('🎯 HELPER CONTAINS CALLED - array:', array, 'value:', value, 'type of array:', typeof array);
+    if (!array || !Array.isArray(array)) {
+        console.log('❌ Array is invalid or not an array');
+        return false;
+    }
+    const result = array.includes(value);
+    console.log('✅ Contains result:', result);
+    return result;
 }
+
   },
   defaultLayout: 'main',
   layoutsDir: path.join(__dirname, 'views/layouts'),

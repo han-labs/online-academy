@@ -156,14 +156,17 @@ router.get('/:id/learn', requireAuth, async (req, res) => {
             ratingStats,
             userReview: userReview ? 'exists' : 'none'
         });
-
+        // Trong route GET /:id/learn
+console.log('✅ Completed lectures from DB:', completedLectureIds);
+console.log('✅ Type of completedLectureIds:', typeof completedLectureIds);
+console.log('✅ Is array?', Array.isArray(completedLectureIds));
         res.render('vwCourse/learn', {
             course,
             chapters: chaptersWithLectures,
             lectures: curriculum.lectures,
             totalLectures: curriculum.lectures.length,
             progress, //  Truyền progress data
-            completedLectureIds ,//  Truyền completed lectures
+            completedLectureIds,//  Truyền completed lectures
             reviews,              // ← TRUYỀN REVIEWS THỰC
             ratingStats,          // ← TRUYỀN RATING STATS  
             userReview,           // ← TRUYỀN USER REVIEW
