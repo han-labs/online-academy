@@ -1,25 +1,36 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-  <h1 class="h2">Quản lý khoá học</h1>
+  <h1 class="h2">Course Management</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <a href="/admin/courses/create" class="btn btn-primary mb-3">
+      <i class="bi bi-plus-lg"></i>
+      Add Course
+    </a>
+  </div>
 </div>
 
-{{#if flash}}
-<div class="alert alert-{{flash.type}} alert-dismissible fade show" role="alert">
-  {{flash.message}}
-  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
+{{#if error}}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Error:</strong> An error has occurred. Please try again.
+</div>  
+{{/if}}
+
+{{#if success}}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Success:</strong> The operation has been completed successfully.
+</div>  
 {{/if}}
 
 <div class="table-responsive">
-  <table class="table table-striped">
-    <thead>
+  <table class="table table-bordered align-middle">
+    <thead class="table-dark text-center">
       <tr>
         <th>ID</th>
-        <th>Tên khoá học</th>
-        <th>Giảng viên</th>
-        <th>Lĩnh vực</th>
-        <th>Giá</th>
-        <th>Trạng thái</th>
-        <th>Thao tác</th>
+        <th>Course Name</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -27,24 +38,42 @@
       <tr>
         <td>{{id}}</td>
         <td>{{title}}</td>
-        <td>{{instructor_name}}</td>
         <td>{{category_name}}</td>
-        <td>{{formatCurrency price}}</td>
-        <td>
+        <td class="text-center">
           <span class="badge bg-{{getStatusBadge status}}">
             {{getStatusText status}}
           </span>
         </td>
         <td>
-          <form method="post" action="/admin/courses/remove" onsubmit="return confirm('Gỡ bỏ khoá học này?')">
-            <input type="hidden" name="id" value="{{id}}">
-            <button class="btn btn-sm btn-danger">
-              <i class="bi bi-trash"></i> Gỡ bỏ
-            </button>
-          </form>
+          <div class="d-flex gap-2 justify-content-center">
+            <a href="/admin/courses/{{id}}" class="btn btn-sm btn-primary">
+              <i class="bi bi-eye"></i> Details
+            </a>
+            <a href="/admin/courses/{{id}}/edit" class="btn btn-sm btn-warning">
+              <i class="bi bi-pencil"></i> Edit
+            </a>
+            <form method="post" action="/admin/courses/delete" class="d-inline frmDeleteCourse" data-course-title="{{title}}">
+              <input type="hidden" name="id" value="{{id}}">
+              <button type="submit" class="btn btn-sm btn-danger">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </form>
+          </div>
         </td>
       </tr>
       {{/each}}
     </tbody>
   </table>
 </div>
+
+<script>
+  // Confirm course deletion
+  document.querySelectorAll('.frmDeleteCourse').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const courseTitle = this.getAttribute('data-course-title');
+      if (!confirm(`Are you sure you want to delete the course "${courseTitle}"?`)) {
+        e.preventDefault();
+      }
+    });
+  });
+</script>
