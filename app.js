@@ -11,9 +11,10 @@ import categoryRouter from './routes/category.route.js';
 import accountRouter from './routes/account.route.js';
 import courseRouter from './routes/course.route.js';
 
-// Admin (giữ đúng router hiện có)
-import adminCategoryRouter from './routes/admin.category.route.js';
+// Admin 
+import adminRouter from './routes/admin.route.js';
 import { requireAuth, checkAdmin } from './middlewares/auth.js';
+
 
 // OAuth
 import { mountGoogleAuth } from './middlewares/google.oauth.js';
@@ -133,8 +134,8 @@ app.use('/account', accountRouter);
 app.use('/categories', categoryRouter);
 app.use('/courses', courseRouter);
 
-// admin (ví dụ quản lý categories)
-app.use('/admin/categories', requireAuth, checkAdmin, adminCategoryRouter);
+// admin 
+app.use('/admin', requireAuth, checkAdmin, adminRouter);
 
 // student features
 app.use('/student', requireAuth, studentRouter);
