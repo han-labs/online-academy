@@ -1,0 +1,144 @@
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="/courses/{{course.id}}" class="btn btn-outline-secondary btn-sm me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h2 class="mb-0">Checkout</h2>
+            </div>
+
+            <!-- Course Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-cart-check"></i> Course</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="{{course.image_url}}" class="img-fluid rounded" alt="{{course.title}}">
+                        </div>
+                        <div class="col-md-9">
+                            <h5>{{course.title}}</h5>
+                            <p class="text-muted mb-2">{{course.instructor_name}}</p>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="text-warning me-2">{{formatNumber course.rating}}</span>
+                                <span class="text-muted">({{formatNumber course.rating_count}} reviews)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-credit-card"></i> Payment Methods</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Payment demo:</strong> This is a simulated checkout page.
+                        Click “Complete Payment” to proceed.
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" checked>
+                        <label class="form-check-label" for="creditCard">
+                            <i class="bi bi-credit-card-2-front"></i> Credit/Debit Card
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="momo">
+                        <label class="form-check-label" for="momo">
+                            <i class="bi bi-wallet2"></i> MoMo e-wallet
+                        </label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer">
+                        <label class="form-check-label" for="bankTransfer">
+                            <i class="bi bi-bank"></i> Bank Transfer
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Summary -->
+        <div class="col-lg-4">
+            <div class="card position-sticky" style="top: 20px;">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-receipt"></i> Payment Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Original price:</span>
+                        <span>{{formatNumber course.price}}₫</span>
+                    </div>
+
+                    {{#ifPromo course.price course.promotional_price}}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Discount:</span>
+                        <span class="text-danger">-{{formatNumber (sub course.price course.promotional_price)}}₫</span>
+                    </div>
+                    {{/ifPromo}}
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong class="text-success h5">
+                            {{#ifPromo course.price course.promotional_price}}
+                            {{formatNumber course.promotional_price}}₫
+                            {{else}}
+                            {{formatNumber course.price}}₫
+                            {{/ifPromo}}
+                        </strong>
+                    </div>
+
+                    <!-- Terms -->
+                    <div class="form-check small mb-3">
+                        <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                        <label class="form-check-label" for="agreeTerms">
+                            I agree to the <a href="#">Terms of Service</a> and the <a href="#">Refund Policy</a>
+                        </label>
+                    </div>
+
+                    <!-- Pay button -->
+                    <form action="/checkout/{{course.id}}/process" method="POST">
+                        <button type="submit" class="btn btn-success w-100 btn-lg" id="btnCheckout">
+                            <i class="bi bi-lock-fill"></i> Complete Payment
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-shield-check"></i>
+                            Secure and encrypted payment
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const agreeTerms = document.getElementById('agreeTerms');
+        const btn = document.getElementById('btnCheckout');
+
+        if (!agreeTerms.checked) {
+            e.preventDefault();
+            alert('Please agree to the Terms of Service.');
+            return;
+        }
+
+        // Loading state
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+    });
+</script>

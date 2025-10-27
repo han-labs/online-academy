@@ -1,0 +1,110 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Category Management</h1>
+
+  <a href="/admin/categories/add" class="btn btn-primary mb-3">
+    <i class="bi bi-plus-circle"></i> Add Category
+  </a>
+</div>
+
+{{#if error}}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Error:</strong> An error has occurred. Please try again.
+</div>  
+{{/if}}
+
+{{#if success}}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Success:</strong> The operation has been completed successfully.
+</div>  
+{{/if}}
+
+<div class="table-responsive">
+  <table class="table table-bordered align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Category Name</th>
+        <th>Type</th>
+        <th>Parent ID</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each categories}}
+<tr>
+  <td>{{id}}</td>
+  <td>{{name}}</td>
+  <td>
+    {{#if (eq parent_id null)}}
+      <span class="badge bg-primary">Parent Category</span>
+    {{else}}
+      <span class="badge bg-secondary">Subcategory</span>
+    {{/if}}
+  </td>
+  <td>{{#if parent_id}}{{parent_id}}{{else}}-{{/if}}</td>
+  <td>
+  <div class="d-flex gap-2">
+    <a href="/admin/categories/detail/{{id}}" class="btn btn-sm btn-info">
+      <i class="bi bi-eye"></i> Details
+    </a>
+    <a href="/admin/categories/edit/{{id}}" class="btn btn-sm btn-warning">
+      <i class="bi bi-pencil"></i> Edit
+    </a>
+
+    <form 
+      class="frmDeleteCategory d-inline" 
+      data-category-id="{{id}}" 
+      data-category-name="{{name}}" 
+      action="/admin/categories/delete/{{id}}" 
+      method="POST">
+      <button type="submit" class="btn btn-sm btn-danger">
+        <i class="bi bi-trash"></i> Delete
+      </button>
+    </form>
+  </div>
+</td>
+</tr>
+{{/each}}
+    </tbody>
+  </table>
+</div>
+
+<script>
+document.querySelectorAll(".frmDeleteCategory").forEach((form) => {
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const categoryId = this.dataset.categoryId;
+    const categoryName = this.dataset.categoryName;
+
+    try {
+      const response = await fetch(`/admin/categories/${categoryId}/check-delete`);
+      const data = await response.json();
+
+      if (data.canDelete) {
+        if (confirm(`Are you sure you want to delete the category "${categoryName}"?`)) {
+          this.submit(); // Submit the actual form
+        }
+      } else {
+        let message = `Cannot delete category "${categoryName}" because:`;
+
+        if (data.courseCount > 0) {
+          message += `\n- Has ${data.courseCount} courses`;
+        }
+
+        if (data.childrenCount > 0) {
+          message += `\n- Has ${data.childrenCount} subcategories`;
+        }
+
+        message += `\n\nPlease move or delete these items first.`;
+        alert(message);
+      }
+    } catch (error) {
+      console.error("Error checking category deletion:", error);
+      alert("An error occurred while checking category deletion possibility");
+    }
+  });
+});
+</script>

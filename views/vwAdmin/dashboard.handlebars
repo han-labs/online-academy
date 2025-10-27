@@ -1,0 +1,105 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Dashboard</h1>
+</div>
+
+{{#if error}}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Error:</strong> An error has occurred. Please try again.
+</div>  
+{{/if}}
+
+{{#if success}}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Success:</strong> The operation has been completed successfully.
+</div>  
+{{/if}}
+
+<div class="row">
+  <!-- Statistics -->
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-primary">
+      <div class="card-body">
+        <h5 class="card-title">Students</h5>
+        <h2 class="card-text">{{stats.total_students}}</h2>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-success">
+      <div class="card-body">
+        <h5 class="card-title">Instructors</h5>
+        <h2 class="card-text">{{stats.total_instructors}}</h2>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-warning">
+      <div class="card-body">
+        <h5 class="card-title">Courses</h5>
+        <h2 class="card-text">{{stats.total_courses}}</h2>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-info">
+      <div class="card-body">
+        <h5 class="card-title">Revenue</h5>
+        <h2 class="card-text">{{formatCurrency stats.total_revenue}}</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Courses -->
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h4>Latest Courses</h4>
+  </div>
+      <div class="card-body">
+        {{#if recentCourses.length}}
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-dark text-center">
+                <tr>
+                  <th>Course Name</th>
+                  <th>Instructor</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Created Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each recentCourses}}
+                <tr>
+                  <td>{{this.title}}</td>
+                  <td>{{this.instructor_name}}</td>
+                  <td class="text-center">{{formatCurrency this.price}}</td>
+                  <td class="text-center">
+                    <span class="badge bg-{{getStatusBadge this.status}}">
+                      {{getStatusText this.status}}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    {{#if this.created_at}}
+                      {{formatDate this.created_at}}
+                    {{else}}
+                      {{#if this.last_updated}}
+                        {{formatDate this.last_updated}}
+                      {{else}}
+                        <span class="text-muted">N/A</span>
+                      {{/if}}
+                    {{/if}}
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        {{else}}
+          <p class="text-muted">No courses available</p>
+        {{/if}}
+      </div>

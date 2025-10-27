@@ -1,0 +1,70 @@
+{{!-- vwTeacher/addCourse.handlebars --}}
+
+<div class="container my-5">
+  <h2 class="mb-4 text-center text-primary fw-bold">Add New Course</h2>
+
+  <form action="/teacher/course/add" method="POST" enctype="multipart/form-data" class="bg-light p-4 rounded shadow-sm">
+    <div class="mb-3">
+      <label class="form-label">Course Title</label>
+      <input type="text" name="title" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Cover Image</label>
+      <input type="file" name="image" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label class="fw-semibold">Category</label>
+      <select name="category_id" class="form-select" required>
+        <option value="" disabled>-- Select Category --</option>
+
+        {{#each categoriesTree}}
+          <optgroup label="📁 {{this.name}}">
+            {{#each this.children}}
+              <option value="{{this.id}}"
+                {{#if (eq ../../selectedCategoryId this.id)}}selected{{/if}}>
+                — {{this.name}}
+              </option>
+            {{/each}}
+          </optgroup>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Price</label>
+        <input type="number" name="price" class="form-control" required>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Promotional Price</label>
+        <input type="number" name="promotional_price" class="form-control">
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Short Description</label>
+      <textarea name="short_description" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Detailed Description</label>
+      <textarea name="detailed_description" id="editor" class="form-control" rows="8"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success px-4 py-2">Add Course</button>
+  </form>
+</div>
+
+{{!-- TinyMCE --}}
+<script src="hw9pfh30njixlu4voz8ag8msnnnr4ofingpiklyaaie8hhdy" referrerpolicy="origin"></script>
+<script>
+  tinymce.init({
+    selector: '#editor',
+    height: 400,
+    plugins: 'lists link image table code',
+    toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image table | code'
+  });
+</script>

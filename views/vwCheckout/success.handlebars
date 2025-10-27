@@ -1,0 +1,64 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <!-- Success Icon -->
+            <div class="mb-4">
+                <i class="bi bi-check-circle-fill" style="font-size: 4rem; color: #28a745;"></i>
+            </div>
+
+            <!-- Message -->
+            <h1 class="mb-3">Payment Successful!</h1>
+            <p class="lead mb-4">Congratulations! You have successfully enrolled in the course.</p>
+
+            <!-- Course Info -->
+            <div class="card mx-auto mb-4" style="max-width: 400px;">
+                <div class="card-body">
+                    <img src="{{course.image_url}}" class="card-img-top mb-3" alt="{{course.title}}">
+                    <h5 class="card-title">{{course.title}}</h5>
+                    <p class="card-text text-muted">Instructor: {{course.instructor_name}}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-success fw-bold">
+                            {{#ifPromo course.price course.promotional_price}}
+                            {{formatNumber course.promotional_price}}₫
+                            {{else}}
+                            {{formatNumber course.price}}₫
+                            {{/ifPromo}}
+                        </span>
+                        <span class="badge bg-success">Paid</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="/courses/{{course.id}}/learn" class="btn btn-primary btn-lg">
+                    <i class="bi bi-play-circle"></i> Start Learning Now
+                </a>
+                <a href="/account/my-courses" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-collection-play"></i> Go to My Courses
+                </a>
+                <a href="/courses/{{course.id}}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Course
+                </a>
+            </div>
+
+            <!-- Extra info -->
+            <div class="mt-5 p-4 bg-light rounded">
+                <h5><i class="bi bi-info-circle"></i> Next, you can:</h5>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check text-success"></i> Access course content immediately</li>
+                    <li><i class="bi bi-check text-success"></i> Track your learning progress</li>
+                    <li><i class="bi bi-check text-success"></i> Interact with the instructor and other learners</li>
+                    <li><i class="bi bi-check text-success"></i> Rate the course after completion</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Optional auto-redirect after 10 seconds
+    setTimeout(() => {
+        // window.location.href = '/account/my-courses';
+    }, 10000);
+</script>

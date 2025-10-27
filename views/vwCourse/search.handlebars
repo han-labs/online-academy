@@ -3,16 +3,16 @@
     <div class="col-md-3 mb-4">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title mb-3">Bộ lọc</h5>
+                <h5 class="card-title mb-3"><i class="bi bi-funnel"></i> Filters</h5>
 
                 {{!-- Search by keyword --}}
                 <form action="/courses/search" method="GET" class="mb-3">
-                    <label class="form-label fw-bold">Từ khóa</label>
+                    <label class="form-label fw-bold">Keyword</label>
                     <div class="input-group">
-                        <input type="text" class="form-control" name="q" 
-                               value="{{q}}" placeholder="Tìm khóa học...">
-                        <button class="btn btn-primary" type="submit">
-                            🔍
+                        <input type="text" class="form-control" name="q" value="{{q}}"
+                            placeholder="Search for courses...">
+                        <button class="btn btn-brand" type="submit">
+                            <i class="bi bi-search"></i>
                         </button>
                     </div>
                     {{#if categoryId}}
@@ -23,20 +23,23 @@
                 {{!-- Category filter --}}
                 {{#if categoryInfo}}
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Lĩnh vực</label>
+                    <label class="form-label fw-bold">Category</label>
                     <div class="alert alert-info mb-0 py-2">
-                        {{categoryInfo.name}}
-                        <a href="/courses/search?q={{q}}" class="float-end">✕</a>
+                        <i class="bi bi-folder-fill"></i> {{categoryInfo.name}}
+                        <a href="/courses/search?q={{q}}" class="float-end text-decoration-none">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
                     </div>
                 </div>
                 {{else}}
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Lĩnh vực</label>
+                    <label class="form-label fw-bold">Category</label>
                     <div class="list-group list-group-flush">
                         {{#each global_categories_tree}}
-                        <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0"
-                                onclick="filterByCategory({{id}})">
-                            {{name}}
+                        <button
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0"
+                            onclick="filterByCategory({{id}})">
+                            <span><i class="bi bi-folder"></i> {{name}}</span>
                         </button>
                         {{/each}}
                     </div>
@@ -45,19 +48,19 @@
 
                 {{!-- Sort options --}}
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Sắp xếp</label>
+                    <label class="form-label fw-bold"><i class="bi bi-sort-down"></i> Sort by</label>
                     <select class="form-select" id="sortSelect" onchange="changeSort()">
-                        <option value="rating_desc" {{#if (eq sort 'rating_desc')}}selected{{/if}}>
-                            Đánh giá cao nhất
+                        <option value="rating_desc" {{#if (eq sort 'rating_desc' )}}selected{{/if}}>
+                            <i class="bi bi-star-fill"></i> Highest Rated
                         </option>
-                        <option value="price_asc" {{#if (eq sort 'price_asc')}}selected{{/if}}>
-                            Giá tăng dần
+                        <option value="price_asc" {{#if (eq sort 'price_asc' )}}selected{{/if}}>
+                            Price: Low to High
                         </option>
-                        <option value="newest" {{#if (eq sort 'newest')}}selected{{/if}}>
-                            Mới nhất
+                        <option value="newest" {{#if (eq sort 'newest' )}}selected{{/if}}>
+                            Newest
                         </option>
-                        <option value="best_seller" {{#if (eq sort 'best_seller')}}selected{{/if}}>
-                            Bán chạy nhất
+                        <option value="best_seller" {{#if (eq sort 'best_seller' )}}selected{{/if}}>
+                            Best Seller
                         </option>
                     </select>
                 </div>
@@ -71,14 +74,14 @@
         <div class="mb-3">
             <h4>
                 {{#if q}}
-                Kết quả tìm kiếm cho "{{q}}"
+                <i class="bi bi-search"></i> Search results for "{{q}}"
                 {{else if categoryInfo}}
-                Khóa học {{categoryInfo.name}}
+                <i class="bi bi-folder-fill"></i> {{categoryInfo.name}} Courses
                 {{else}}
-                Tất cả khóa học
+                <i class="bi bi-collection"></i> All Courses
                 {{/if}}
             </h4>
-            <p class="text-muted">Tìm thấy {{formatNumber total}} khóa học</p>
+            <p class="text-muted">Found {{formatNumber total}} courses</p>
         </div>
 
         {{!-- Course grid --}}
@@ -96,22 +99,25 @@
         <nav aria-label="Course pagination">
             <ul class="pagination justify-content-center">
                 <li class="page-item {{#if (eq page 1)}}disabled{{/if}}">
-                    <a class="page-link" href="?q={{q}}{{#if categoryId}}&category={{categoryId}}{{/if}}&sort={{sort}}&page={{sub page 1}}">
-                        Trước
+                    <a class="page-link"
+                        href="?q={{q}}{{#if categoryId}}&category={{categoryId}}{{/if}}&sort={{sort}}&page={{sub page 1}}">
+                        <i class="bi bi-chevron-left"></i>
                     </a>
                 </li>
 
                 {{#each (range 1 totalPages)}}
                 <li class="page-item {{#if (eq this ../page)}}active{{/if}}">
-                    <a class="page-link" href="?q={{../q}}{{#if ../categoryId}}&category={{../categoryId}}{{/if}}&sort={{../sort}}&page={{this}}">
+                    <a class="page-link"
+                        href="?q={{../q}}{{#if ../categoryId}}&category={{../categoryId}}{{/if}}&sort={{../sort}}&page={{this}}">
                         {{this}}
                     </a>
                 </li>
                 {{/each}}
 
                 <li class="page-item {{#if (eq page totalPages)}}disabled{{/if}}">
-                    <a class="page-link" href="?q={{q}}{{#if categoryId}}&category={{categoryId}}{{/if}}&sort={{sort}}&page={{add page 1}}">
-                        Sau
+                    <a class="page-link"
+                        href="?q={{q}}{{#if categoryId}}&category={{categoryId}}{{/if}}&sort={{sort}}&page={{add page 1}}">
+                        <i class="bi bi-chevron-right"></i>
                     </a>
                 </li>
             </ul>
@@ -120,26 +126,26 @@
 
         {{else}}
         <div class="alert alert-warning">
-            <h5>Không tìm thấy khóa học nào</h5>
-            <p>Thử thay đổi từ khóa hoặc bộ lọc</p>
+            <h5><i class="bi bi-exclamation-triangle"></i> No courses found</h5>
+            <p>Try changing the keyword or filters</p>
         </div>
         {{/if}}
     </div>
 </div>
 
 <script>
-function changeSort() {
-    const sort = document.getElementById('sortSelect').value;
-    const url = new URL(window.location.href);
-    url.searchParams.set('sort', sort);
-    url.searchParams.set('page', 1);
-    window.location.href = url.toString();
-}
+    function changeSort() {
+        const sort = document.getElementById('sortSelect').value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort', sort);
+        url.searchParams.set('page', 1);
+        window.location.href = url.toString();
+    }
 
-function filterByCategory(catId) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('category', catId);
-    url.searchParams.set('page', 1);
-    window.location.href = url.toString();
-}
+    function filterByCategory(catId) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('category', catId);
+        url.searchParams.set('page', 1);
+        window.location.href = url.toString();
+    }
 </script>

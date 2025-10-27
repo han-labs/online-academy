@@ -1,79 +1,219 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+{{!-- HEADER with topbar + main navbar --}}
+<link rel="stylesheet" href="/static/css/style.css">
+<!-- Topbar (match footer color) -->
+<div class="topbar text-white-50 d-none d-lg-block" style="background-color:#160438;">
+    <div class="container d-flex justify-content-end gap-3 py-1 small">
+        <a class="text-decoration-none link-topbar" href="/aboutus"><i class="bi bi-info-circle"></i> About Us</a>
+        <a class="text-decoration-none link-topbar" href="/contactus"><i class="bi bi-envelope"></i> Contact Us</a>
+        <a class="text-decoration-none link-topbar" href="/faq"><i class="bi bi-question-circle"></i> FAQ</a>
+        <a class="text-decoration-none link-topbar" href="/policy"><i class="bi bi-shield-check"></i> Policy</a>
+    </div>
+</div>
+
+<nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/">
-            🎓 Online Academy
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
+            <i class="bi bi-mortarboard text-brand"></i>
+            <span>Online Academy</span>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain"
+            aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarMain">
-            {{!-- Search Form --}}
-            <form class="d-flex mx-auto my-2 my-lg-0" action="/courses/search" method="GET" style="width: 100%; max-width: 500px;">
-                <input class="form-control me-2" 
-                       type="search" 
-                       name="q" 
-                       placeholder="Tìm kiếm khóa học..." 
-                       aria-label="Search">
-                <button class="btn btn-outline-light" type="submit">🔍</button>
-            </form>
-
-            {{!-- Right Menu --}}
-            <ul class="navbar-nav ms-auto">
-                {{!-- Categories Dropdown --}}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        Danh mục
+        <div id="navMain" class="collapse navbar-collapse">
+            <!-- Left -->
+            <ul class="navbar-nav me-auto">
+                {{#if user}}
+                {{#if (eq user.role 'admin')}}
+                <!-- Admin Menu -->
+                <li class="nav-item dropdown me-2">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-grid-3x3-gap"></i> Administration
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/admin/dashboard"><i class="bi bi-speedometer2"></i>
+                                Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/admin/categories"><i class="bi bi-tags"></i> Category
+                                Management</a></li>
+                        <li><a class="dropdown-item" href="/admin/courses"><i class="bi bi-book"></i> Course
+                                Management</a></li>
+                        <li><a class="dropdown-item" href="/admin/users"><i class="bi bi-people"></i> User
+                                Management</a></li>
+                    </ul>
+                </li>
+                {{/if}}
+                {{/if}}
+
+                <!-- Categories -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-grid-3x3-gap"></i> Categories
+                    </a>
+                    <ul class="dropdown-menu">
                         {{#each global_categories_tree}}
                         <li>
-                            <a class="dropdown-item fw-bold" href="/categories/{{id}}">
-                                {{name}}
-                            </a>
-                            {{#if children}}
-                            {{#each children}}
-                            <a class="dropdown-item ps-4 small" href="/categories/{{id}}">
-                                • {{name}}
-                            </a>
-                            {{/each}}
-                            {{/if}}
+                            <h6 class="dropdown-header text-primary"><i class="bi bi-folder"></i> {{name}}</h6>
                         </li>
-                        {{#unless @last}}<li><hr class="dropdown-divider"></li>{{/unless}}
+                        {{#each children}}
+                        <li><a class="dropdown-item" href="/categories/{{id}}">
+                                <i class="bi bi-chevron-right small"></i> {{name}}
+                            </a></li>
+                        {{/each}}
+                        {{#unless @last}}<li>
+                            <hr class="dropdown-divider">
+                        </li>{{/unless}}
                         {{/each}}
                     </ul>
                 </li>
+            </ul>
 
-                {{!-- User Menu --}}
-                {{#if user}}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        👤 {{user.full_name}}
-                    </a>
+            <!-- Search -->
+            <form class="d-flex mx-auto me-3" action="/courses/search" method="GET"
+                style="max-width: 420px; width: 100%;">
+                <div class="input-group position-relative">
+                    <input class="form-control" type="text" name="q" id="searchInput" placeholder="Search for anything"
+                        aria-label="Search" value="{{q}}">
+                    <button
+                        class="btn btn-link text-secondary position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent d-none"
+                        type="button" id="clearSearch" style="z-index:5; right:50px !important;"
+                        aria-label="Clear search">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Right: User -->
+            {{#if user}}
+            <div class="d-flex align-items-center gap-2">
+                <div class="dropdown">
+                    <button
+                        class="btn btn-link text-dark text-decoration-none dropdown-toggle d-flex align-items-center gap-2"
+                        data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle fs-4"></i>
+                        <span class="d-none d-lg-inline">{{user.name}}</span>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="/account/profile">Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="/account/my-courses">Khóa học của tôi</a></li>
-                        <li><a class="dropdown-item" href="/account/watchlist">Yêu thích</a></li>
-                        {{#if (eq user.role 'admin')}}
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/admin">Quản trị</a></li>
+                        <li>
+                            <div class="dropdown-header">
+                                <div class="fw-bold">{{user.name}}</div>
+                                <small class="text-muted">{{user.email}}</small>
+                            </div>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            {{#if (eq user.role 'instructor')}}
+                            <a class="dropdown-item" href="/teacher/profile"><i class="bi bi-person"></i> Profile</a>
+                            {{else}}
+                            <a class="dropdown-item" href="/account/profile"><i class="bi bi-person"></i> Profile</a>
+                            {{/if}}
+                        </li>
+
+                        {{#if (eq user.role 'student')}}
+                        <li><a class="dropdown-item" href="/account/my-courses"><i class="bi bi-journal-bookmark"></i>
+                                My Courses</a></li>
+                        <li><a class="dropdown-item" href="/student/watchlist"><i class="bi bi-heart"></i> Favorites</a>
+                        </li>
                         {{/if}}
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/account/logout">Đăng xuất</a></li>
+
+                        {{#if (eq user.role 'instructor')}}
+                        <li><a class="dropdown-item" href="/teacher/dashboard"><i class="bi bi-speedometer2"></i>
+                                Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/teacher/course/add"><i class="bi bi-easel"></i> Create
+                                Course</a></li>
+                        {{/if}}
+
+                        {{#if (eq user.role 'admin')}}
+                        <li><a class="dropdown-item text-danger" href="/admin/dashboard"><i
+                                    class="bi bi-shield-lock"></i> Admin Panel</a></li>
+                        {{/if}}
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/account/change-password"><i class="bi bi-key"></i> Change
+                                Password</a></li>
+                        <li>
+                            <form action="/account/logout" method="post" class="d-inline">
+                                <button class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i>
+                                    Logout</button>
+                            </form>
+                        </li>
                     </ul>
+                </div>
+            </div>
+            {{else}}
+            <div class="d-flex gap-2">
+                <a class="btn btn-brand-outline btn-sm" href="/account/login">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+                <a class="btn btn-brand btn-sm" href="/account/register">
+                    <i class="bi bi-person-plus"></i> Register
+                </a>
+            </div>
+            {{/if}}
+
+            <!-- Help & Info in mobile (shows the 4 links when collapsed) -->
+            <ul class="navbar-nav d-lg-none w-100 mt-3 pt-2 border-top">
+                <li class="nav-item"><span class="nav-link text-muted small text-uppercase">Help &amp; Info</span></li>
+                <li class="nav-item"><a class="nav-link" href="/aboutus"><i class="bi bi-info-circle me-1"></i> About
+                        Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="/contactus"><i class="bi bi-envelope me-1"></i> Contact
+                        Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="/faq"><i class="bi bi-question-circle me-1"></i> FAQ</a>
                 </li>
-                {{else}}
-                <li class="nav-item">
-                    <a class="nav-link" href="/account/login">Đăng nhập</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link btn btn-primary text-white ms-2" href="/account/register">
-                        Đăng ký
-                    </a>
-                </li>
-                {{/if}}
+                <li class="nav-item"><a class="nav-link" href="/policy"><i class="bi bi-shield-check me-1"></i>
+                        Policy</a></li>
             </ul>
         </div>
     </div>
 </nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearch');
+        if (!searchInput || !clearBtn) return;
+
+        function toggleClearButton() {
+            if (searchInput.value.trim().length > 0) clearBtn.classList.remove('d-none');
+            else clearBtn.classList.add('d-none');
+        }
+
+        searchInput.addEventListener('input', toggleClearButton);
+        searchInput.addEventListener('keyup', toggleClearButton);
+        clearBtn.addEventListener('click', function (e) {
+            e.preventDefault(); e.stopPropagation();
+            searchInput.value = '';
+            clearBtn.classList.add('d-none');
+            searchInput.focus();
+        });
+        toggleClearButton();
+    });
+</script>
+
+<style>
+    /* Hover tone to match footer */
+    .topbar .link-topbar {
+        color: rgba(255, 255, 255, .65);
+    }
+
+    .topbar .link-topbar:hover {
+        color: #fff;
+    }
+
+    /* Improve dropdown spacing on desktop */
+    @media (min-width: 992px) {
+        .navbar .dropdown-menu {
+            margin-top: .5rem;
+        }
+    }
+</style>

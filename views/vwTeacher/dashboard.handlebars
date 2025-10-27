@@ -1,0 +1,60 @@
+{{!-- vwTeacher/dashboard.handlebars --}}
+
+<div class="container my-5">
+  <h2 class="mb-4 text-center text-primary fw-bold">Teacher Dashboard</h2>
+
+  <div class="d-flex justify-content-end mb-3">
+    <a href="/teacher/course/add" class="btn btn-success">
+      <i class="bi bi-plus-circle"></i> Add New Course
+    </a>
+  </div>
+
+  {{#if courses.length}}
+  <table class="table table-striped table-hover shadow-sm">
+    <thead class="table-primary">
+      <tr>
+        <th>#</th>
+        <th>Course</th>
+        <th>Status</th>
+        <th>Enrollments</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each courses}}
+      <tr>
+        <td>{{add @index 1}}</td>
+        <td>
+          <a href="/teacher/course/{{id}}" class="fw-semibold text-decoration-none text-dark">
+            {{title}}
+          </a>
+        </td>
+        <td class="text-center">
+          <form action="/teacher/course/{{id}}/toggle-status" method="POST">
+            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+              <option value="draft" {{#ifEquals status "draft" }}selected{{/ifEquals}}>Draft</option>
+              <option value="completed" {{#ifEquals status "completed" }}selected{{/ifEquals}}>Completed</option>
+              <option value="published" {{#ifEquals status "published" }}selected{{/ifEquals}}>Published</option>
+            </select>
+          </form>
+        </td>
+        <td>{{students}}</td>
+        <td class="text-center">
+          <a href="/teacher/course/{{id}}/detail" class="btn btn-info btn-sm">Details</a>
+          <a href="/teacher/course/{{id}}/edit" class="btn btn-warning btn-sm">Edit</a>
+          <form method="POST" action="/teacher/course/{{id}}/delete" style="display: inline;"
+            onsubmit="return confirm('Are you sure you want to delete this course?');">
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{else}}
+  <div class="alert alert-info text-center mt-4" role="alert">
+    You haven't created any courses yet.
+    <a href="/teacher/course/add" class="alert-link">Create one now!</a>
+  </div>
+  {{/if}}
+</div>
