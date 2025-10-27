@@ -1,81 +1,318 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-  <h1 class="h2">Quản lý người dùng</h1>
+  <h1 class="h2">User Management</h1>
 </div>
 
-{{#if flash}}
-<div class="alert alert-{{flash.type}} alert-dismissible fade show" role="alert">
-  {{flash.message}}
-  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
+{{#if error}}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Error:</strong> An error has occurred. Please try again.
+</div>  
 {{/if}}
 
-<!-- Form tạo giảng viên -->
+{{#if success}}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Success:</strong> The operation has been completed successfully.
+</div>  
+{{/if}}
+
+<!-- Create Instructor Form -->
 <div class="card mb-4">
   <div class="card-header">
-    <h5 class="mb-0">Tạo tài khoản giảng viên</h5>
+    <h5 class="mb-0">Create Instructor Account</h5>
   </div>
   <div class="card-body">
-    <form method="post" action="/admin/users">
-      <input type="hidden" name="action" value="createInstructor">
+    <form method="post" action="/admin/users/create-instructor" id="frmCreateInstructor">
       <div class="row">
-        <div class="col-md-4">
-          <input type="text" class="form-control" name="full_name" placeholder="Họ tên" required>
+        <div class="col-md-12 mb-3">
+          <input type="text" class="form-control" name="full_name" placeholder="Full Name" required>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6 mb-3">
           <input type="email" class="form-control" name="email" placeholder="Email" required>
         </div>
-        <div class="col-md-3">
-          <input type="password" class="form-control" name="password" placeholder="Mật khẩu" required minlength="6">
+        <div class="col-md-6 mb-3">
+          <input type="password" class="form-control" id="txtPassword" name="password" placeholder="Password" required minlength="6">
         </div>
-        <div class="col-md-2">
-          <button type="submit" class="btn btn-success w-100">Tạo</button>
+        <div class="col-md-12 mb-3">
+          <input type="text" class="form-control" name="instructor_bio" placeholder="Bio (optional)">
+        </div>
+        <div class="col-md-2 ms-auto">
+          <button type="submit" class="btn btn-success w-100">Create</button>
         </div>
       </div>
     </form>
   </div>
 </div>
 
-<div class="table-responsive">
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Tên</th>
-        <th>Email</th>
-        <th>Vai trò</th>
-        <th>Ngày tạo</th>
-        <th>Thao tác</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each users}}
-      <tr>
-        <td>{{id}}</td>
-        <td>{{full_name}}</td>
-        <td>{{email}}</td>
-        <td>
-          <form method="post" action="/admin/users" class="d-inline">
-            <input type="hidden" name="action" value="updateRole">
-            <input type="hidden" name="id" value="{{id}}">
-            <select name="role" class="form-select form-select-sm d-inline-block" style="width:130px" onchange="this.form.submit()">
-              <option value="student" {{#eq role 'student'}}selected{{/eq}}>Student</option>
-              <option value="instructor" {{#eq role 'instructor'}}selected{{/eq}}>Instructor</option>
-              <option value="admin" {{#eq role 'admin'}}selected{{/eq}}>Admin</option>
-            </select>
-          </form>
-        </td>
-        <td>{{formatDate created_at}}</td>
-        <td>
-          <form method="post" action="/admin/users" onsubmit="return confirm('Xóa người dùng này?')">
-            <input type="hidden" name="action" value="delete">
-            <input type="hidden" name="id" value="{{id}}">
-            <button class="btn btn-sm btn-danger">
-              <i class="bi bi-trash"></i> Xóa
-            </button>
-          </form>
-        </td>
-      </tr>
-      {{/each}}
-    </tbody>
-  </table>
+<!-- User List -->
+<div class="card">
+  <div class="card-header">
+    <h5 class="card-title mb-0">User List</h5>
+  </div>
+  <div class="card-body">
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-3" id="userTabs">
+      <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#instructors" data-role="instructor">Instructors</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#students" data-role="student">Students</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#all" data-role="all">All Users</a>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <!-- Instructors Tab -->
+      <div class="tab-pane fade show active" id="instructors">
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-dark text-center">
+              <tr>
+                <th width="50">No.</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Created Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each users}}
+                {{#if (eq this.role 'instructor')}}
+                <tr>
+                  <td class="text-center">{{@index}}</td>
+                  <td>{{this.full_name}}</td>
+                  <td>{{this.email}}</td>
+                  <td class="text-center">{{formatDate this.created_at}}</td>
+                  <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-eye"></i> Details
+                      </a>
+                      <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editUserModal{{this.id}}">
+                        <i class="bi bi-pencil"></i> Edit
+                      </button>
+                      <form method="post" action="/admin/users/delete" class="d-inline frmDeleteUser" data-user-name="{{this.full_name}}">
+                        <input type="hidden" name="id" value="{{this.id}}">
+                        <button type="submit" class="btn btn-sm btn-danger">
+                          <i class="bi bi-trash"></i> Delete
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {{/if}}
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Students Tab -->
+      <div class="tab-pane fade" id="students">
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-dark text-center">
+              <tr>
+                <th width="50">No.</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Created Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each users}}
+                {{#if (eq this.role 'student')}}
+                <tr>
+                  <td class="text-center">{{@index}}</td>
+                  <td>{{this.full_name}}</td>
+                  <td>{{this.email}}</td>
+                  <td class="text-center">{{formatDate this.created_at}}</td>
+                  <td>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-eye"></i> Details
+                      </a>
+                      <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editUserModal{{this.id}}">
+                        <i class="bi bi-pencil"></i> Edit
+                      </button>
+                      <form method="post" action="/admin/users/delete" class="d-inline frmDeleteUser" data-user-name="{{this.full_name}}">
+                        <input type="hidden" name="id" value="{{this.id}}">
+                        <button type="submit" class="btn btn-sm btn-danger">
+                          <i class="bi bi-trash"></i> Delete
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {{/if}}
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- All Users Tab -->
+      <div class="tab-pane fade" id="all">
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-dark text-center">
+              <tr>
+                <th width="50">No.</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Created Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each users}}
+               {{#unless (eq this.role 'admin')}}
+              <tr>
+                <td class="text-center">{{@index}}</td>
+                <td>{{this.full_name}}</td>
+                <td>{{this.email}}</td>
+                <td class="text-center">
+                  <span class="badge bg-{{getRoleBadge this.role}}">
+                    {{getRoleText this.role}}
+                  </span>
+                </td>
+                <td class="text-center">{{formatDate this.created_at}}</td>
+                <td>
+                  <div class="d-flex gap-2 justify-content-center">
+                    <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
+                      <i class="bi bi-eye"></i> Details
+                    </a>
+                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editUserModal{{this.id}}">
+                      <i class="bi bi-pencil"></i> Edit
+                    </button>
+                    <form method="post" action="/admin/users/delete" class="d-inline frmDeleteUser" data-user-name="{{this.full_name}}">
+                      <input type="hidden" name="id" value="{{this.id}}">
+                      <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i> Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {{/unless}}
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Edit User Modal -->
+{{#each users}}
+<div class="modal fade" id="editUserModal{{this.id}}" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit User Information</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post" action="/admin/users/update">
+        <div class="modal-body">
+          <input type="hidden" name="id" value="{{this.id}}">
+          
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="full_name" value="{{this.full_name}}" required>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" value="{{this.email}}" required>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Role</label>
+            <select name="role" class="form-select" required>
+              <option value="student" {{#if (eq this.role 'student')}}selected{{/if}}>Student</option>
+              <option value="instructor" {{#if (eq this.role 'instructor')}}selected{{/if}}>Instructor</option>
+            </select>
+          </div>
+
+          {{#if (eq this.role 'instructor')}}
+          <div class="mb-3">
+            <label class="form-label">Bio</label>
+            <textarea class="form-control" name="instructor_bio" rows="3">{{this.instructor_bio}}</textarea>
+          </div>
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{{/each}}
+
+<script>
+  // Handle create instructor form
+  document.querySelector('#frmCreateInstructor')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const password = document.querySelector('#txtPassword').value.trim();
+    
+    if (password.length < 6) {
+      alert('Password must be at least 6 characters long');
+      return;
+    }
+    
+    this.submit();
+  });
+
+  // Confirm user deletion
+  document.querySelectorAll('.frmDeleteUser').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const userName = this.getAttribute('data-user-name');
+      if (!confirm(`Are you sure you want to delete user "${userName}"?`)) {
+        e.preventDefault();
+      }
+    });
+  });
+
+  // Renumber all tables
+  function renumberAllTables() {
+    const panes = document.querySelectorAll('.tab-pane');
+    panes.forEach(pane => {
+      const table = pane.querySelector('table tbody');
+      if (table) {
+        const rows = table.querySelectorAll('tr');
+        rows.forEach((row, index) => {
+          const sttCell = row.querySelector('td:first-child');
+          if (sttCell) {
+            sttCell.textContent = index + 1;
+          }
+        });
+      }
+    });
+  }
+
+  // When page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    // Renumber after page render
+    setTimeout(renumberAllTables, 200);
+    
+    // Activate Bootstrap tabs
+    const triggerTabList = [].slice.call(document.querySelectorAll('#userTabs a'));
+    triggerTabList.forEach(function (triggerEl) {
+      const tabTrigger = new bootstrap.Tab(triggerEl);
+      triggerEl.addEventListener('click', function (event) {
+        event.preventDefault();
+        tabTrigger.show();
+        // Renumber after switching tabs
+        setTimeout(renumberAllTables, 100);
+      });
+    });
+  });
+</script>

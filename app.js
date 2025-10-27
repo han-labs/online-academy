@@ -24,24 +24,40 @@ app.engine(
   "handlebars",
   engine({
     helpers: {
+      // Định dạng số
       formatNumber(v) {
         return new Intl.NumberFormat("en-US").format(v ?? 0);
       },
+
+      // So sánh bằng / không bằng
       eq(a, b) {
         return a === b;
       },
+      neq(a, b) {
+        return a !== b;
+      },
+
+      // Phép cộng / trừ cơ bản
       add: (a, b) => (a || 0) + (b || 0),
       sub: (a, b) => (a || 0) - (b || 0),
+
+      // Độ dài mảng
       length: (arr) => (Array.isArray(arr) ? arr.length : 0),
+
+      // Hiển thị giá có giảm giá
       price(p, promo) {
         return promo && promo > 0 ? promo : p;
       },
       ifPromo(p, promo, opts) {
         return promo && promo > 0 ? opts.fn(this) : opts.inverse(this);
       },
-      fillContent: function (value, defaultValue) {
+
+      // Giá trị mặc định nếu trống
+      fillContent(value, defaultValue) {
         return value != null && value !== "" ? value : defaultValue || "";
       },
+
+      // Tạo mảng range
       range(start, end) {
         const s = Number(start) || 0,
           e = Number(end) || 0,
@@ -49,32 +65,8 @@ app.engine(
         for (let i = s; i <= e; i++) out.push(i);
         return out;
       },
-      formatCurrency(amount) {
-        return new Intl.NumberFormat("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }).format(amount || 0);
-      },
-      getStatusBadge(status) {
-        const statusMap = {
-          draft: "secondary",
-          published: "success",
-          completed: "primary",
-        };
-        return statusMap[status] || "secondary";
-      },
-      getStatusText(status) {
-        const statusMap = {
-          draft: "Bản nháp",
-          published: "Đã xuất bản",
-          completed: "Hoàn thành",
-        };
-        return statusMap[status] || status;
-      },
-      formatDate(date) {
-        if (!date) date = new Date();
-        return new Date(date).toLocaleDateString("vi-VN");
-      },
+
+      // Định dạng tiền VND
       formatCurrency(amount) {
         return new Intl.NumberFormat("vi-VN", {
           style: "currency",
@@ -82,33 +74,95 @@ app.engine(
         }).format(amount || 0);
       },
 
+      // Badge cho trạng thái
       getStatusBadge(status) {
-        const statusMap = {
+        const map = {
           draft: "secondary",
           published: "success",
           completed: "primary",
         };
-        return statusMap[status] || "secondary";
+        return map[status] || "secondary";
       },
 
+      // Text hiển thị trạng thái
       getStatusText(status) {
-        const statusMap = {
-          draft: "Bản nháp",
-          published: "Đã xuất bản",
-          completed: "Hoàn thành",
+        const map = {
+          draft: "Draft",
+          published: "Published",
+          completed: "Completed",
         };
-        return statusMap[status] || status;
+        return map[status] || status;
       },
 
+      // Định dạng ngày
       formatDate(date) {
-        if (!date) return "-";
-        return new Date(date).toLocaleDateString("vi-VN");
+        return new Date(date || new Date()).toLocaleDateString("vi-VN");
       },
 
-      eq(a, b) {
-        return a === b;
+      // Đánh giá sao ★
+      stars(rating) {
+        if (!rating) return "";
+        return [...Array(5)].map((_, i) => (i < rating ? "★" : "☆")).join("");
+      },
+
+      // So sánh > và <
+      gt(a, b) {
+        return a > b;
+      },
+      lt(a, b) {
+        return a < b;
+      },
+
+      // Kiểm tra giá trị không rỗng
+      notEmpty(value) {
+        return value && value.toString().trim() !== "";
+      },
+
+      // Lặp với index
+      eachWithIndex(context, options) {
+        let out = "";
+        for (let i = 0; i < context.length; i++) {
+          out += options.fn(context[i], { data: { index: i } });
+        }
+        return out;
+      },
+
+      // Toán tử logic
+      and(a, b) {
+        return a && b;
+      },
+      or(a, b) {
+        return a || b;
+      },
+
+      // Vai trò user
+      getRoleBadge(role) {
+        const map = {
+          admin: "danger",
+          instructor: "success",
+          student: "primary",
+        };
+        return map[role] || "secondary";
+      },
+      getRoleText(role) {
+        const map = {
+          admin: "Administrator",
+          instructor: "Instructor",
+          student: "Student",
+        };
+        return map[role] || role;
+      },
+
+      // Tính tổng học viên
+      getTotalStudents(courses) {
+        if (!Array.isArray(courses)) return 0;
+        return courses.reduce(
+          (total, c) => total + (c.enrollment_count || 0),
+          0
+        );
       },
     },
+
     defaultLayout: "main",
     layoutsDir: path.join(__dirname, "views/layouts"),
     partialsDir: path.join(__dirname, "views/partials"),
@@ -121,6 +175,7 @@ app.set("views", path.join(__dirname, "views"));
 // middleware
 app.use(express.urlencoded({ extended: true }));
 app.use("/static", express.static(path.join(__dirname, "static"))); // ✅ không dùng ../static
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
 app.use(
   session({
@@ -141,6 +196,11 @@ app.use(async (req, res, next) => {
     res.locals.global_categories = [];
     res.locals.global_categories_tree = [];
   }
+  next();
+});
+
+app.use((req, res, next) => {
+  res.locals.user = req.session.user;
   next();
 });
 
