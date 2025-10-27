@@ -40,17 +40,21 @@
 
                     {{!-- Enroll / Login --}}
                     {{#if user}}
+                    {{#if (eq user.role 'student')}}
                     <a href="/checkout/{{course.id}}" class="btn btn-primary w-100 mt-3 mb-2">
                         <i class="bi bi-cart-check"></i> Enroll now
                     </a>
+                    {{/if}}
                     {{else}}
                     <a href="/account/login?returnUrl=/courses/{{course.id}}" class="btn btn-primary w-100 mt-3 mb-2">
                         <i class="bi bi-box-arrow-in-right"></i> Log in to enroll
                     </a>
                     {{/if}}
 
+
                     {{!-- Watchlist --}}
                     {{#if user}}
+                    {{#if (eq user.role 'student')}}
                     {{#if isInWatchlist}}
                     <form action="/student/watchlist/remove" method="POST" class="w-100">
                         <input type="hidden" name="course_id" value="{{course.id}}">
@@ -63,6 +67,8 @@
                     </form>
                     {{/if}}
                     {{/if}}
+                    {{/if}}
+
                 </div>
             </div>
         </div>

@@ -15,7 +15,7 @@
                 {{#if user}}
                 {{#if (eq user.role 'admin')}}
                 <!-- Admin Menu -->
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown me-2">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                         <i class="bi bi-grid-3x3-gap"></i> Administration
                     </a>
@@ -30,8 +30,10 @@
                                 Management</a></li>
                     </ul>
                 </li>
-                {{else}}
-                <!-- Categories -->
+                {{/if}}
+                {{/if}}
+
+                <!-- Categories: luôn hiển thị cho mọi role (kể cả admin & guest) -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                         <i class="bi bi-grid-3x3-gap"></i> Categories
@@ -48,49 +50,18 @@
                             </a>
                         </li>
                         {{/each}}
-                        {{#unless @last}}
-                        <li>
+                        {{#unless @last}}<li>
                             <hr class="dropdown-divider">
-                        </li>
-                        {{/unless}}
+                        </li>{{/unless}}
                         {{/each}}
                     </ul>
                 </li>
-                {{/if}}
-                {{else}}
-                <!-- Guest sees Categories -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-grid-3x3-gap"></i> Categories
-                    </a>
-                    <ul class="dropdown-menu">
-                        {{#each global_categories_tree}}
-                        <li>
-                            <h6 class="dropdown-header text-primary"><i class="bi bi-folder"></i> {{name}}</h6>
-                        </li>
-                        {{#each children}}
-                        <li>
-                            <a class="dropdown-item" href="/categories/{{id}}">
-                                <i class="bi bi-chevron-right small"></i> {{name}}
-                            </a>
-                        </li>
-                        {{/each}}
-                        {{#unless @last}}
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        {{/unless}}
-                        {{/each}}
-                    </ul>
-                </li>
-                {{/if}}
             </ul>
 
-            <!-- Search -->
-            {{#if user}}
-            {{#if (eq user.role 'admin')}}
-            <!-- Admin: ẩn search -->
-            {{else}}
+
+
+
+            <!-- Search: luôn hiển thị cho mọi role -->
             <form class="d-flex mx-auto me-3" action="/courses/search" method="GET"
                 style="max-width: 400px; width: 100%;">
                 <div class="input-group position-relative">
@@ -102,39 +73,16 @@
                         aria-label="Clear search">
                         <i class="bi bi-x-lg"></i>
                     </button>
-                    <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
-                </div>
-            </form>
-            {{/if}}
-            {{else}}
-            <form class="d-flex mx-auto me-3" action="/courses/search" method="GET"
-                style="max-width: 400px; width: 100%;">
-                <div class="input-group position-relative">
-                    <input class="form-control" type="text" name="q" id="searchInput" placeholder="Search for anything"
-                        aria-label="Search" value="{{q}}">
-                    <button
-                        class="btn btn-link text-secondary position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent d-none"
-                        type="button" id="clearSearch" style="z-index:5; right:50px !important;"
-                        aria-label="Clear search">
-                        <i class="bi bi-x-lg"></i>
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="bi bi-search"></i>
                     </button>
-                    <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
                 </div>
             </form>
-            {{/if}}
+
 
             <!-- Right: User -->
             {{#if user}}
             <div class="d-flex align-items-center gap-2">
-                {{#if (eq user.role 'admin')}}
-                {{!-- Admin: ẩn chuông thông báo --}}
-                {{else}}
-                <a href="#" class="btn btn-link text-dark position-relative" title="Notifications">
-                    <i class="bi bi-bell fs-5"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                        style="font-size:.6rem;">3</span>
-                </a>
-                {{/if}}
 
                 <div class="dropdown">
                     <button

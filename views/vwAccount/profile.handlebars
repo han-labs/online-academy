@@ -25,6 +25,8 @@
                     <a href="/account/change-password" class="list-group-item list-group-item-action">
                         <i class="bi bi-shield-lock"></i> Change password
                     </a>
+                    {{!-- CHỈ hiển thị cho học viên --}}
+                    {{#if (eq user.role 'student')}}
                     <a href="/student/watchlist" class="list-group-item list-group-item-action">
                         <i class="bi bi-bookmark-heart"></i> Favorite Courses
                         <span class="badge bg-primary rounded-pill float-end">{{stats.watchlists}}</span>
@@ -33,6 +35,8 @@
                         <i class="bi bi-collection-play"></i> My courses
                         <span class="badge bg-primary rounded-pill float-end">{{stats.enrollments}}</span>
                     </a>
+                    {{/if}}
+
                     <form action="/account/logout" method="post" class="list-group-item">
                         <button type="submit" class="btn btn-link text-danger p-0 border-0 text-start w-100">
                             <i class="bi bi-box-arrow-right"></i> Log out
@@ -126,6 +130,7 @@
                                 <small class="text-muted">Joined</small>
                                 <div>{{me.created_at}}</div>
                             </div>
+                            {{#if (eq user.role 'student')}}
                             <div class="mb-2">
                                 <small class="text-muted">Enrolled</small>
                                 <div><span class="badge text-bg-dark">{{stats.enrollments}}</span> courses</div>
@@ -134,6 +139,8 @@
                                 <small class="text-muted">Watchlist</small>
                                 <div><span class="badge text-bg-dark">{{stats.watchlists}}</span> courses</div>
                             </div>
+                            {{/if}}
+
                         </div>
                     </div>
 
