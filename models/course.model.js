@@ -1,7 +1,9 @@
 import db from '../utils/db.js';
 
 const baseCols = [
-    'c.id', 'c.title', 'c.price',
+    'c.id',
+    'c.title',
+    'c.price',
     db.raw('c.promotional_price as promo_price'),
     db.raw('c.image_url as cover'),
     db.raw('c.short_description'),
@@ -24,6 +26,7 @@ async function getStatistics(courseId) {
             db.raw('COUNT(*) as rating_count')
         )
         .first();
+
     const enrollmentStats = await db('enrollments')
         .where('course_id', courseId)
         .count('* as enrolled_count')
@@ -115,7 +118,7 @@ export default {
             .select(['cat.id', 'cat.name', db.raw('COUNT(e.user_id) as enroll_count')]);
     },
 
-    // Public search - giữ bản remove_accents (tốt cho TV)
+    // Public search - remove_accents hỗ trợ tốt TV
     async search({ q = '', categoryId = null, sort = 'rating_desc', page = 1, pageSize = 12 }) {
         const offset = (page - 1) * pageSize;
 
@@ -162,7 +165,7 @@ export default {
         return { rows, total: Number(count || 0) };
     },
 
-    // Search by multiple categories (parent + children)
+    // Search theo nhiều category (cha + con)
     async searchByCategories({ categoryIds = [], sort = 'newest', page = 1, pageSize = 12 }) {
         const offset = (page - 1) * pageSize;
 

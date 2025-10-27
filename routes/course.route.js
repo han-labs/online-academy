@@ -1,3 +1,4 @@
+// routes/course.route.js
 import { Router } from 'express';
 import courseModel from '../models/course.model.js';
 import categoryModel from '../models/category.model.js';
@@ -10,7 +11,7 @@ import reviewModel from '../models/review.model.js';
 
 const router = Router();
 
-// Search (trước /:id)
+// Search (đặt trước /:id để không “ăn” nhầm param)
 router.get('/search', async (req, res) => {
     const q = req.query.q || '';
     const categoryId = req.query.category ? Number(req.query.category) : null;
@@ -25,8 +26,10 @@ router.get('/search', async (req, res) => {
     if (categoryId) categoryInfo = await categoryModel.findById(categoryId);
 
     res.render('vwCourse/search', {
-        courses: rows, q, categoryId, categoryInfo, sort,
-        page, totalPages, total, hasResults: rows.length > 0
+        courses: rows,
+        q, categoryId, categoryInfo, sort,
+        page, totalPages, total,
+        hasResults: rows.length > 0
     });
 });
 
@@ -44,17 +47,18 @@ router.get('/:id', async (req, res) => {
         courseModel.relatedBestSellers(course.category_id, id, 5),
     ]);
 
-    // group lectures
+    // group lectures theo chapter
     const chaptersWithLectures = curriculum.chapters.map(ch => ({
-        ...ch, lectures: curriculum.lectures.filter(l => l.chapter_id === ch.id)
+        ...ch,
+        lectures: curriculum.lectures.filter(l => l.chapter_id === ch.id)
     }));
 
-    // duration
+    // tổng thời lượng
     const totalMinutes = curriculum.lectures.reduce((s, l) => s + (l.duration_minutes || 0), 0);
     const totalHours = Math.floor(totalMinutes / 60);
     const remainingMinutes = totalMinutes % 60;
 
-    // watchlist state
+    // watchlist state (nếu đã đăng nhập)
     let isInWatchlist = false;
     if (req.session.user) {
         try { isInWatchlist = await watchlistModel.isInWatchlist(req.session.user.id, id); }
@@ -88,7 +92,8 @@ router.get('/:id/learn', requireAuth, async (req, res) => {
         const curriculum = await courseModel.curriculum(id);
 
         const chaptersWithLectures = curriculum.chapters.map(ch => ({
-            ...ch, lectures: curriculum.lectures.filter(l => l.chapter_id === ch.id)
+            ...ch,
+            lectures: curriculum.lectures.filter(l => l.chapter_id === ch.id)
         }));
 
         const progress = await progressModel.getCourseProgress(userId, id);

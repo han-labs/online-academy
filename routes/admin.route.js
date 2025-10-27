@@ -2,6 +2,7 @@
 import express from "express";
 import adminModel from "../models/admin.model.js";
 import bcrypt from "bcryptjs";
+import upload from "../utils/upload.js";
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.get("/dashboard", async (req, res) => {
     console.error("Dashboard error:", err);
     res.render("vwAdmin/dashboard", {
       title: "Dashboard",
-      error: "Không thể tải dữ liệu",
+      error: true,
       stats: {
         total_students: 0,
         total_instructors: 0,
@@ -34,64 +35,262 @@ router.get("/dashboard", async (req, res) => {
 });
 
 /* ============= CATEGORY ============= */
+// Category list
 router.get("/categories", async (req, res) => {
   try {
-    const data = await adminModel.listCategories();
+    const categories = await adminModel.findAllCategories();
+    const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+
     res.render("vwAdmin/categories", {
-      title: "Quản lý lĩnh vực",
-      categories: data.rows,
-      total: data.total,
+      title: "Category Management",
+      categories: categories,
+      categoriesHierarchy,
     });
   } catch (err) {
     console.error("Categories error:", err);
     res.render("vwAdmin/categories", {
-      title: "Quản lý lĩnh vực",
-      error: "Không thể tải dữ liệu",
+      title: "Category Management",
+      error: true,
       categories: [],
-      total: 0,
+      categoriesHierarchy: { parentCategories: [], childCategories: [] },
     });
   }
 });
 
-// POST xử lý thêm / sửa / xóa category
-router.post("/categories", async (req, res) => {
+// Add category form
+router.get("/categories/add", async (req, res) => {
   try {
-    const { action, id, name, parent_id } = req.body;
+    const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
 
-    if (action === "create") {
-      await adminModel.createCategory({
-        name,
-        parent_id: parent_id || null,
+    res.render("vwAdmin/category.add.handlebars", {
+      title: "Add New Category",
+      categoriesHierarchy,
+    });
+  } catch (err) {
+    console.error("Add category form error:", err);
+    res.render("vwAdmin/category.add.handlebars", {
+      title: "Add New Category",
+      categoriesHierarchy: { parentCategories: [], childCategories: [] },
+      error: true,
+    });
+  }
+});
+
+// Process add category
+router.post("/categories/add", async (req, res) => {
+  try {
+    const { name, parent_id } = req.body;
+
+    await adminModel.addCategory({
+      name,
+      parent_id: parent_id || null,
+    });
+
+    const categories = await adminModel.findAllCategories();
+    const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+
+    res.render("vwAdmin/categories", {
+      title: "Category Management",
+      categories,
+      categoriesHierarchy,
+      success: true,
+    });
+  } catch (err) {
+    console.error("Add category error:", err);
+
+    const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+
+    res.render("vwAdmin/category.add.handlebars", {
+      title: "Add New Category",
+      categoriesHierarchy,
+      error: true,
+      formData: req.body,
+    });
+  }
+});
+
+// Edit category form
+router.get("/categories/edit/:id", async (req, res) => {
+  try {
+    const categoryId = req.params.id;
+    const category = await adminModel.findCategoryById(categoryId);
+    const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+
+    if (!category) {
+      const categories = await adminModel.findAllCategories();
+      const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+
+      return res.render("vwAdmin/categories", {
+        title: "Category Management",
+        categories,
+        categoriesHierarchy,
+        error: true,
       });
-      req.session.flash = {
-        type: "success",
-        message: "Thêm lĩnh vực thành công",
-      };
-    } else if (action === "update") {
-      await adminModel.updateCategory(id, {
-        name,
-        parent_id: parent_id || null,
-      });
-      req.session.flash = {
-        type: "success",
-        message: "Cập nhật lĩnh vực thành công",
-      };
-    } else if (action === "delete") {
-      await adminModel.deleteCategory(id);
-      req.session.flash = {
-        type: "success",
-        message: "Xóa lĩnh vực thành công",
-      };
     }
 
-    res.redirect("/admin/categories");
+    res.render("vwAdmin/category.edit.handlebars", {
+      title: `Edit: ${category.name}`,
+      category,
+      categoriesHierarchy,
+    });
   } catch (err) {
-    console.error("Category action error:", err);
-    const data = await adminModel.listCategories();
+    console.error("Edit category form error:", err);
+
+    const categories = await adminModel.findAllCategories();
+    const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+
     res.render("vwAdmin/categories", {
-      error: err.message,
-      categories: data.rows,
-      total: data.total,
+      title: "Category Management",
+      categories,
+      categoriesHierarchy,
+      error: true,
+    });
+  }
+});
+
+// Process edit category
+router.post("/categories/edit/:id", async (req, res) => {
+  try {
+    const categoryId = req.params.id;
+    const { name, parent_id } = req.body;
+
+    await adminModel.patchCategory(categoryId, {
+      name,
+      parent_id: parent_id || null,
+    });
+
+    const categories = await adminModel.findAllCategories();
+    const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+
+    res.render("vwAdmin/categories", {
+      title: "Category Management",
+      categories,
+      categoriesHierarchy,
+      success: true,
+    });
+  } catch (err) {
+    console.error("Edit category error:", err);
+
+    const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+    const category = await adminModel.findCategoryById(req.params.id);
+
+    res.render("vwAdmin/category.edit.handlebars", {
+      title: `Edit: ${category.name}`,
+      category,
+      categoriesHierarchy,
+      error: true,
+      formData: req.body,
+    });
+  }
+});
+
+// View category details
+router.get("/categories/detail/:id", async (req, res) => {
+  try {
+    const categoryId = req.params.id;
+    const categoryDetails = await adminModel.findCategoryWithDetails(
+      categoryId
+    );
+
+    if (!categoryDetails) {
+      const categories = await adminModel.findAllCategories();
+      const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+
+      return res.render("vwAdmin/categories", {
+        title: "Category Management",
+        categories,
+        categoriesHierarchy,
+        error: true,
+      });
+    }
+
+    res.render("vwAdmin/category.detail.handlebars", {
+      title: `Details: ${categoryDetails.name}`,
+      category: categoryDetails,
+    });
+  } catch (err) {
+    console.error("Category detail error:", err);
+
+    const categories = await adminModel.findAllCategories();
+    const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+
+    res.render("vwAdmin/categories", {
+      title: "Category Management",
+      categories,
+      categoriesHierarchy,
+      error: true,
+    });
+  }
+});
+
+router.get("/categories/:id/check-delete", async (req, res) => {
+  try {
+    const categoryId = req.params.id;
+
+    const category = await adminModel.findCategoryWithDetails(categoryId);
+    if (!category) {
+      return res.json({ canDelete: false, reason: "not_found" });
+    }
+
+    const canDelete =
+      category.course_count === 0 && category.children_count === 0;
+
+    res.json({
+      canDelete,
+      courseCount: category.course_count,
+      childrenCount: category.children_count,
+    });
+  } catch (err) {
+    console.error("Check delete error:", err);
+    res.status(500).json({ canDelete: false, reason: "server_error" });
+  }
+});
+
+// Process delete category
+router.post("/categories/delete/:id", async (req, res) => {
+  try {
+    const categoryId = req.params.id;
+
+    // Validate categoryId
+    if (!categoryId || isNaN(categoryId)) {
+      throw new Error("Invalid category ID");
+    }
+
+    await adminModel.delCategory(categoryId);
+
+    const categories = await adminModel.findAllCategories();
+    const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+
+    res.render("vwAdmin/categories", {
+      title: "Category Management",
+      categories,
+      categoriesHierarchy,
+      success: "Category deleted successfully!",
+    });
+  } catch (err) {
+    console.error("Delete category route error:", err);
+
+    const categories = await adminModel.findAllCategories();
+    const categoriesHierarchy = await adminModel.findCategoriesHierarchy();
+
+    let errorMessage = "An error occurred while deleting the category";
+
+    // Handle specific error types
+    if (err.code === "CATEGORY_HAS_COURSES") {
+      errorMessage = err.message;
+    } else if (err.code === "CATEGORY_HAS_CHILDREN") {
+      errorMessage = err.message;
+    } else if (err.code === "CATEGORY_NOT_FOUND") {
+      errorMessage = err.message;
+    } else {
+      errorMessage = `Error: ${err.message}`;
+    }
+
+    res.render("vwAdmin/categories", {
+      title: "Category Management",
+      categories,
+      categoriesHierarchy,
+      error: errorMessage,
     });
   }
 });
@@ -99,100 +298,480 @@ router.post("/categories", async (req, res) => {
 /* ============= COURSE ============= */
 router.get("/courses", async (req, res) => {
   try {
-    const data = await adminModel.listCourses();
+    const courses = await adminModel.findAllCourses();
     res.render("vwAdmin/courses", {
-      title: "Quản lý khoá học",
-      courses: data.rows,
+      title: "Course Management",
+      courses: courses,
     });
   } catch (err) {
     console.error("Courses error:", err);
     res.render("vwAdmin/courses", {
-      title: "Quản lý khoá học",
-      error: "Không thể tải dữ liệu",
+      title: "Course Management",
+      error: true,
       courses: [],
     });
   }
 });
 
-router.post("/courses/remove", async (req, res) => {
+// Add new course form
+router.get("/courses/create", async (req, res) => {
   try {
-    await adminModel.removeCourse(req.body.id);
-    req.session.flash = {
-      type: "success",
-      message: "Gỡ bỏ khóa học thành công",
-    };
+    const instructors = await adminModel.findAllInstructors();
+    const categories = await adminModel.findAllCategories();
+
+    // If no instructors, show warning
+    if (instructors.length === 0) {
+      return res.render("vwAdmin/courseForm", {
+        title: "Add New Course",
+        course: {},
+        instructors,
+        categories,
+        formAction: "/admin/courses/create",
+        error: true,
+      });
+    }
+
+    res.render("vwAdmin/courseForm", {
+      title: "Add New Course",
+      course: {},
+      instructors,
+      categories,
+      formAction: "/admin/courses/create",
+    });
   } catch (err) {
-    console.error("Remove course error:", err);
-    req.session.flash = { type: "danger", message: err.message };
+    console.error("Create course form error:", err);
+
+    const courses = await adminModel.findAllCourses();
+    res.render("vwAdmin/courses", {
+      title: "Course Management",
+      courses,
+      error: true,
+    });
   }
-  res.redirect("/admin/courses");
+});
+
+// Process add new course
+router.post(
+  "/courses/create",
+  upload.single("course_image"),
+  async (req, res) => {
+    try {
+      const {
+        title,
+        short_description,
+        detailed_description,
+        price,
+        promotional_price,
+        status,
+        instructor_id,
+        category_id,
+      } = req.body;
+
+      // Validate data
+      if (!title || !title.trim()) {
+        const instructors = await adminModel.findAllInstructors();
+        const categories = await adminModel.findAllCategories();
+
+        return res.render("vwAdmin/courseForm", {
+          title: "Add New Course",
+          course: req.body,
+          instructors,
+          categories,
+          formAction: "/admin/courses/create",
+          error: true,
+        });
+      }
+
+      if (!instructor_id) {
+        const instructors = await adminModel.findAllInstructors();
+        const categories = await adminModel.findAllCategories();
+
+        return res.render("vwAdmin/courseForm", {
+          title: "Add New Course",
+          course: req.body,
+          instructors,
+          categories,
+          formAction: "/admin/courses/create",
+          error: true,
+        });
+      }
+
+      // Process image path
+      let image_url = null;
+      if (req.file) {
+        image_url = "/uploads/courses/" + req.file.filename;
+      }
+
+      await adminModel.addCourse({
+        title: title.trim(),
+        short_description: short_description?.trim() || "",
+        detailed_description: detailed_description?.trim() || "",
+        price: price ? parseFloat(price) : 0,
+        promotional_price: promotional_price
+          ? parseFloat(promotional_price)
+          : null,
+        image_url: image_url,
+        status: status || "draft",
+        instructor_id: instructor_id,
+        category_id: category_id ? parseInt(category_id) : null,
+      });
+
+      const courses = await adminModel.findAllCourses();
+      res.render("vwAdmin/courses", {
+        title: "Course Management",
+        courses,
+        success: true,
+      });
+    } catch (err) {
+      console.error("Create course route error:", err);
+
+      const instructors = await adminModel.findAllInstructors();
+      const categories = await adminModel.findAllCategories();
+
+      res.render("vwAdmin/courseForm", {
+        title: "Add New Course",
+        course: req.body,
+        instructors,
+        categories,
+        formAction: "/admin/courses/create",
+        error: true,
+      });
+    }
+  }
+);
+
+// View course details
+router.get("/courses/:id", async (req, res) => {
+  try {
+    const courseId = req.params.id;
+    const course = await adminModel.findCourseDetails(courseId);
+
+    if (!course) {
+      const courses = await adminModel.findAllCourses();
+      return res.render("vwAdmin/courses", {
+        title: "Course Management",
+        courses,
+        error: true,
+      });
+    }
+
+    res.render("vwAdmin/courseDetail", {
+      title: `Details: ${course.title}`,
+      course,
+    });
+  } catch (err) {
+    console.error("Course detail error:", err);
+
+    const courses = await adminModel.findAllCourses();
+    res.render("vwAdmin/courses", {
+      title: "Course Management",
+      courses,
+      error: true,
+    });
+  }
+});
+
+// Edit course form
+router.get("/courses/:id/edit", async (req, res) => {
+  try {
+    const courseId = req.params.id;
+    const course = await adminModel.findCourseById(courseId);
+    const instructors = await adminModel.findAllInstructors();
+    const categories = await adminModel.findAllCategories();
+
+    if (!course) {
+      const courses = await adminModel.findAllCourses();
+      return res.render("vwAdmin/courses", {
+        title: "Course Management",
+        courses,
+        error: true,
+      });
+    }
+
+    res.render("vwAdmin/courseForm", {
+      title: `Edit: ${course.title}`,
+      course,
+      instructors,
+      categories,
+      formAction: `/admin/courses/${courseId}/edit`,
+    });
+  } catch (err) {
+    console.error("Edit course form error:", err);
+
+    const courses = await adminModel.findAllCourses();
+    res.render("vwAdmin/courses", {
+      title: "Course Management",
+      courses,
+      error: true,
+    });
+  }
+});
+
+// Process edit course
+router.post(
+  "/courses/:id/edit",
+  upload.single("course_image"),
+  async (req, res) => {
+    try {
+      const courseId = req.params.id;
+      const {
+        title,
+        short_description,
+        detailed_description,
+        price,
+        promotional_price,
+        status,
+        instructor_id,
+        category_id,
+      } = req.body;
+
+      // Process image path
+      let updateData = {
+        title,
+        short_description,
+        detailed_description,
+        price: parseFloat(price) || 0,
+        promotional_price: promotional_price
+          ? parseFloat(promotional_price)
+          : null,
+        status,
+        instructor_id,
+        category_id: category_id ? parseInt(category_id) : null,
+      };
+
+      // Only update image_url if there's a new file
+      if (req.file) {
+        updateData.image_url = "/uploads/courses/" + req.file.filename;
+      }
+
+      await adminModel.patchCourse(courseId, updateData);
+
+      const courses = await adminModel.findAllCourses();
+      res.render("vwAdmin/courses", {
+        title: "Course Management",
+        courses,
+        success: true,
+      });
+    } catch (err) {
+      console.error("Update course error:", err);
+
+      const instructors = await adminModel.findAllInstructors();
+      const categories = await adminModel.findAllCategories();
+
+      res.render("vwAdmin/courseForm", {
+        title: `Edit: ${req.body.title}`,
+        course: req.body,
+        instructors,
+        categories,
+        formAction: `/admin/courses/${req.params.id}/edit`,
+        error: true,
+      });
+    }
+  }
+);
+
+// Delete course
+router.post("/courses/delete", async (req, res) => {
+  try {
+    await adminModel.delCourse(req.body.id);
+
+    const courses = await adminModel.findAllCourses();
+    res.render("vwAdmin/courses", {
+      title: "Course Management",
+      courses,
+      success: true,
+    });
+  } catch (err) {
+    console.error("Delete course error:", err);
+
+    const courses = await adminModel.findAllCourses();
+    res.render("vwAdmin/courses", {
+      title: "Course Management",
+      courses,
+      error: true,
+    });
+  }
 });
 
 /* ============= USERS ============= */
 router.get("/users", async (req, res) => {
   try {
-    const data = await adminModel.listUsers();
+    const users = await adminModel.findAll();
     res.render("vwAdmin/users", {
-      title: "Quản lý người dùng",
-      users: data.rows,
+      title: "User Management",
+      users: users,
     });
   } catch (err) {
     console.error("Users error:", err);
     res.render("vwAdmin/users", {
-      title: "Quản lý người dùng",
-      error: "Không thể tải dữ liệu",
+      title: "User Management",
+      error: true,
       users: [],
     });
   }
 });
 
-router.post("/users", async (req, res) => {
-  const { action, id, role } = req.body;
-
+// View user details
+router.get("/users/:id", async (req, res) => {
   try {
-    if (action === "updateRole") {
-      await adminModel.updateUserRole(id, role);
-      req.session.flash = {
-        type: "success",
-        message: "Cập nhật vai trò thành công",
-      };
-    } else if (action === "delete") {
-      await adminModel.deleteUser(id);
-      req.session.flash = {
-        type: "success",
-        message: "Xóa người dùng thành công",
-      };
-    } else if (action === "createInstructor") {
-      const { full_name, email, password, instructor_bio } = req.body;
+    const userId = req.params.id;
+    const userDetail = await adminModel.findById(userId);
 
-      const existingUser = await adminModel.getUserByEmail(email);
-      if (existingUser) {
-        req.session.flash = {
-          type: "danger",
-          message: "Email đã tồn tại trong hệ thống",
-        };
-        return res.redirect("/admin/users");
-      }
-
-      const password_hash = bcrypt.hashSync(password, 10);
-
-      await adminModel.createInstructor({
-        full_name,
-        email,
-        password_hash,
-        instructor_bio: instructor_bio || null,
+    if (!userDetail) {
+      const users = await adminModel.findAll();
+      return res.render("vwAdmin/users", {
+        title: "User Management",
+        users,
+        error: true,
       });
-      req.session.flash = {
-        type: "success",
-        message: "Tạo tài khoản giảng viên thành công",
-      };
     }
-  } catch (err) {
-    console.error("User action error:", err);
-    req.session.flash = { type: "danger", message: err.message };
-  }
 
-  res.redirect("/admin/users");
+    let courses = [];
+    if (userDetail.role === "instructor") {
+      courses = await adminModel.getCoursesByInstructor(userId);
+    }
+
+    let enrolledCourses = [];
+    if (userDetail.role === "student") {
+      enrolledCourses = await adminModel.getEnrolledCourses(userId);
+    }
+
+    res.render("vwAdmin/userDetail", {
+      title: `Details: ${userDetail.full_name}`,
+      userDetail,
+      courses,
+      enrolledCourses,
+    });
+  } catch (err) {
+    console.error("User detail error:", err);
+
+    const users = await adminModel.findAll();
+    res.render("vwAdmin/users", {
+      title: "User Management",
+      users,
+      error: true,
+    });
+  }
+});
+
+// Create new instructor
+router.post("/users/create-instructor", async (req, res) => {
+  try {
+    const { full_name, email, password, instructor_bio } = req.body;
+
+    // Check if email already exists
+    const existingUser = await adminModel.findByEmail(email);
+    if (existingUser) {
+      const users = await adminModel.findAll();
+      return res.render("vwAdmin/users", {
+        title: "User Management",
+        users,
+        error: true,
+      });
+    }
+
+    const password_hash = bcrypt.hashSync(password, 10);
+
+    const newUser = {
+      full_name,
+      email,
+      password_hash,
+      role: "instructor",
+      instructor_bio: instructor_bio || null,
+      created_at: new Date(),
+    };
+
+    await adminModel.add(newUser);
+
+    const users = await adminModel.findAll();
+    res.render("vwAdmin/users", {
+      title: "User Management",
+      users,
+      success: true,
+    });
+  } catch (err) {
+    console.error("Create instructor error:", err);
+    const users = await adminModel.findAll();
+    res.render("vwAdmin/users", {
+      title: "User Management",
+      users,
+      error: true,
+    });
+  }
+});
+
+// Update user information
+router.post("/users/update", async (req, res) => {
+  try {
+    const { id, full_name, email, role, instructor_bio } = req.body;
+
+    // Check if email already exists (excluding current user)
+    if (email) {
+      const existingUser = await adminModel.findByEmail(email);
+      if (existingUser && existingUser.id !== parseInt(id)) {
+        const users = await adminModel.findAll();
+        return res.render("vwAdmin/users", {
+          title: "User Management",
+          users,
+          error: true,
+        });
+      }
+    }
+
+    const updateData = {
+      full_name,
+      email,
+      role,
+    };
+
+    // Only update instructor_bio if user is instructor
+    if (role === "instructor") {
+      updateData.instructor_bio = instructor_bio;
+    } else {
+      updateData.instructor_bio = null;
+    }
+
+    await adminModel.patch(id, updateData);
+
+    const users = await adminModel.findAll();
+    res.render("vwAdmin/users", {
+      title: "User Management",
+      users,
+      success: true,
+    });
+  } catch (err) {
+    console.error("Update user error:", err);
+    const users = await adminModel.findAll();
+    res.render("vwAdmin/users", {
+      title: "User Management",
+      users,
+      error: true,
+    });
+  }
+});
+
+// Delete user
+router.post("/users/delete", async (req, res) => {
+  try {
+    const { id } = req.body;
+    await adminModel.del(id);
+
+    const users = await adminModel.findAll();
+    res.render("vwAdmin/users", {
+      title: "User Management",
+      users,
+      success: true,
+    });
+  } catch (err) {
+    console.error("Delete user error:", err);
+
+    const users = await adminModel.findAll();
+    res.render("vwAdmin/users", {
+      title: "User Management",
+      users,
+      error: true,
+    });
+  }
 });
 
 export default router;

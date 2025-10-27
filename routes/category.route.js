@@ -1,3 +1,4 @@
+// routes/category.route.js
 import { Router } from 'express';
 import courseModel from '../models/course.model.js';
 import categoryModel from '../models/category.model.js';

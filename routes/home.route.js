@@ -1,5 +1,7 @@
+// routes/home.route.js
 import { Router } from 'express';
 import courseModel from '../models/course.model.js';
+
 const router = Router();
 
 router.get('/', async (req, res) => {
@@ -11,8 +13,8 @@ router.get('/', async (req, res) => {
             courseModel.topCategoriesThisWeek(8)
         ]);
 
+        // fallback nếu tuần này không có featured
         if (!featured || featured.length === 0) {
-            // fallback khi tuần này không có
             featured = newest.slice(0, 4);
         }
 

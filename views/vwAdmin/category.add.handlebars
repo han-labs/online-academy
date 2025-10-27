@@ -1,0 +1,123 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">{{title}}</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <a href="/admin/categories" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+</div>
+
+{{#if error}}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Error:</strong> An error has occurred. Please try again.
+</div>  
+{{/if}}
+
+{{#if success}}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Success:</strong> The operation has been completed successfully.
+</div>  
+{{/if}}
+
+<div class="card">
+  <div class="card-header">
+    <h5 class="card-title mb-0">Category Information</h5>
+  </div>
+  <div class="card-body">
+    <form method="post" action="/admin/categories/add" id="frmAddCategory">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="name" class="form-label">Category Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" name="name" 
+                   value="{{formData.name}}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Category Type <span class="text-danger">*</span></label>
+            <div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="category_type" id="type_parent" value="parent" 
+                       {{#unless formData.parent_id}}checked{{/unless}}>
+                <label class="form-check-label" for="type_parent">
+                  Parent Category
+                </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="category_type" id="type_child" value="child"
+                       {{#if formData.parent_id}}checked{{/if}}>
+                <label class="form-check-label" for="type_child">
+                  Subcategory
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3" id="parentCategorySection" 
+               style="display: {{#if formData.parent_id}}block{{else}}none{{/if}};">
+            <label for="parent_id" class="form-label">Parent Category <span class="text-danger">*</span></label>
+            <select name="parent_id" id="parent_id" class="form-select">
+              <option value="">-- Select Parent Category --</option>
+              {{#each categoriesHierarchy.parentCategories}}
+                <option value="{{id}}" {{#if (eq id ../formData.parent_id)}}selected{{/if}}>
+                  {{name}}
+                </option>
+              {{/each}}
+            </select>
+            <div class="form-text">Required when creating a subcategory</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-lg"></i> Add Category
+        </button>
+        <a href="/admin/categories" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('frmAddCategory');
+  const parentSection = document.getElementById('parentCategorySection');
+  const parentSelect = document.getElementById('parent_id');
+  
+  // Handle category type change
+  document.querySelectorAll('input[name="category_type"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      if (this.value === 'child') {
+        parentSection.style.display = 'block';
+        parentSelect.required = true;
+      } else {
+        parentSection.style.display = 'none';
+        parentSelect.required = false;
+        parentSelect.value = '';
+      }
+    });
+  });
+
+  // Validate form
+  form.addEventListener('submit', function(e) {
+    const name = document.getElementById('name').value.trim();
+    const categoryType = document.querySelector('input[name="category_type"]:checked').value;
+    const parentId = parentSelect.value;
+
+    if (!name) {
+      e.preventDefault();
+      alert('Please enter category name');
+      return;
+    }
+
+    if (categoryType === 'child' && !parentId) {
+      e.preventDefault();
+      alert('Please select a parent category for the subcategory');
+      return;
+    }
+  });
+});
+</script>

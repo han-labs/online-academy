@@ -10,8 +10,28 @@
         </button>
 
         <div id="navMain" class="collapse navbar-collapse">
-            <!-- Left: Categories -->
+            <!-- Left -->
             <ul class="navbar-nav me-auto">
+                {{#if user}}
+                {{#if (eq user.role 'admin')}}
+                <!-- Admin Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-grid-3x3-gap"></i> Administration
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/admin/dashboard"><i class="bi bi-speedometer2"></i>
+                                Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/admin/categories"><i class="bi bi-tags"></i> Category
+                                Management</a></li>
+                        <li><a class="dropdown-item" href="/admin/courses"><i class="bi bi-book"></i> Course
+                                Management</a></li>
+                        <li><a class="dropdown-item" href="/admin/users"><i class="bi bi-people"></i> User
+                                Management</a></li>
+                    </ul>
+                </li>
+                {{else}}
+                <!-- Categories -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                         <i class="bi bi-grid-3x3-gap"></i> Categories
@@ -19,9 +39,7 @@
                     <ul class="dropdown-menu">
                         {{#each global_categories_tree}}
                         <li>
-                            <h6 class="dropdown-header text-primary">
-                                <i class="bi bi-folder"></i> {{name}}
-                            </h6>
+                            <h6 class="dropdown-header text-primary"><i class="bi bi-folder"></i> {{name}}</h6>
                         </li>
                         {{#each children}}
                         <li>
@@ -38,9 +56,41 @@
                         {{/each}}
                     </ul>
                 </li>
+                {{/if}}
+                {{else}}
+                <!-- Guest sees Categories -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-grid-3x3-gap"></i> Categories
+                    </a>
+                    <ul class="dropdown-menu">
+                        {{#each global_categories_tree}}
+                        <li>
+                            <h6 class="dropdown-header text-primary"><i class="bi bi-folder"></i> {{name}}</h6>
+                        </li>
+                        {{#each children}}
+                        <li>
+                            <a class="dropdown-item" href="/categories/{{id}}">
+                                <i class="bi bi-chevron-right small"></i> {{name}}
+                            </a>
+                        </li>
+                        {{/each}}
+                        {{#unless @last}}
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        {{/unless}}
+                        {{/each}}
+                    </ul>
+                </li>
+                {{/if}}
             </ul>
 
             <!-- Search -->
+            {{#if user}}
+            {{#if (eq user.role 'admin')}}
+            <!-- Admin: ẩn search -->
+            {{else}}
             <form class="d-flex mx-auto me-3" action="/courses/search" method="GET"
                 style="max-width: 400px; width: 100%;">
                 <div class="input-group position-relative">
@@ -52,20 +102,39 @@
                         aria-label="Clear search">
                         <i class="bi bi-x-lg"></i>
                     </button>
-                    <button class="btn btn-outline-secondary" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
+                    <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
                 </div>
             </form>
+            {{/if}}
+            {{else}}
+            <form class="d-flex mx-auto me-3" action="/courses/search" method="GET"
+                style="max-width: 400px; width: 100%;">
+                <div class="input-group position-relative">
+                    <input class="form-control" type="text" name="q" id="searchInput" placeholder="Search for anything"
+                        aria-label="Search" value="{{q}}">
+                    <button
+                        class="btn btn-link text-secondary position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent d-none"
+                        type="button" id="clearSearch" style="z-index:5; right:50px !important;"
+                        aria-label="Clear search">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                </div>
+            </form>
+            {{/if}}
 
             <!-- Right: User -->
             {{#if user}}
             <div class="d-flex align-items-center gap-2">
+                {{#if (eq user.role 'admin')}}
+                {{!-- Admin: ẩn chuông thông báo --}}
+                {{else}}
                 <a href="#" class="btn btn-link text-dark position-relative" title="Notifications">
                     <i class="bi bi-bell fs-5"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                         style="font-size:.6rem;">3</span>
                 </a>
+                {{/if}}
 
                 <div class="dropdown">
                     <button
@@ -120,8 +189,8 @@
                                 Password</a></li>
                         <li>
                             <form action="/account/logout" method="post" class="d-inline">
-                                <button class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i> Log
-                                    Out</button>
+                                <button class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i>
+                                    Logout</button>
                             </form>
                         </li>
                     </ul>
@@ -129,12 +198,10 @@
             </div>
             {{else}}
             <div class="d-flex gap-2">
-                <a class="btn btn-outline-primary btn-sm" href="/account/login">
-                    <i class="bi bi-box-arrow-in-right"></i> Log In
-                </a>
-                <a class="btn btn-primary btn-sm" href="/account/register">
-                    <i class="bi bi-person-plus"></i> Sign Up
-                </a>
+                <a class="btn btn-outline-primary btn-sm" href="/account/login"><i class="bi bi-box-arrow-in-right"></i>
+                    Login</a>
+                <a class="btn btn-primary btn-sm" href="/account/register"><i class="bi bi-person-plus"></i>
+                    Register</a>
             </div>
             {{/if}}
         </div>

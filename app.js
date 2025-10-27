@@ -32,13 +32,12 @@ const __dirname = path.dirname(__filename);
 // Init app
 const app = express();
 
-// view engine + helpers (hợp nhất)
+// view engine + helpers
 app.engine('handlebars', engine({
   helpers: {
     // generic
     formatNumber(v) { return new Intl.NumberFormat('en-US').format(v ?? 0); },
     eq(a, b) { return a === b; },
-    ifEquals(a, b, opts) { return a == b ? opts.fn(this) : opts.inverse(this); },
     add: (a, b) => (a || 0) + (b || 0),
     sub: (a, b) => (a || 0) - (b || 0),
     length: (arr) => Array.isArray(arr) ? arr.length : 0,
@@ -51,18 +50,16 @@ app.engine('handlebars', engine({
       return out;
     },
     formatCurrency(amount) {
-      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
-        .format(amount || 0);
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
     },
     getStatusBadge(status) {
       const m = { draft: 'secondary', published: 'success', completed: 'primary' };
       return m[status] || 'secondary';
     },
     getStatusText(status) {
-      const m = { draft: 'Bản nháp', published: 'Đã xuất bản', completed: 'Hoàn thành' };
+      const m = { draft: 'Draft', published: 'Published', completed: 'Completed' };
       return m[status] || status;
     },
-    // formatting
     formatDate(date) {
       if (!date) return '';
       const d = new Date(date);
@@ -77,7 +74,7 @@ app.engine('handlebars', engine({
     calculateChapterDuration(lectures) {
       if (!Array.isArray(lectures)) return 0;
       return lectures.reduce((t, l) => t + (l.duration_minutes || 0), 0);
-    },
+    }
   },
   defaultLayout: 'main',
   layoutsDir: path.join(__dirname, 'views/layouts'),
@@ -96,6 +93,7 @@ app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use(express.static('public'));
 
+// session
 app.use(session({
   secret: 'exam-secret',
   resave: false,
@@ -118,6 +116,11 @@ app.use(async (req, res, next) => {
 
 // optional flash (nếu có dùng)
 app.use((req, res, next) => {
+  res.locals.user = req.session.user;
+  next();
+});
+
+app.use((req, res, next) => {
   res.locals.flash = req.session.flash;
   delete req.session.flash;
   next();
@@ -130,7 +133,7 @@ app.use('/account', accountRouter);
 app.use('/categories', categoryRouter);
 app.use('/courses', courseRouter);
 
-// admin theo repo hiện tại
+// admin (ví dụ quản lý categories)
 app.use('/admin/categories', requireAuth, checkAdmin, adminCategoryRouter);
 
 // student features

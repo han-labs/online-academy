@@ -1,0 +1,226 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">{{title}}</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <a href="/admin/courses" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+</div>
+
+{{#if error}}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Error:</strong> An error has occurred. Please try again.
+</div>  
+{{/if}}
+
+{{#if success}}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Success:</strong> The operation has been completed successfully.
+</div>  
+{{/if}}
+
+<!-- Display warning when no instructors -->
+{{#if (eq instructors.length 0)}}
+<div class="alert alert-warning">
+  <h5><i class="bi bi-exclamation-triangle"></i> No instructors in the system</h5>
+  <p>You need to create instructor accounts before creating courses.</p>
+  <div class="mt-3">
+    <a href="/admin/users" class="btn btn-primary me-2">
+      <i class="bi bi-person-plus"></i> Create New Instructor
+    </a>
+  </div>
+</div>
+{{/if}}
+
+<form method="post" action="{{formAction}}" {{#if (eq instructors.length 0)}}class="opacity-50"{{/if}} enctype="multipart/form-data" id="frmCourse">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Basic Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="title" class="form-label">Course Title *</label>
+            <input type="text" class="form-control" id="title" name="title" 
+                   value="{{course.title}}" required {{#if (eq instructors.length 0)}}disabled{{/if}}>
+          </div>
+
+          <div class="mb-3">
+            <label for="short_description" class="form-label">Short Description</label>
+            <textarea class="form-control" id="short_description" name="short_description" 
+                      rows="3" {{#if (eq instructors.length 0)}}disabled{{/if}}>{{course.short_description}}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="detailed_description" class="form-label">Detailed Description</label>
+            <textarea class="form-control" id="detailed_description" name="detailed_description" 
+                      rows="6" {{#if (eq instructors.length 0)}}disabled{{/if}}>{{course.detailed_description}}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="price" class="form-label">Original Price *</label>
+            <input type="number" class="form-control" id="price" name="price" 
+                   step="0.01" min="0" value="{{course.price}}" required {{#if (eq instructors.length 0)}}disabled{{/if}}>
+          </div>
+
+          <div class="mb-3">
+            <label for="promotional_price" class="form-label">Promotional Price</label>
+            <input type="number" class="form-control" id="promotional_price" name="promotional_price" 
+                   step="0.01" min="0" value="{{course.promotional_price}}" {{#if (eq instructors.length 0)}}disabled{{/if}}>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Settings</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="instructor_id" class="form-label">Instructor *</label>
+            {{#if (gt instructors.length 0)}}
+            <select class="form-select" id="instructor_id" name="instructor_id" required>
+              <option value="">Select Instructor</option>
+              {{#each instructors}}
+              <option value="{{this.id}}" {{#if (eq this.id ../course.instructor_id)}}selected{{/if}}>
+                {{this.full_name}} ({{this.email}})
+              </option>
+              {{/each}}
+            </select>
+            {{else}}
+            <div class="alert alert-warning py-2">
+              <small>No instructors in the system</small>
+            </div>
+            {{/if}}
+          </div>
+
+          <div class="mb-3">
+            <label for="category_id" class="form-label">Category</label>
+            <select class="form-select" id="category_id" name="category_id" {{#if (eq instructors.length 0)}}disabled{{/if}}>
+              <option value="">Select Category</option>
+              {{#each categories}}
+              <option value="{{this.id}}" {{#if (eq this.id ../course.category_id)}}selected{{/if}}>
+                {{this.name}}
+              </option>
+              {{/each}}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status" {{#if (eq instructors.length 0)}}disabled{{/if}}>
+              <option value="draft" {{#if (eq course.status "draft")}}selected{{/if}}>Draft</option>
+              <option value="published" {{#if (eq course.status "published")}}selected{{/if}}>Published</option>
+              <option value="completed" {{#if (eq course.status "completed")}}selected{{/if}}>Completed</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Image</h5>
+        </div>
+        <div class="card-body">
+          <!-- Display current image if available -->
+          {{#if course.image_url}}
+          <div class="mb-3">
+            <label class="form-label">Current Image</label>
+            <div>
+              <img src="{{course.image_url}}" alt="Course image" class="img-thumbnail" style="max-height: 200px;">
+            </div>
+          </div>
+          {{/if}}
+
+          <div class="mb-3">
+            <label for="course_image" class="form-label">
+              {{#if course.image_url}}Change Image{{else}}Select Image{{/if}}
+            </label>
+            <input type="file" class="form-control" id="course_image" name="course_image" 
+                   accept="image/*" {{#if (eq instructors.length 0)}}disabled{{/if}}>
+            <div class="form-text">
+              Accepted: JPG, PNG, GIF. Max 5MB.
+              {{#if course.image_url}}Leave empty to keep current image.{{/if}}
+            </div>
+          </div>
+
+          <!-- Image preview -->
+          <div class="mb-3 d-none" id="image-preview-container">
+            <label class="form-label">Preview</label>
+            <div>
+              <img id="image-preview" class="img-thumbnail" style="max-height: 200px;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <button type="submit" class="btn btn-primary" {{#if (eq instructors.length 0)}}disabled{{/if}}>
+            <i class="bi bi-check-lg"></i>
+            {{#if course.id}}Update{{else}}Create Course{{/if}}
+          </button>
+          <a href="/admin/courses" class="btn btn-secondary">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const imageInput = document.getElementById('course_image');
+  const previewContainer = document.getElementById('image-preview-container');
+  const previewImage = document.getElementById('image-preview');
+
+  imageInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        previewImage.src = e.target.result;
+        previewContainer.classList.remove('d-none');
+      }
+      
+      reader.readAsDataURL(file);
+    } else {
+      previewContainer.classList.add('d-none');
+    }
+  });
+
+  // Form validation
+  document.querySelector('#frmCourse')?.addEventListener('submit', function(e) {
+    const title = document.querySelector('#title').value.trim();
+    const instructor = document.querySelector('#instructor_id').value;
+    const price = document.querySelector('#price').value;
+
+    if (!title) {
+      e.preventDefault();
+      alert('Please enter course title');
+      return;
+    }
+
+    if (!instructor) {
+      e.preventDefault();
+      alert('Please select an instructor');
+      return;
+    }
+
+    if (!price || parseFloat(price) < 0) {
+      e.preventDefault();
+      alert('Please enter a valid price');
+      return;
+    }
+  });
+});
+</script>

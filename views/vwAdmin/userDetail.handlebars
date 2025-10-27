@@ -1,0 +1,251 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">User Details</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <a href="/admin/users" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+</div>
+
+{{#if error}}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Error:</strong> An error has occurred. Please try again.
+</div>  
+{{/if}}
+
+{{#if success}}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <strong>Success:</strong> The operation has been completed successfully.
+</div>  
+{{/if}}
+
+<div class="row">
+  <!-- Personal Information -->
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Personal Information</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- Detailed Information -->
+          <div class="col-md-9">
+            <table class="table table-borderless">
+              <tr>
+                <th width="30%">ID:</th>
+                <td><strong>#{{userDetail.id}}</strong></td>
+              </tr>
+              <tr>
+                <th>Full Name:</th>
+                <td>{{userDetail.full_name}}</td>
+              </tr>
+              <tr>
+                <th>Email:</th>
+                <td>{{userDetail.email}}</td>
+              </tr>
+              <tr>
+                <th>Role:</th>
+                <td>
+                  <span class="badge bg-{{getRoleBadge userDetail.role}}">
+                    {{getRoleText userDetail.role}}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th>Created Date:</th>
+                <td>{{formatDate userDetail.created_at}}</td>
+              </tr>
+              {{#if userDetail.instructor_bio}}
+              <tr>
+                <th>Bio:</th>
+                <td>{{userDetail.instructor_bio}}</td>
+              </tr>
+              {{/if}}
+            </table>
+          </div>
+          
+          <!-- Profile Picture -->
+          <div class="col-md-3 text-center">
+            <div class="card p-3 bg-secondary bg-opacity-10">
+              <h6><b>Profile Picture</b></h6>
+              {{#if userDetail.profile_picture_url}}
+              <img src="{{userDetail.profile_picture_url}}" alt="Avatar" class="rounded img-fluid" 
+                   style="width: 100%; max-width: 280px; height: auto; object-fit: cover;"
+                   onerror="this.onerror=null; this.src='https://via.placeholder.com/280x280?text=No+Image';">
+              {{else}}
+              <img src="https://via.placeholder.com/280x280?text=No+Image" alt="Avatar" class="rounded img-fluid" 
+                   style="width: 100%; max-width: 280px; height: auto; object-fit: cover;">
+              {{/if}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mt-4">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Statistics</h5>
+      </div>
+      <div class="card-body">
+        {{#if (eq userDetail.role 'instructor')}}
+          {{#if courses.length}}
+          <div class="row">
+            <div class="col-md-4">
+              <div class="text-center p-3 border rounded">
+                <h4 class="text-info">{{length courses}}</h4>
+                <p class="mb-0">Total Courses</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-center p-3 border rounded">
+                <h4 class="text-success">{{getActiveCoursesCount courses}}</h4>
+                <p class="mb-0">Active Courses</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-center p-3 border rounded">
+                <h4 class="text-secondary">{{countCoursesByStatus courses 'draft'}}</h4>
+                <p class="mb-0">Draft Courses</p>
+              </div>
+            </div>
+          </div>
+          {{else}}
+          <p class="text-muted text-center">No courses available</p>
+          {{/if}}
+        {{/if}}
+
+        {{#if (eq userDetail.role 'student')}}
+          <div class="row">
+            <div class="col-md-4">
+              <div class="text-center p-3 border rounded">
+                <h4 class="text-info">{{#if enrolledCourses}}{{enrolledCourses.length}}{{else}}0{{/if}}</h4>
+                <p class="mb-0">Enrolled Courses</p>
+              </div>
+            </div>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Instructor's Courses -->
+{{#if (eq userDetail.role 'instructor')}}
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Created Courses</h5>
+      </div>
+      <div class="card-body">
+        {{#if courses.length}}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Course Name</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Created Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each courses}}
+              <tr>
+                <td>{{this.id}}</td>
+                <td>{{this.title}}</td>
+                <td>{{formatCurrency this.price}}</td>
+                <td>
+                  <span class="badge bg-{{getStatusBadge this.status}}">
+                    {{getStatusText this.status}}
+                  </span>
+                </td>
+                <td>{{formatDate this.created_at}}</td>
+                <td>
+                  <a href="/admin/courses/{{this.id}}" class="btn btn-sm btn-info">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{else}}
+        <p class="text-muted text-center">No courses available</p>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>
+{{/if}}
+
+<!-- Student's Enrolled Courses -->
+{{#if (eq userDetail.role 'student')}}
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Enrolled Courses</h5>
+      </div>
+      <div class="card-body">
+        {{#if enrolledCourses.length}}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Instructor</th>
+                <th>Price</th>
+                <th>Enrollment Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each enrolledCourses}}
+              <tr>
+                <td>{{this.title}}</td>
+                <td>{{this.instructor_name}}</td>
+                <td>{{formatCurrency this.price}}</td>
+                <td>{{formatDate this.enrolled_at}}</td>
+                <td>
+                  <a href="/admin/courses/{{this.id}}" class="btn btn-sm btn-info">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{else}}
+        <p class="text-muted text-center">No enrolled courses</p>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>
+{{/if}}
+
+<script>
+  // Initialize tabs if any
+  document.addEventListener('DOMContentLoaded', function() {
+    const triggerTabList = [].slice.call(document.querySelectorAll('#userDetailTabs a'));
+    triggerTabList.forEach(function (triggerEl) {
+      const tabTrigger = new bootstrap.Tab(triggerEl);
+      triggerEl.addEventListener('click', function (event) {
+        event.preventDefault();
+        tabTrigger.show();
+      });
+    });
+  });
+</script>

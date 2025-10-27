@@ -2,13 +2,12 @@
 
 <script>
     console.log('=== DEBUG SERVER DATA ===');
-    console.log('completedLectureIds:', [{{ #each completedLectureIds }}{{ this}}, {{/ each}}]);
+    console.log('completedLectureIds:', [{{ #each completedLectureIds }}{{ this}}{{ #unless @last }}, {{/ unless}}{{/ each}}]);
     console.log('=== END DEBUG ===');
 </script>
 
 <div class="container-fluid">
     <div class="row">
-
         <!-- Sidebar Curriculum -->
         <div class="col-lg-3 bg-light border-end sidebar-curriculum" id="sidebarCurriculum"
             style="height: 100vh; overflow-y: auto;">
@@ -84,12 +83,10 @@
                             <h4 id="current-lecture-title" class="mb-0">Select a lesson to start</h4>
                         </div>
                         <div id="lecture-nav" style="display:none;">
-                            <button id="prev-lecture" class="btn btn-outline-light btn-sm me-2">
-                                <i class="bi bi-chevron-left"></i> Previous
-                            </button>
-                            <button id="next-lecture" class="btn btn-light btn-sm">
-                                Next <i class="bi bi-chevron-right"></i>
-                            </button>
+                            <button id="prev-lecture" class="btn btn-outline-light btn-sm me-2"><i
+                                    class="bi bi-chevron-left"></i> Previous</button>
+                            <button id="next-lecture" class="btn btn-light btn-sm">Next <i
+                                    class="bi bi-chevron-right"></i></button>
                         </div>
                     </div>
                 </div>
@@ -233,15 +230,23 @@
 </div>
 
 <script>
-    console.log('🔍 DEBUG - completedLectureIds từ server:', [{{ #each completedLectureIds }}{{ this}}, {{/ each}}]);
-    console.log('🔍 DEBUG - Progress data:', { completed: {{ progress.completed }}, total: {{ progress.total }}, percentage: {{ progress.percentage }} });
+    console.log('🔍 DEBUG - completedLectureIds từ server:', [{{ #each completedLectureIds }}{{ this}}{{ #unless @last }}, {{/ unless}}{{/ each}}]);
+    console.log('🔍 DEBUG - Progress data:', {
+        completed: {{ progress.completed }},
+        total: {{ progress.total }},
+        percentage: {{ progress.percentage }}
+  });
 
     const allLectures = [
-        {{ #each chapters }}{ { #each this.lectures } }
-    { id: { { this.id } }, title: "{{this.title}}", video_url: "{{this.video_url}}", duration: { { this.duration_minutes } }, chapter_id: { { this.chapter_id } } },
-    { { /each}}{{/each } }
+        {{ #each chapters }}
+    { { #each this.lectures } }
+    { id: { { this.id } }, title: "{{this.title}}", video_url: "{{this.video_url}}", duration: { { this.duration_minutes } }, chapter_id: { { this.chapter_id } } } { { #unless @last } }, { {/unless } }
+    { {/each } }
+    { { #unless @last } }, { {/unless } }
+    { {/each } }
   ];
-    let completedLectureIds = [{{ #each completedLectureIds }}{ { this } }, { {/each } }];
+
+    let completedLectureIds = [{{ #each completedLectureIds }}{ { this } } { { #unless @last } }, { { /unless}}{{/each } }];
     let currentLectureIndex = -1;
 
     function getYouTubeId(url) {
@@ -257,7 +262,12 @@
         const iframe = document.querySelector('#plyr-player iframe');
         iframe.src = `https://www.youtube.com/embed/${youtubeId}`;
         if (window.coursePlayer) { window.coursePlayer.destroy(); }
-        window.coursePlayer = new Plyr('#plyr-player', { youtube: { noCookie: true, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }, controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'airplay', 'fullscreen'], settings: ['quality', 'speed'], autoplay: true });
+        window.coursePlayer = new Plyr('#plyr-player', {
+            youtube: { noCookie: true, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 },
+            controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'airplay', 'fullscreen'],
+            settings: ['quality', 'speed'],
+            autoplay: true
+        });
     }
 
     function updateLectureUI(title, duration) {
@@ -277,8 +287,12 @@
               <div class="card-body">
                 <h5 class="card-title">Lesson information</h5>
                 <div class="lecture-meta">
-                  <div class="d-flex justify-content-between mb-2 py-2 border-bottom"><span class="text-muted">Duration:</span><span class="fw-medium">${duration} minute</span></div>
-                  <div class="d-flex justify-content-between mb-2 py-2 border-bottom"><span class="text-muted">Status:</span><span class="text-success fw-medium">Studying</span></div>
+                  <div class="d-flex justify-content-between mb-2 py-2 border-bottom">
+                    <span class="text-muted">Duration:</span><span class="fw-medium">${duration} minute</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2 py-2 border-bottom">
+                    <span class="text-muted">Status:</span><span class="text-success fw-medium">Studying</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -305,12 +319,25 @@
 
     function showNotification(msg, type = 'info') {
         let c = document.getElementById('toastContainer');
-        if (!c) { c = document.createElement('div'); c.id = 'toastContainer'; c.className = 'toast-container position-fixed top-0 end-0 p-3'; document.body.appendChild(c); }
+        if (!c) {
+            c = document.createElement('div');
+            c.id = 'toastContainer';
+            c.className = 'toast-container position-fixed top-0 end-0 p-3';
+            document.body.appendChild(c);
+        }
         const t = document.createElement('div');
         t.className = `toast align-items-center text-bg-${type === 'error' ? 'danger' : 'success'} border-0`;
         t.setAttribute('role', 'alert');
-        t.innerHTML = `<div class="d-flex"><div class="toast-body"><i class="bi bi-${type === 'error' ? 'exclamation-triangle' : 'check-circle'} me-2"></i>${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
-        c.appendChild(t); new bootstrap.Toast(t).show(); t.addEventListener('hidden.bs.toast', () => t.remove());
+        t.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="bi bi-${type === 'error' ? 'exclamation-triangle' : 'check-circle'} me-2"></i>${msg}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>`;
+        c.appendChild(t);
+        new bootstrap.Toast(t).show();
+        t.addEventListener('hidden.bs.toast', () => t.remove());
     }
 
     function toggleSidebar() {
@@ -318,8 +345,15 @@
         const main = document.getElementById('mainContent');
         const toggle = document.getElementById('sidebarToggleContainer');
         const isOpen = sidebar.style.display !== 'none';
-        if (isOpen) { sidebar.style.display = 'none'; main.classList.remove('col-lg-9'); main.classList.add('col-lg-12'); toggle.style.display = 'block'; }
-        else { sidebar.style.display = 'block'; main.classList.remove('col-lg-12'); main.classList.add('col-lg-9'); toggle.style.display = 'none'; }
+        if (isOpen) {
+            sidebar.style.display = 'none';
+            main.classList.remove('col-lg-9'); main.classList.add('col-lg-12');
+            toggle.style.display = 'block';
+        } else {
+            sidebar.style.display = 'block';
+            main.classList.remove('col-lg-12'); main.classList.add('col-lg-9');
+            toggle.style.display = 'none';
+        }
     }
     document.getElementById('toggleSidebar')?.addEventListener('click', toggleSidebar);
     document.getElementById('openSidebar')?.addEventListener('click', toggleSidebar);
@@ -330,11 +364,19 @@
                 const id = this.getAttribute('data-chapter-id');
                 const content = document.getElementById(id);
                 const arrow = this.querySelector('.chapter-arrow');
-                if (content.style.display === 'none') { content.style.display = 'block'; arrow.className = 'bi bi-chevron-down chapter-arrow'; this.classList.remove('collapsed'); }
-                else { content.style.display = 'none'; arrow.className = 'bi bi-chevron-right chapter-arrow'; this.classList.add('collapsed'); }
+                if (content.style.display === 'none') {
+                    content.style.display = 'block';
+                    arrow.className = 'bi bi-chevron-down chapter-arrow';
+                    this.classList.remove('collapsed');
+                } else {
+                    content.style.display = 'none';
+                    arrow.className = 'bi bi-chevron-right chapter-arrow';
+                    this.classList.add('collapsed');
+                }
             });
         });
     }
+
     function autoCollapseLongChapters() {
         document.querySelectorAll('.chapter-card').forEach((ch, idx) => {
             const count = ch.querySelectorAll('.list-group-item').length;
@@ -343,7 +385,9 @@
                 const content = document.getElementById(id);
                 const header = ch.querySelector('.chapter-header');
                 const arrow = header.querySelector('.chapter-arrow');
-                content.style.display = 'none'; arrow.className = 'bi bi-chevron-right chapter-arrow'; header.classList.add('collapsed');
+                content.style.display = 'none';
+                arrow.className = 'bi bi-chevron-right chapter-arrow';
+                header.classList.add('collapsed');
             }
         });
     }
