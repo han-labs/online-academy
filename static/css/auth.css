@@ -1,262 +1,262 @@
-/* Auth Pages Styling - Udemy inspired */
+    /* Auth Pages Styling - Udemy inspired */
 
-.auth-wrapper {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 2rem 0;
-}
-
-.auth-card {
-    max-width: 450px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    padding: 2.5rem;
-}
-
-.auth-logo {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.auth-logo h2 {
-    color: #1c1d1f;
-    font-weight: 700;
-    font-size: 1.75rem;
-    margin-bottom: 0.5rem;
-}
-
-.auth-logo p {
-    color: #6c757d;
-    font-size: 0.95rem;
-}
-
-.auth-form .form-label {
-    font-weight: 600;
-    color: #1c1d1f;
-    margin-bottom: 0.5rem;
-}
-
-.auth-form .form-control {
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border: 1px solid #d1d7dc;
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.auth-form .form-control:focus {
-    border-color: #5624d0;
-    box-shadow: 0 0 0 3px rgba(86, 36, 208, 0.1);
-}
-
-.auth-form .btn-primary {
-    background: #5624d0;
-    border: none;
-    padding: 0.85rem;
-    font-weight: 600;
-    border-radius: 6px;
-    width: 100%;
-    transition: all 0.2s;
-}
-
-.auth-form .btn-primary:hover {
-    background: #401b9c;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(86, 36, 208, 0.3);
-}
-
-.auth-divider {
-    text-align: center;
-    margin: 1.5rem 0;
-    position: relative;
-}
-
-.auth-divider::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: 100%;
-    height: 1px;
-    background: #d1d7dc;
-}
-
-.auth-divider span {
-    background: white;
-    padding: 0 1rem;
-    position: relative;
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-
-.social-login {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-}
-
-.btn-google,
-.btn-facebook {
-    flex: 1;
-    padding: 0.75rem;
-    border: 1px solid #d1d7dc;
-    border-radius: 6px;
-    background: white;
-    font-weight: 600;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-.btn-google:hover {
-    background: #f7f9fa;
-    border-color: #4285f4;
-}
-
-.btn-facebook {
-    background: #1877f2;
-    color: white;
-    border-color: #1877f2;
-}
-
-.btn-facebook:hover {
-    background: #145dbf;
-}
-
-.auth-footer {
-    text-align: center;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e8ebed;
-    color: #6c757d;
-}
-
-.auth-footer a {
-    color: #5624d0;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.auth-footer a:hover {
-    text-decoration: underline;
-}
-
-.alert-custom {
-    border-radius: 6px;
-    border: none;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.alert-danger {
-    background: #fef2f2;
-    color: #dc2626;
-}
-
-.alert-success {
-    background: #f0fdf4;
-    color: #16a34a;
-}
-
-.password-toggle {
-    position: relative;
-}
-
-.password-toggle .toggle-icon {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #6c757d;
-}
-
-/* OTP Input styling */
-.otp-inputs {
-    display: flex;
-    gap: 0.75rem;
-    justify-content: center;
-    margin: 2rem 0;
-}
-
-.otp-input {
-    width: 50px;
-    height: 60px;
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: 600;
-    border: 2px solid #d1d7dc;
-    border-radius: 8px;
-    transition: all 0.2s;
-}
-
-.otp-input:focus {
-    border-color: #5624d0;
-    box-shadow: 0 0 0 3px rgba(86, 36, 208, 0.1);
-}
-
-.resend-otp {
-    text-align: center;
-    margin-top: 1rem;
-    color: #6c757d;
-}
-
-.resend-otp button {
-    background: none;
-    border: none;
-    color: #5624d0;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: underline;
-}
-
-.resend-otp button:disabled {
-    color: #d1d7dc;
-    cursor: not-allowed;
-    text-decoration: none;
-}
-
-/* Loading spinner */
-.btn-loading {
-    position: relative;
-}
-
-.btn-loading::after {
-    content: '';
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-@keyframes spin {
-    to {
-        transform: translateY(-50%) rotate(360deg);
+    .auth-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem 0;
     }
-}
 
-/* Responsive */
-@media (max-width: 576px) {
     .auth-card {
-        padding: 1.5rem;
-        margin: 1rem;
+        max-width: 450px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        padding: 2.5rem;
+    }
+
+    .auth-logo {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-logo h2 {
+        color: #1c1d1f;
+        font-weight: 700;
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-logo p {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .auth-form .form-label {
+        font-weight: 600;
+        color: #1c1d1f;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-form .form-control {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border: 1px solid #d1d7dc;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .auth-form .form-control:focus {
+        border-color: #5624d0;
+        box-shadow: 0 0 0 3px rgba(86, 36, 208, 0.1);
+    }
+
+    .auth-form .btn-primary {
+        background: #5624d0;
+        border: none;
+        padding: 0.85rem;
+        font-weight: 600;
+        border-radius: 6px;
+        width: 100%;
+        transition: all 0.2s;
+    }
+
+    .auth-form .btn-primary:hover {
+        background: #401b9c;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(86, 36, 208, 0.3);
+    }
+
+    .auth-divider {
+        text-align: center;
+        margin: 1.5rem 0;
+        position: relative;
+    }
+
+    .auth-divider::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 100%;
+        height: 1px;
+        background: #d1d7dc;
+    }
+
+    .auth-divider span {
+        background: white;
+        padding: 0 1rem;
+        position: relative;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .social-login {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-google,
+    .btn-facebook {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid #d1d7dc;
+        border-radius: 6px;
+        background: white;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-google:hover {
+        background: #f7f9fa;
+        border-color: #4285f4;
+    }
+
+    .btn-facebook {
+        background: #1877f2;
+        color: white;
+        border-color: #1877f2;
+    }
+
+    .btn-facebook:hover {
+        background: #145dbf;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e8ebed;
+        color: #6c757d;
+    }
+
+    .auth-footer a {
+        color: #5624d0;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .alert-custom {
+        border-radius: 6px;
+        border: none;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-danger {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .alert-success {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .password-toggle {
+        position: relative;
+    }
+
+    .password-toggle .toggle-icon {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+    }
+
+    /* OTP Input styling */
+    .otp-inputs {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+        margin: 2rem 0;
     }
 
     .otp-input {
-        width: 45px;
-        height: 55px;
-        font-size: 1.25rem;
+        width: 50px;
+        height: 60px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        border: 2px solid #d1d7dc;
+        border-radius: 8px;
+        transition: all 0.2s;
     }
-}
+
+    .otp-input:focus {
+        border-color: #5624d0;
+        box-shadow: 0 0 0 3px rgba(86, 36, 208, 0.1);
+    }
+
+    .resend-otp {
+        text-align: center;
+        margin-top: 1rem;
+        color: #6c757d;
+    }
+
+    .resend-otp button {
+        background: none;
+        border: none;
+        color: #5624d0;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+
+    .resend-otp button:disabled {
+        color: #d1d7dc;
+        cursor: not-allowed;
+        text-decoration: none;
+    }
+
+    /* Loading spinner */
+    .btn-loading {
+        position: relative;
+    }
+
+    .btn-loading::after {
+        content: '';
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    @keyframes spin {
+        to {
+            transform: translateY(-50%) rotate(360deg);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 576px) {
+        .auth-card {
+            padding: 1.5rem;
+            margin: 1rem;
+        }
+
+        .otp-input {
+            width: 45px;
+            height: 55px;
+            font-size: 1.25rem;
+        }
+    }

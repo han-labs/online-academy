@@ -30,15 +30,17 @@
                             </a>
                         </li>
                         {{/each}}
-                        {{#unless @last}}<li>
+                        {{#unless @last}}
+                        <li>
                             <hr class="dropdown-divider">
-                        </li>{{/unless}}
+                        </li>
+                        {{/unless}}
                         {{/each}}
                     </ul>
                 </li>
             </ul>
 
-            <!-- Search with clear button -->
+            <!-- Search -->
             <form class="d-flex mx-auto me-3" action="/courses/search" method="GET"
                 style="max-width: 400px; width: 100%;">
                 <div class="input-group position-relative">
@@ -46,7 +48,7 @@
                         aria-label="Search" value="{{q}}">
                     <button
                         class="btn btn-link text-secondary position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent d-none"
-                        type="button" id="clearSearch" style="z-index: 5; right: 50px !important;"
+                        type="button" id="clearSearch" style="z-index:5; right:50px !important;"
                         aria-label="Clear search">
                         <i class="bi bi-x-lg"></i>
                     </button>
@@ -59,14 +61,12 @@
             <!-- Right: User -->
             {{#if user}}
             <div class="d-flex align-items-center gap-2">
-                <!-- (optional) Notifications -->
                 <a href="#" class="btn btn-link text-dark position-relative" title="Notifications">
                     <i class="bi bi-bell fs-5"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                        style="font-size: .6rem;">3</span>
+                        style="font-size:.6rem;">3</span>
                 </a>
 
-                <!-- User Dropdown -->
                 <div class="dropdown">
                     <button
                         class="btn btn-link text-dark text-decoration-none dropdown-toggle d-flex align-items-center gap-2"
@@ -85,7 +85,12 @@
                             <hr class="dropdown-divider">
                         </li>
 
-                        <li><a class="dropdown-item" href="/account/profile"><i class="bi bi-person"></i> Profile</a>
+                        <li>
+                            {{#if (eq user.role 'instructor')}}
+                            <a class="dropdown-item" href="/teacher/profile"><i class="bi bi-person"></i> Profile</a>
+                            {{else}}
+                            <a class="dropdown-item" href="/account/profile"><i class="bi bi-person"></i> Profile</a>
+                            {{/if}}
                         </li>
 
                         {{#if (eq user.role 'student')}}
@@ -97,9 +102,9 @@
 
                         {{#if (eq user.role 'instructor')}}
                         <li><a class="dropdown-item" href="/teacher/dashboard"><i class="bi bi-speedometer2"></i>
-                                Instructor Dashboard</a></li>
-                        <li><a class="dropdown-item" href="/teacher/courses"><i class="bi bi-easel"></i> My Courses</a>
-                        </li>
+                                Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/teacher/course/add"><i class="bi bi-easel"></i> Create
+                                Course</a></li>
                         {{/if}}
 
                         {{#if (eq user.role 'admin')}}
@@ -124,9 +129,12 @@
             </div>
             {{else}}
             <div class="d-flex gap-2">
-                <a class="btn btn-outline-primary btn-sm" href="/account/login"><i class="bi bi-box-arrow-in-right"></i>
-                    Log In</a>
-                <a class="btn btn-primary btn-sm" href="/account/register"><i class="bi bi-person-plus"></i> Sign Up</a>
+                <a class="btn btn-outline-primary btn-sm" href="/account/login">
+                    <i class="bi bi-box-arrow-in-right"></i> Log In
+                </a>
+                <a class="btn btn-primary btn-sm" href="/account/register">
+                    <i class="bi bi-person-plus"></i> Sign Up
+                </a>
             </div>
             {{/if}}
         </div>

@@ -1,5 +1,50 @@
-<footer class="bg-white border-top">
-    <div class="container py-3 small text-muted">
-        <span>&copy; {{year}} Online Academy</span>
+<footer class="mt-5 border-top bg-light">
+    <div class="container py-4">
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <a class="navbar-brand fw-bold d-inline-flex align-items-center mb-2" href="/">
+                    <i class="bi bi-mortarboard-fill text-primary me-2"></i> OnlineAcademy
+                </a>
+                <p class="text-muted small mb-2">Learn new skills, anytime, anywhere.</p>
+                <div class="d-flex gap-2">
+                    <a class="text-muted" href="#"><i class="bi bi-facebook"></i></a>
+                    <a class="text-muted" href="#"><i class="bi bi-youtube"></i></a>
+                    <a class="text-muted" href="https://github.com/han-labs/online-academy"><i
+                            class="bi bi-github"></i></a>
+                    <a class="text-muted" href="#"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <h6 class="text-uppercase small text-muted">Company</h6>
+                <ul class="list-unstyled small">
+                    <li><a class="text-decoration-none text-dark" href="/about">About</a></li>
+                    <li><a class="text-decoration-none text-dark" href="/careers">Careers</a></li>
+                    <li><a class="text-decoration-none text-dark" href="/blog">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md-2">
+                <h6 class="text-uppercase small text-muted">Support</h6>
+                <ul class="list-unstyled small">
+                    <li><a class="text-decoration-none text-dark" href="/help">Help Center</a></li>
+                    <li><a class="text-decoration-none text-dark" href="/contact">Contact</a></li>
+                    <li><a class="text-decoration-none text-dark" href="/faq">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="col-12 col-md-4">
+                <h6 class="text-uppercase small text-muted">Newsletter</h6>
+                <form class="d-flex gap-2" action="/newsletter/subscribe" method="POST">
+                    <input class="form-control" name="email" type="email" placeholder="Your email" required>
+                    <button class="btn btn-primary">Subscribe</button>
+                </form>
+                <small class="text-muted d-block mt-2">Get product updates and course highlights.</small>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between pt-3 mt-3 border-top small text-muted">
+            <span>© {{yearNow}} OnlineAcademy</span>
+            <div class="d-flex gap-3">
+                <a class="text-decoration-none text-muted" href="/terms">Terms</a>
+                <a class="text-decoration-none text-muted" href="/privacy">Privacy</a>
+            </div>
+        </div>
     </div>
 </footer>

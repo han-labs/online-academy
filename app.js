@@ -10,14 +10,21 @@ import homeRouter from './routes/home.route.js';
 import categoryRouter from './routes/category.route.js';
 import accountRouter from './routes/account.route.js';
 import courseRouter from './routes/course.route.js';
+
+// Admin (giữ đúng router hiện có)
 import adminCategoryRouter from './routes/admin.category.route.js';
 import { requireAuth, checkAdmin } from './middlewares/auth.js';
+
+// OAuth
 import { mountGoogleAuth } from './middlewares/google.oauth.js';
 
-// Student feature routes
+// Student features
 import studentRouter from './routes/student.route.js';
 import checkoutRouter from './routes/checkout.route.js';
 import progressRouter from './routes/progress.route.js';
+
+// Teacher features
+import teacherRouter from './routes/teacher.route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,51 +32,52 @@ const __dirname = path.dirname(__filename);
 // Init app
 const app = express();
 
-// view engine
+// view engine + helpers (hợp nhất)
 app.engine('handlebars', engine({
   helpers: {
-    // Display ★/☆ for ratings (0..5)
-    stars(rating) {
-      let s = '';
-      for (let i = 1; i <= 5; i++) s += i <= (Number(rating) || 0) ? '★' : '☆';
-      return s;
-    },
-    // Format a date to readable string
-    formatDate(date) {
-      if (!date) return '';
-      const d = new Date(date);
-      return d.toLocaleString('en-GB', {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-        timeZone: 'Asia/Ho_Chi_Minh'
-      });
-    },
+    // generic
     formatNumber(v) { return new Intl.NumberFormat('en-US').format(v ?? 0); },
     eq(a, b) { return a === b; },
+    ifEquals(a, b, opts) { return a == b ? opts.fn(this) : opts.inverse(this); },
     add: (a, b) => (a || 0) + (b || 0),
     sub: (a, b) => (a || 0) - (b || 0),
     length: (arr) => Array.isArray(arr) ? arr.length : 0,
     price(p, promo) { return promo && promo > 0 ? promo : p; },
     ifPromo(p, promo, opts) { return promo && promo > 0 ? opts.fn(this) : opts.inverse(this); },
-    fillContent(value, defaultValue) { return value != null && value !== '' ? value : (defaultValue || ''); },
+    fillContent(value, def) { return value != null && value !== '' ? value : (def || ''); },
     range(start, end) {
       const s = Number(start) || 0, e = Number(end) || 0, out = [];
       for (let i = s; i <= e; i++) out.push(i);
       return out;
     },
-    substring(str, start, end) { return (str || '').substring(start, end); },
-    contains(array, value) {
-      if (!Array.isArray(array)) return false;
-      return array.includes(value);
+    formatCurrency(amount) {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+        .format(amount || 0);
     },
+    getStatusBadge(status) {
+      const m = { draft: 'secondary', published: 'success', completed: 'primary' };
+      return m[status] || 'secondary';
+    },
+    getStatusText(status) {
+      const m = { draft: 'Bản nháp', published: 'Đã xuất bản', completed: 'Hoàn thành' };
+      return m[status] || status;
+    },
+    // formatting
+    formatDate(date) {
+      if (!date) return '';
+      const d = new Date(date);
+      return d.toLocaleString('en-GB', {
+        year: 'numeric', month: 'short', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hour12: false,
+        timeZone: 'Asia/Ho_Chi_Minh'
+      });
+    },
+    substring(str, start, end) { return (str || '').substring(start, end); },
+    contains(array, value) { return Array.isArray(array) ? array.includes(value) : false; },
     calculateChapterDuration(lectures) {
       if (!Array.isArray(lectures)) return 0;
-      return lectures.reduce((total, l) => total + (l.duration_minutes || 0), 0);
-    }
+      return lectures.reduce((t, l) => t + (l.duration_minutes || 0), 0);
+    },
   },
   defaultLayout: 'main',
   layoutsDir: path.join(__dirname, 'views/layouts'),
@@ -80,9 +88,13 @@ app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
 
 // middleware
-app.use(express.json()); // important for /api/progress/toggle
+app.use(express.json()); // cần cho /api/progress/*
 app.use(express.urlencoded({ extended: true }));
+
+// static
 app.use('/static', express.static(path.join(__dirname, 'static')));
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use(express.static('public'));
 
 app.use(session({
   secret: 'exam-secret',
@@ -91,7 +103,7 @@ app.use(session({
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// inject user + categories into views
+// inject user + categories
 app.use(async (req, res, next) => {
   res.locals.user = req.session.user || null;
   try {
@@ -104,11 +116,21 @@ app.use(async (req, res, next) => {
   next();
 });
 
+// optional flash (nếu có dùng)
+app.use((req, res, next) => {
+  res.locals.flash = req.session.flash;
+  delete req.session.flash;
+  next();
+});
+
 // routes
+app.use('/teacher', teacherRouter);
 app.use('/', homeRouter);
 app.use('/account', accountRouter);
 app.use('/categories', categoryRouter);
 app.use('/courses', courseRouter);
+
+// admin theo repo hiện tại
 app.use('/admin/categories', requireAuth, checkAdmin, adminCategoryRouter);
 
 // student features
@@ -116,12 +138,14 @@ app.use('/student', requireAuth, studentRouter);
 app.use('/checkout', requireAuth, checkoutRouter);
 app.use('/api/progress', progressRouter);
 
-// OAuth mounts (after app + session)
+// OAuth mounts (sau session)
 mountGoogleAuth(app);
 
 // 404
 app.use((req, res) => res.status(404).render('vwAccount/404'));
 
+// start
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server http://localhost:${PORT}`));
+
 export default app;

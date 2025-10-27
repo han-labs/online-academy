@@ -36,95 +36,95 @@
    EXISTING STYLES (GIỮ NGUYÊN)
    ============================================ */
 :root {
-  font-family: system-ui, sans-serif;
+    font-family: system-ui, sans-serif;
 }
 
 .container {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 16px;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 16px;
 }
 
 .header,
 .footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: #f7f7f7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f7f7f7;
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
 }
 
 .course-card {
-  border: 1px solid #eee;
-  padding: 12px;
-  border-radius: 8px;
-  background: #fff;
+    border: 1px solid #eee;
+    padding: 12px;
+    border-radius: 8px;
+    background: #fff;
 }
 
 .course-card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 6px;
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 6px;
 }
 
 .price .strike {
-  text-decoration: line-through;
-  opacity: .6;
-  margin-left: 6px;
+    text-decoration: line-through;
+    opacity: .6;
+    margin-left: 6px;
 }
 
 .error {
-  color: #b00020;
+    color: #b00020;
 }
 
 .pagination a {
-  margin-right: 8px;
-  padding: 4px 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+    margin-right: 8px;
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
 .pagination a.active {
-  background: #333;
-  color: #fff;
+    background: #333;
+    color: #fff;
 }
 
 .dropdown {
-  position: relative;
+    position: relative;
 }
 
 .dropdown-content {
-  position: absolute;
-  display: none;
-  background: #fff;
-  border: 1px solid #eee;
-  padding: 8px;
-  z-index: 10;
+    position: absolute;
+    display: none;
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 8px;
+    z-index: 10;
 }
 
 .dropdown:hover .dropdown-content {
-  display: block;
+    display: block;
 }
 
 .card-img-top {
-  height: 160px;
-  object-fit: cover;
+    height: 160px;
+    object-fit: cover;
 }
 
 .carousel-item img {
-  height: 260px;
-  object-fit: cover;
+    height: 260px;
+    object-fit: cover;
 }
 
 h4.mb-0 {
-  font-weight: 700;
+    font-weight: 700;
 }
 
 /* ============================================
@@ -224,7 +224,7 @@ body {
     margin-bottom: 1rem;
 }
 
-.breadcrumb-item + .breadcrumb-item::before {
+.breadcrumb-item+.breadcrumb-item::before {
     content: "›";
     font-size: 1.2rem;
 }
@@ -338,15 +338,16 @@ body {
     .carousel-item {
         min-height: 200px;
     }
-    
+
     .card-img-top {
         height: 140px;
     }
-    
-    h1, h2 {
+
+    h1,
+    h2 {
         font-size: 1.5rem;
     }
-    
+
     .carousel-item img {
         height: 180px;
     }
@@ -356,7 +357,7 @@ body {
     .container {
         padding: 12px;
     }
-    
+
     .card-title {
         font-size: 0.875rem;
     }
@@ -364,11 +365,12 @@ body {
 
 /* Animation */
 @keyframes fadeIn {
-    from { 
-        opacity: 0; 
+    from {
+        opacity: 0;
         transform: translateY(10px);
     }
-    to { 
+
+    to {
         opacity: 1;
         transform: translateY(0);
     }
@@ -439,7 +441,7 @@ footer a:hover {
 }
 
 .plyr--video .plyr__controls {
-    background: linear-gradient(transparent, rgba(0,0,0,0.75));
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
 }
 
 .plyr__control--overlaid {
@@ -494,7 +496,8 @@ footer a:hover {
 }
 
 .ratio-16x9::before {
-    display: none !important; /* Disable Bootstrap's padding */
+    display: none !important;
+    /* Disable Bootstrap's padding */
 }
 
 /* ============================================
@@ -527,8 +530,8 @@ footer a:hover {
 }
 
 /* QUAN TRỌNG: Sửa CSS selector cho đúng thứ tự */
-.star-rating-modal input:checked + label,
-.star-rating-modal input:checked ~ input + label {
+.star-rating-modal input:checked+label,
+.star-rating-modal input:checked~input+label {
     color: #f4c150;
     transform: scale(1.1);
 }
@@ -596,8 +599,15 @@ footer a:hover {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ============================================
@@ -615,7 +625,7 @@ footer a:hover {
 }
 
 .review-item:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .rating-breakdown-item {
@@ -700,7 +710,7 @@ footer a:hover {
 .udemy-sidebar-toggle:hover {
     background: rgba(0, 0, 0, 0.9);
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* ============================================
@@ -715,7 +725,7 @@ footer a:hover {
 }
 
 .plyr__menu__container .plyr__control--forward:hover {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .plyr__menu__value {
@@ -730,7 +740,7 @@ footer a:hover {
 }
 
 .plyr__controls .plyr__controls__item.plyr__control[data-plyr="settings"]:hover {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* Interactive Icons */
@@ -785,4 +795,24 @@ footer a:hover {
 /* Smooth collapse animation */
 .chapter-content {
     overflow: hidden;
+}
+
+.course-card {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08);
+}
+
+.course-thumb {
+    aspect-ratio: 16/9;
+    object-fit: cover;
+}
+
+.badge-best {
+    background: #eceb98;
+    color: #3d3c0a;
+    font-weight: 600;
 }

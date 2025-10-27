@@ -5,8 +5,9 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-2">
                     <li class="breadcrumb-item"><a href="/" class="text-white-50">Home</a></li>
-                    <li class="breadcrumb-item"><a href="/categories/{{course.category_id}}"
-                            class="text-white-50">{{course.category_name}}</a></li>
+                    <li class="breadcrumb-item">
+                        <a href="/categories/{{course.category_id}}" class="text-white-50">{{course.category_name}}</a>
+                    </li>
                     <li class="breadcrumb-item active text-white" aria-current="page">{{course.title}}</li>
                 </ol>
             </nav>
@@ -109,9 +110,8 @@
                                         <div>
                                             <span class="me-2"><i class="bi bi-play-fill"></i></span>
                                             {{title}}
-                                            {{#if is_preview_allowed}}
-                                            <span class="badge bg-info ms-2">Preview</span>
-                                            {{/if}}
+                                            {{#if is_preview_allowed}}<span
+                                                class="badge bg-info ms-2">Preview</span>{{/if}}
                                         </div>
                                         <span class="text-muted">{{duration_minutes}} min</span>
                                     </li>
@@ -178,8 +178,7 @@
                             <div class="small text-muted">{{formatDate created_at}}</div>
                         </div>
                     </div>
-                    <div class="mb-1">
-                        {{#each (range 1 rating)}}<i class="bi bi-star-fill text-warning"></i>{{/each}}
+                    <div class="mb-1">{{#each (range 1 rating)}}<i class="bi bi-star-fill text-warning"></i>{{/each}}
                     </div>
                     <p class="mb-0">{{comment}}</p>
                 </div>
