@@ -140,6 +140,121 @@ router.post('/login', requireGuest, async (req, res) => {
   }
 });
 
+// ========== FORGOT PASSWORD (request OTP) ==========
+router.get('/forgot-password', requireGuest, (req, res) => {
+  res.render('vwAccount/forgot-password');
+});
+
+router.post('/forgot-password', requireGuest, async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.render('vwAccount/forgot-password', { error: 'Please enter your email.' });
+
+    const user = await db('users').where({ email }).first();
+    if (!user) {
+      // Để tránh lộ thông tin, vẫn trả về "đã gửi"
+      return res.render('vwAccount/forgot-password', {
+        success: 'If this email exists, we’ve sent a 6-digit OTP to reset your password.'
+      });
+    }
+
+    // Tài khoản Google -> gợi ý đăng nhập Google (không reset bằng email & mật khẩu)
+    if ((user.auth_provider || 'local') === 'google') {
+      return res.render('vwAccount/forgot-password', {
+        error: 'This account is linked with Google. Please sign in with Google instead.'
+      });
+    }
+
+    const code = await otpService.create(email, 'reset_password');
+    await emailService.sendOTP(email, code, 'reset_password');
+
+    // Ghi lại email đang reset để kiểm tra bước sau
+    req.session.resetEmail = email;
+    return res.redirect(`/account/reset-password?email=${encodeURIComponent(email)}`);
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    return res.render('vwAccount/forgot-password', { error: 'Something went wrong. Please try again.' });
+  }
+});
+
+// ========== RESET PASSWORD (verify OTP + set new password) ==========
+router.get('/reset-password', requireGuest, (req, res) => {
+  const email = req.query.email;
+  if (!email || req.session.resetEmail !== email) {
+    return res.redirect('/account/forgot-password');
+  }
+  res.render('vwAccount/reset-password', { email });
+});
+
+router.post('/reset-password', requireGuest, async (req, res) => {
+  const { email, otp_code, new_password, confirm_password } = req.body;
+
+  if (!email || req.session.resetEmail !== email) {
+    return res.redirect('/account/forgot-password');
+  }
+  if (!otp_code || otp_code.length !== 6) {
+    return res.render('vwAccount/reset-password', { email, error: 'Please enter the 6-digit code.' });
+  }
+  if (!new_password || !confirm_password) {
+    return res.render('vwAccount/reset-password', { email, error: 'Please enter your new password.' });
+  }
+  if (new_password !== confirm_password) {
+    return res.render('vwAccount/reset-password', { email, error: 'Password confirmation does not match.' });
+  }
+  if (new_password.length < 6) {
+    return res.render('vwAccount/reset-password', { email, error: 'New password must have at least 6 characters.' });
+  }
+
+  try {
+    const isValid = await otpService.verify(email, otp_code, 'reset_password');
+    if (!isValid) {
+      return res.render('vwAccount/reset-password', { email, error: 'OTP is invalid or expired.' });
+    }
+
+    const user = await db('users').where({ email }).first();
+    if (!user) {
+      // Không để lộ thông tin — quay về forgot
+      delete req.session.resetEmail;
+      return res.redirect('/account/forgot-password');
+    }
+    if ((user.auth_provider || 'local') === 'google') {
+      return res.render('vwAccount/reset-password', {
+        email,
+        error: 'This account is linked with Google. Please sign in with Google instead.'
+      });
+    }
+
+    const hash = await bcrypt.hash(new_password, 10);
+    await db('users').where({ email }).update({
+      password_hash: hash,
+    });
+
+    delete req.session.resetEmail;
+
+    await emailService.sendPasswordResetSuccess(email);
+    return res.redirect('/account/login?success=1');
+  } catch (err) {
+    console.error('Reset password error:', err);
+    return res.render('vwAccount/reset-password', { email, error: 'Something went wrong. Please try again.' });
+  }
+});
+
+// ========== RESEND RESET OTP ==========
+router.post('/resend-reset-otp', requireGuest, async (req, res) => {
+  const { email } = req.body;
+  if (!email || req.session.resetEmail !== email) return res.redirect('/account/forgot-password');
+
+  try {
+    const code = await otpService.create(email, 'reset_password');
+    await emailService.sendOTP(email, code, 'reset_password');
+    return res.redirect(`/account/reset-password?email=${encodeURIComponent(email)}&resent=1`);
+  } catch (err) {
+    console.error('Resend reset OTP error:', err);
+    return res.redirect(`/account/reset-password?email=${encodeURIComponent(email)}&error=1`);
+  }
+});
+
+
 // ========== LOGOUT ==========
 router.post('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
@@ -234,7 +349,6 @@ router.post('/change-password', requireAuth, async (req, res) => {
     const newPasswordHash = await bcrypt.hash(new_password, 10);
     await db('users').where({ id: userId }).update({
       password_hash: newPasswordHash,
-      updated_at: new Date()
     });
 
     await emailService.sendPasswordResetSuccess(user.email);

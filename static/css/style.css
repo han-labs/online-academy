@@ -816,3 +816,73 @@ footer a:hover {
     color: #3d3c0a;
     font-weight: 600;
 }
+
+/* Nút Login - viền tím, nền trắng */
+.btn-brand-outline {
+    background-color: #ffffff;
+    border: 2px solid #8b5cf6;
+    color: #8b5cf6;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-brand-outline:hover {
+    background-color: #8b5cf6;
+    border-color: #8b5cf6;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* Nút Register - nền tím, chữ trắng */
+.btn-brand {
+    background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+    border: 2px solid #8b5cf6;
+    color: #ffffff;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-brand:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+    border-color: #7c3aed;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.btn-brand i,
+.btn-brand-outline i {
+    margin-right: 4px;
+}
+
+/* ============================================
+   HEADER CATEGORIES DROPDOWN - PURPLE THEME
+   ============================================ */
+
+/* Lĩnh vực cha (parent categories) - màu tím */
+.dropdown-menu .dropdown-header {
+    color: #8b5cf6 !important;
+    font-weight: 600;
+}
+
+/* Icon folder cho lĩnh vực cha */
+.dropdown-menu .dropdown-header .bi-folder {
+    color: #8b5cf6 !important;
+}
+
+/* Subcategories (children) giữ màu đen */
+.dropdown-menu .dropdown-item {
+    color: #1c1d1f;
+}
+
+/* Hover effect cho subcategories */
+.dropdown-menu .dropdown-item:hover {
+    background-color: #f3f0ff;
+    color: #8b5cf6;
+}
+
+/* Icon chevron cho subcategories */
+.dropdown-menu .dropdown-item .bi-chevron-right {
+    color: #8b5cf6;
+}

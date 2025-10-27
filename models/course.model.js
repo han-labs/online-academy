@@ -41,6 +41,7 @@ async function getStatistics(courseId) {
 
 async function checkAndUpdateStatus(courseId) {
     const chapters = await db('chapters').where('course_id', courseId);
+    // Thay khối quyết định newStatus hiện tại bằng:
     let newStatus;
 
     if (chapters.length === 0) {
@@ -51,13 +52,16 @@ async function checkAndUpdateStatus(courseId) {
             const { count } = await db('lectures').where('chapter_id', ch.id).count('id as count').first();
             if (Number(count) === 0) { allChHaveLectures = false; break; }
         }
-        newStatus = allChHaveLectures ? 'completed' : 'incomplete';
+        // ❗ KHÔNG dùng 'incomplete' (DB không có). 
+        // Khi CHƯA đủ lecture: set 'draft' để hợp lệ với enum và UI hiện tại.
+        newStatus = allChHaveLectures ? 'completed' : 'draft';
     }
 
     await db('courses').where('id', courseId).update({
         status: newStatus,
         last_updated: db.fn.now()
     });
+
 
     return newStatus;
 }
@@ -118,8 +122,8 @@ export default {
             .select(['cat.id', 'cat.name', db.raw('COUNT(e.user_id) as enroll_count')]);
     },
 
-    // Public search - remove_accents hỗ trợ tốt TV
-    async search({ q = '', categoryId = null, sort = 'rating_desc', page = 1, pageSize = 12 }) {
+    /// Public search - hỗ trợ tiếng Việt + fallback ILIKE + lọc theo nhiều category
+    async search({ q = '', categoryIds = null, sort = 'rating_desc', page = 1, pageSize = 12 }) {
         const offset = (page - 1) * pageSize;
 
         const qb = db({ c: 'courses' })
@@ -129,19 +133,38 @@ export default {
             .leftJoin({ e2: 'enrollments' }, 'e2.course_id', 'c.id')
             .where('c.status', 'published');
 
+        // --- Keyword search ---
         if (q && q.trim()) {
-            const keywords = q.trim().replace(/ /g, ' & ');
-            qb.whereRaw('c.fts @@ to_tsquery(remove_accents(?))', [keywords]);
+            const kw = q.trim();
+            // Ưu tiên FTS (websearch_to_tsquery), fallback ILIKE để chắc ăn
+            qb.andWhere(function () {
+                this.whereRaw(
+                    "c.fts @@ websearch_to_tsquery('simple', remove_accents(?))",
+                    [kw]
+                )
+                    .orWhereILike('c.title', `%${kw}%`)
+                    .orWhereILike('c.short_description', `%${kw}%`);
+            });
         }
 
-        if (categoryId) qb.andWhere('c.category_id', categoryId);
+        // --- Category filter: nhận mảng categoryIds (cha + con) ---
+        if (Array.isArray(categoryIds) && categoryIds.length > 0) {
+            qb.whereIn('c.category_id', categoryIds);
 
+        }
+
+        // --- Order ---
         const orderBy = [];
         if (q && q.trim()) {
-            const keywords = q.trim().replace(/ /g, ' & ');
-            orderBy.push({ column: db.raw('ts_rank(c.fts, to_tsquery(remove_accents(?)))', [keywords]), order: 'desc' });
+            const kw = q.trim();
+            orderBy.push({
+                column: db.raw(
+                    "ts_rank(c.fts, websearch_to_tsquery('simple', remove_accents(?)))",
+                    [kw]
+                ),
+                order: 'desc'
+            });
         }
-
         if (sort === 'price_asc') orderBy.push({ column: db.raw('COALESCE(c.promotional_price, c.price)'), order: 'asc' });
         else if (sort === 'newest') orderBy.push({ column: 'c.last_updated', order: 'desc' });
         else if (sort === 'best_seller') orderBy.push({ column: db.raw('COUNT(DISTINCT e2.user_id)'), order: 'desc' });
@@ -154,16 +177,28 @@ export default {
             .offset(offset)
             .select(baseCols);
 
+        // --- Count ---
         const countQb = db({ c: 'courses' }).where('c.status', 'published');
         if (q && q.trim()) {
-            const keywords = q.trim().replace(/ /g, ' & ');
-            countQb.whereRaw('c.fts @@ to_tsquery(remove_accents(?))', [keywords]);
+            const kw = q.trim();
+            countQb.andWhere(function () {
+                this.whereRaw(
+                    "c.fts @@ websearch_to_tsquery('simple', remove_accents(?))",
+                    [kw]
+                )
+                    .orWhereILike('c.title', `%${kw}%`)
+                    .orWhereILike('c.short_description', `%${kw}%`);
+            });
         }
-        if (categoryId) countQb.andWhere('c.category_id', categoryId);
+        if (Array.isArray(categoryIds) && categoryIds.length > 0) {
+            countQb.whereIn('c.category_id', categoryIds);
+
+        }
 
         const [{ count }] = await countQb.count();
         return { rows, total: Number(count || 0) };
     },
+
 
     // Search theo nhiều category (cha + con)
     async searchByCategories({ categoryIds = [], sort = 'newest', page = 1, pageSize = 12 }) {

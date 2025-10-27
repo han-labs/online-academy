@@ -1,4 +1,4 @@
-<footer class="mt-5 border-top bg-light">
+{{!-- <footer class="mt-5 border-top bg-light">
     <div class="container py-4">
         <div class="row g-4">
             <div class="col-12 col-md-4">
@@ -47,4 +47,67 @@
             </div>
         </div>
     </div>
+</footer> --}}
+
+
+<footer class="mt-0 border-top" style="background-color: #160438;">
+    <div class="container py-4">
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <a class="navbar-brand fw-bold d-inline-flex align-items-center mb-2 text-white" href="/">
+                    <i class="bi bi-mortarboard-fill text-white me-2"></i> OnlineAcademy
+                </a>
+                <p class="text-white-50 small mb-2">Learn new skills, anytime, anywhere.</p>
+                <div class="d-flex gap-2">
+                    <a class="text-white-50" href="#"><i class="bi bi-facebook"></i></a>
+                    <a class="text-white-50" href="#"><i class="bi bi-youtube"></i></a>
+                    <a class="text-white-50" href="https://github.com/han-labs/online-academy"><i
+                            class="bi bi-github"></i></a>
+                    <a class="text-white-50" href="#"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <h6 class="text-uppercase small text-white-50">Company</h6>
+                <ul class="list-unstyled small">
+                    <li><a class="text-decoration-none text-white" href="/aboutus">About Us</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md-2">
+                <h6 class="text-uppercase small text-white-50">Support</h6>
+                <ul class="list-unstyled small">
+                    <li><a class="text-decoration-none text-white" href="/contactus">Contact Us</a></li>
+                    <li><a class="text-decoration-none text-white" href="/faq">FAQ</a></li>
+                    <li><a class="text-decoration-none text-white" href="/policy">Policy</a></li>
+                </ul>
+            </div>
+            <div class="col-12 col-md-4">
+                <h6 class="text-uppercase small text-white-50">Newsletter</h6>
+                <form class="d-flex gap-2" action="/newsletter/subscribe" method="POST">
+                    <input class="form-control" name="email" type="email" placeholder="Your email" required>
+                    <button class="btn btn-brand">Subscribe</button>
+                </form>
+                <small class="text-white-50 d-block mt-2">Get product updates and course highlights.</small>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between pt-3 mt-3 border-top small text-white-50">
+            <span>©2025 OnlineAcademy</span>
+            <div class="d-flex gap-3">
+                <a class="text-decoration-none text-white-50" href="/policy">Terms & Policies </a>
+            </div>
+        </div>
+    </div>
 </footer>
+
+<style>
+    /* Thêm hiệu ứng hover cho links */
+    footer a.text-white:hover,
+    footer a.text-white-50:hover {
+        color: #ffffff !important;
+        opacity: 1;
+    }
+
+    /* Đảm bảo border-top có màu phù hợp */
+    footer .border-top {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+</style>

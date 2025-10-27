@@ -10,6 +10,7 @@ import homeRouter from './routes/home.route.js';
 import categoryRouter from './routes/category.route.js';
 import accountRouter from './routes/account.route.js';
 import courseRouter from './routes/course.route.js';
+import aboutRouter from "./routes/about.route.js";
 
 // Admin 
 import adminRouter from './routes/admin.route.js';
@@ -44,7 +45,9 @@ app.engine('handlebars', engine({
     },
     substring(str, start, end) { return (str || '').substring(start, end); },
     fillContent(value, def) { return value != null && value !== '' ? value : (def || ''); },
-
+    ifEquals(arg1, arg2, options) {
+      return arg1 == arg2 ? options.fn(this) : options.inverse(this);
+    },
     // ===== So sánh / logic =====
     eq(a, b) { return a === b; },
     neq(a, b) { return a !== b; },
@@ -116,6 +119,11 @@ app.engine('handlebars', engine({
       if (!Array.isArray(lectures)) return 0;
       return lectures.reduce((t, l) => t + (l.duration_minutes || 0), 0);
     },
+    json(value) {
+      try { return JSON.stringify(value || null); }
+      catch { return 'null'; }
+    },
+
   },
   defaultLayout: 'main',
   layoutsDir: path.join(__dirname, 'views/layouts'),
@@ -186,6 +194,9 @@ app.use('/student', requireStudent, studentRouter);
 app.use('/checkout', requireStudent, checkoutRouter);
 //app.use('/api/progress', progressRouter);
 app.use('/api/progress', requireStudent, progressRouter);
+
+// About us
+app.use("/", aboutRouter);
 
 // OAuth mounts (sau session)
 mountGoogleAuth(app);

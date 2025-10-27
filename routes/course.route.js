@@ -11,7 +11,7 @@ import reviewModel from '../models/review.model.js';
 
 const router = Router();
 
-// Search (đặt trước /:id để không “ăn” nhầm param)
+// Search (đặt trước /:id)
 router.get('/search', async (req, res) => {
     const q = req.query.q || '';
     const categoryId = req.query.category ? Number(req.query.category) : null;
@@ -19,19 +19,38 @@ router.get('/search', async (req, res) => {
     const page = Number(req.query.page) || 1;
     const pageSize = 12;
 
-    const { rows, total } = await courseModel.search({ q, categoryId, sort, page, pageSize });
-    const totalPages = Math.max(1, Math.ceil(total / pageSize));
-
+    let categoryIds = null;
     let categoryInfo = null;
-    if (categoryId) categoryInfo = await categoryModel.findById(categoryId);
+
+    if (categoryId) {
+        categoryInfo = await categoryModel.findById(categoryId);
+        // Lấy cả cha + con (nếu là cha), hoặc chỉ chính nó (nếu là con)
+        categoryIds = await categoryModel.getCategoryWithChildren(categoryId);
+    }
+
+    const { rows, total } = await courseModel.search({
+        q,
+        categoryIds,    // ← truyền mảng IDs thay vì 1 id
+        sort,
+        page,
+        pageSize
+    });
+
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
     res.render('vwCourse/search', {
         courses: rows,
-        q, categoryId, categoryInfo, sort,
-        page, totalPages, total,
+        q,
+        categoryId,      // để UI hiển thị chip đang lọc
+        categoryInfo,
+        sort,
+        page,
+        totalPages,
+        total,
         hasResults: rows.length > 0
     });
 });
+
 
 // Detail
 router.get('/:id', async (req, res) => {

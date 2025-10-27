@@ -1,13 +1,16 @@
 // utils/email.service.js - GỬI EMAIL THẬT
 import nodemailer from "nodemailer";
 
-// ⚠️ QUAN TRỌNG: Thay email và password của bạn vào đây
 const SMTP_CONFIG = {
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // dùng 465 thì true
   auth: {
     user: "giahanthcstmt@gmail.com",
-    pass: "jqwegjdsksjiaeaa",
+    pass: "xwqtjzkmjuwkxzbm",
   },
+  logger: true,
+  debug: true,
 };
 
 class EmailService {
@@ -25,8 +28,8 @@ class EmailService {
   async sendOTP(email, code, type = "register") {
     const subject =
       type === "register"
-        ? "Xác thực đăng ký - Online Academy"
-        : "Đặt lại mật khẩu - Online Academy";
+        ? "Verify your email – Online Academy"
+        : "Password reset code – Online Academy";
     const html = this._buildOTPTemplate(code, type);
 
     try {
@@ -64,7 +67,7 @@ class EmailService {
       await this.transporter.sendMail({
         from: `"Online Academy" <${SMTP_CONFIG.auth.user}>`,
         to: email,
-        subject: "Chào mừng đến với Online Academy! 🎉",
+        subject: "Welcome to Online Academy! 🎉",
         html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                         <div style="text-align: center; margin-bottom: 30px;">
@@ -94,7 +97,7 @@ class EmailService {
                         </div>
                         
                         <div style="text-align: center; margin-top: 30px; color: #999; font-size: 12px;">
-                            <p>&copy; 2024 Online Academy. All rights reserved.</p>
+                            <p>&copy; 2025 Online Academy. All rights reserved.</p>
                         </div>
                     </div>
                 `,
@@ -159,52 +162,32 @@ class EmailService {
    * @private
    */
   _buildOTPTemplate(code, type) {
-    const title = type === "register" ? "Xác thực đăng ký" : "Đặt lại mật khẩu";
+    const title = type === "register" ? "Email verification" : "Password reset";
     const message =
       type === "register"
-        ? "Sử dụng mã OTP sau để hoàn tất đăng ký tài khoản:"
-        : "Sử dụng mã OTP sau để đặt lại mật khẩu tài khoản:";
+        ? "Use the following 6-digit code to verify your account:"
+        : "Use the following 6-digit code to reset your password:";
 
     return `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <h1 style="color: #5624d0; margin: 0;">🎓 Online Academy</h1>
-                </div>
-                
-                <div style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                    <h2 style="color: #1c1d1f; margin-top: 0; font-size: 24px;">${title}</h2>
-                    <p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
-                        ${message}
-                    </p>
-                    
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; margin: 30px 0; border-radius: 8px;">
-                        <div style="font-size: 48px; font-weight: bold; letter-spacing: 12px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
-                            ${code}
-                        </div>
-                    </div>
-                    
-                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
-                        <p style="margin: 0; color: #856404; font-size: 14px;">
-                            <strong>⏰ Mã này sẽ hết hạn sau 10 phút.</strong>
-                        </p>
-                    </div>
-                    
-                    <p style="color: #999; font-size: 14px; margin-top: 30px; line-height: 1.5;">
-                        Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này. 
-                        Không ai có thể truy cập tài khoản của bạn nếu không có mã OTP này.
-                    </p>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px; color: #999; font-size: 12px;">
-                    <p style="margin: 5px 0;">
-                        Email này được gửi tự động, vui lòng không reply.
-                    </p>
-                    <p style="margin: 5px 0;">
-                        &copy; 2024 Online Academy. All rights reserved.
-                    </p>
-                </div>
-            </div>
-        `;
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #5624d0; margin: 0;">🎓 Online Academy</h1>
+      </div>
+      <div style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <h2 style="color: #1c1d1f; margin-top: 0; font-size: 24px;">${title}</h2>
+        <p style="color: #666; font-size: 16px; line-height: 1.6;">${message}</p>
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; margin: 30px 0; border-radius: 8px;">
+          <div style="font-size: 48px; font-weight: bold; letter-spacing: 12px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">${code}</div>
+        </div>
+        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
+          <p style="margin:0; color:#856404; font-size:14px;"><strong>⏰ This code expires in 10 minutes.</strong></p>
+        </div>
+        <p style="color:#999; font-size:14px; margin-top:30px;">If you didn’t request this, you can safely ignore this email.</p>
+      </div>
+      <div style="text-align:center; margin-top:30px; color:#999; font-size:12px;">
+        <p style="margin:5px 0;">&copy; 2025 Online Academy. All rights reserved.</p>
+      </div>
+    </div>`;
   }
 }
 

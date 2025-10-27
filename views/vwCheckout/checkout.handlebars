@@ -6,13 +6,13 @@
                 <a href="/courses/{{course.id}}" class="btn btn-outline-secondary btn-sm me-3">
                     <i class="bi bi-arrow-left"></i>
                 </a>
-                <h2 class="mb-0">Thanh toán</h2>
+                <h2 class="mb-0">Checkout</h2>
             </div>
 
-            <!-- Thông tin khóa học -->
+            <!-- Course Information -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-cart-check"></i> Khóa học</h5>
+                    <h5 class="mb-0"><i class="bi bi-cart-check"></i> Course</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -24,64 +24,64 @@
                             <p class="text-muted mb-2">{{course.instructor_name}}</p>
                             <div class="d-flex align-items-center mb-2">
                                 <span class="text-warning me-2">{{formatNumber course.rating}}</span>
-                                <span class="text-muted">({{formatNumber course.rating_count}} đánh giá)</span>
+                                <span class="text-muted">({{formatNumber course.rating_count}} reviews)</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Phương thức thanh toán -->
+            <!-- Payment Methods -->
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-credit-card"></i> Phương thức thanh toán</h5>
+                    <h5 class="mb-0"><i class="bi bi-credit-card"></i> Payment Methods</h5>
                 </div>
                 <div class="card-body">
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i>
-                        <strong>Demo thanh toán:</strong> Đây là trang thanh toán giả lập.
-                        Bấm "Hoàn tất thanh toán" để tiếp tục.
+                        <strong>Payment demo:</strong> This is a simulated checkout page.
+                        Click “Complete Payment” to proceed.
                     </div>
 
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" checked>
                         <label class="form-check-label" for="creditCard">
-                            <i class="bi bi-credit-card-2-front"></i> Thẻ tín dụng/ghi nợ
+                            <i class="bi bi-credit-card-2-front"></i> Credit/Debit Card
                         </label>
                     </div>
 
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="radio" name="paymentMethod" id="momo">
                         <label class="form-check-label" for="momo">
-                            <i class="bi bi-wallet2"></i> Ví điện tử MoMo
+                            <i class="bi bi-wallet2"></i> MoMo e-wallet
                         </label>
                     </div>
 
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer">
                         <label class="form-check-label" for="bankTransfer">
-                            <i class="bi bi-bank"></i> Chuyển khoản ngân hàng
+                            <i class="bi bi-bank"></i> Bank Transfer
                         </label>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sidebar tổng kết -->
+        <!-- Sidebar Summary -->
         <div class="col-lg-4">
             <div class="card position-sticky" style="top: 20px;">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-receipt"></i> Tóm tắt thanh toán</h5>
+                    <h5 class="mb-0"><i class="bi bi-receipt"></i> Payment Summary</h5>
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Giá gốc:</span>
+                        <span>Original price:</span>
                         <span>{{formatNumber course.price}}₫</span>
                     </div>
 
                     {{#ifPromo course.price course.promotional_price}}
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Khuyến mãi:</span>
+                        <span>Discount:</span>
                         <span class="text-danger">-{{formatNumber (sub course.price course.promotional_price)}}₫</span>
                     </div>
                     {{/ifPromo}}
@@ -89,7 +89,7 @@
                     <hr>
 
                     <div class="d-flex justify-content-between mb-3">
-                        <strong>Tổng cộng:</strong>
+                        <strong>Total:</strong>
                         <strong class="text-success h5">
                             {{#ifPromo course.price course.promotional_price}}
                             {{formatNumber course.promotional_price}}₫
@@ -99,25 +99,25 @@
                         </strong>
                     </div>
 
-                    <!-- Điều khoản -->
+                    <!-- Terms -->
                     <div class="form-check small mb-3">
                         <input class="form-check-input" type="checkbox" id="agreeTerms" required>
                         <label class="form-check-label" for="agreeTerms">
-                            Tôi đồng ý với <a href="#">điều khoản dịch vụ</a> và <a href="#">chính sách hoàn tiền</a>
+                            I agree to the <a href="#">Terms of Service</a> and the <a href="#">Refund Policy</a>
                         </label>
                     </div>
 
-                    <!-- Nút thanh toán -->
+                    <!-- Pay button -->
                     <form action="/checkout/{{course.id}}/process" method="POST">
                         <button type="submit" class="btn btn-success w-100 btn-lg" id="btnCheckout">
-                            <i class="bi bi-lock-fill"></i> Hoàn tất thanh toán
+                            <i class="bi bi-lock-fill"></i> Complete Payment
                         </button>
                     </form>
 
                     <div class="text-center mt-3">
                         <small class="text-muted">
                             <i class="bi bi-shield-check"></i>
-                            Thanh toán an toàn và được bảo mật
+                            Secure and encrypted payment
                         </small>
                     </div>
                 </div>
@@ -133,12 +133,12 @@
 
         if (!agreeTerms.checked) {
             e.preventDefault();
-            alert('Vui lòng đồng ý với điều khoản dịch vụ');
+            alert('Please agree to the Terms of Service.');
             return;
         }
 
         // Loading state
         btn.disabled = true;
-        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
     });
 </script>

@@ -32,9 +32,9 @@
         <td class="text-center">
           <form action="/teacher/course/{{id}}/toggle-status" method="POST">
             <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-              <option value="draft" {{#ifEquals status "draft"}}selected{{/ifEquals}}>Draft</option>
-              <option value="completed" {{#ifEquals status "completed"}}selected{{/ifEquals}}>Completed</option>
-              <option value="published" {{#ifEquals status "published"}}selected{{/ifEquals}}>Published</option>
+              <option value="draft" {{#ifEquals status "draft" }}selected{{/ifEquals}}>Draft</option>
+              <option value="completed" {{#ifEquals status "completed" }}selected{{/ifEquals}}>Completed</option>
+              <option value="published" {{#ifEquals status "published" }}selected{{/ifEquals}}>Published</option>
             </select>
           </form>
         </td>
@@ -42,7 +42,8 @@
         <td class="text-center">
           <a href="/teacher/course/{{id}}/detail" class="btn btn-info btn-sm">Details</a>
           <a href="/teacher/course/{{id}}/edit" class="btn btn-warning btn-sm">Edit</a>
-          <form method="POST" action="/teacher/course/{{id}}/delete" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this course?');">
+          <form method="POST" action="/teacher/course/{{id}}/delete" style="display: inline;"
+            onsubmit="return confirm('Are you sure you want to delete this course?');">
             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
           </form>
         </td>
@@ -52,7 +53,7 @@
   </table>
   {{else}}
   <div class="alert alert-info text-center mt-4" role="alert">
-    You haven't created any courses yet.  
+    You haven't created any courses yet.
     <a href="/teacher/course/add" class="alert-link">Create one now!</a>
   </div>
   {{/if}}

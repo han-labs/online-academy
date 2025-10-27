@@ -3,7 +3,8 @@
 <div class="container my-5">
     <h2 class="mb-4 text-primary fw-bold">Edit Lecture: {{lecture.title}}</h2>
 
-    <form action="/teacher/lecture/{{lecture.id}}/edit" method="POST" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
+    <form action="/teacher/lecture/{{lecture.id}}/edit" method="POST" enctype="multipart/form-data"
+        class="shadow p-4 rounded bg-light">
         <div class="mb-3">
             <label for="title" class="form-label">Lecture Name</label>
             <input type="text" class="form-control" id="title" name="title" value="{{lecture.title}}" required>
@@ -13,34 +14,36 @@
             <label for="chapter_id" class="form-label">Select Chapter</label>
             <select class="form-select" id="chapter_id" name="chapter_id" required>
                 {{#each chapters}}
-                    <option value="{{this.id}}" {{#if (eq this.id ../lecture.chapter_id)}}selected{{/if}}>
-                        {{this.chapter_order}}. {{this.title}}
-                    </option>
+                <option value="{{this.id}}" {{#if (eq this.id ../lecture.chapter_id)}}selected{{/if}}>
+                    {{this.chapter_order}}. {{this.title}}
+                </option>
                 {{/each}}
             </select>
         </div>
 
         <div class="mb-3">
             <label for="duration_minutes" class="form-label">Duration (minutes)</label>
-            <input type="number" class="form-control" id="duration_minutes" name="duration_minutes" min="1" value="{{lecture.duration_minutes}}">
+            <input type="number" class="form-control" id="duration_minutes" name="duration_minutes" min="1"
+                value="{{lecture.duration_minutes}}">
         </div>
 
         <div class="mb-3">
             <label for="video" class="form-label">Current Video</label>
             {{#if lecture.video_url}}
-                <video width="320" height="240" controls class="d-block mb-2">
-                    <source src="{{lecture.video_url}}" type="video/mp4">
-                    Your browser does not support video.
-                </video>
+            <video width="320" height="240" controls class="d-block mb-2">
+                <source src="{{lecture.video_url}}" type="video/mp4">
+                Your browser does not support video.
+            </video>
             {{else}}
-                <p>No video uploaded</p>
+            <p>No video uploaded</p>
             {{/if}}
             <label for="video" class="form-label">Upload New Video (optional)</label>
             <input type="file" class="form-control" id="video" name="video" accept="video/*">
         </div>
 
         <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" value="on" id="is_preview_allowed" name="is_preview_allowed" {{#if lecture.is_preview_allowed}}checked{{/if}}>
+            <input class="form-check-input" type="checkbox" value="on" id="is_preview_allowed" name="is_preview_allowed"
+                {{#if lecture.is_preview_allowed}}checked{{/if}}>
             <label class="form-check-label" for="is_preview_allowed">
                 Allow Free Preview
             </label>
