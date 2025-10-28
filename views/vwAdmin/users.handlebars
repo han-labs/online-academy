@@ -5,15 +5,15 @@
 {{#if error}}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  <strong>Error:</strong> An error has occurred. Please try again.
-</div>  
+  <strong>Error:</strong> Something went wrong. Please try again.
+</div>
 {{/if}}
 
 {{#if success}}
 <div class="alert alert-success alert-dismissible fade show" role="alert">
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  <strong>Success:</strong> The operation has been completed successfully.
-</div>  
+  <strong>Success:</strong> Action completed successfully.
+</div>
 {{/if}}
 
 <!-- Create Instructor Form -->
@@ -31,10 +31,11 @@
           <input type="email" class="form-control" name="email" placeholder="Email" required>
         </div>
         <div class="col-md-6 mb-3">
-          <input type="password" class="form-control" id="txtPassword" name="password" placeholder="Password" required minlength="6">
+          <input type="password" class="form-control" id="txtPassword" name="password" placeholder="Password" required
+            minlength="6">
         </div>
         <div class="col-md-12 mb-3">
-          <input type="text" class="form-control" name="instructor_bio" placeholder="Bio (optional)">
+          <input type="text" class="form-control" name="instructor_bio" placeholder="Short Bio (optional)">
         </div>
         <div class="col-md-2 ms-auto">
           <button type="submit" class="btn btn-success w-100">Create</button>
@@ -50,20 +51,22 @@
     <h5 class="card-title mb-0">User List</h5>
   </div>
   <div class="card-body">
+
     <!-- Tabs -->
     <ul class="nav nav-tabs mb-3" id="userTabs">
       <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="tab" href="#instructors" data-role="instructor">Instructors</a>
+        <a class="nav-link active" data-bs-toggle="tab" href="#instructors">Instructors</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#students" data-role="student">Students</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#students">Students</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#all" data-role="all">All Users</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#all">All Users</a>
       </li>
     </ul>
 
     <div class="tab-content">
+
       <!-- Instructors Tab -->
       <div class="tab-pane fade show active" id="instructors">
         <div class="table-responsive">
@@ -79,30 +82,32 @@
             </thead>
             <tbody>
               {{#each users}}
-                {{#if (eq this.role 'instructor')}}
-                <tr>
-                  <td class="text-center">{{@index}}</td>
-                  <td>{{this.full_name}}</td>
-                  <td>{{this.email}}</td>
-                  <td class="text-center">{{formatDate this.created_at}}</td>
-                  <td>
-                    <div class="d-flex gap-2 justify-content-center">
-                      <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
-                        <i class="bi bi-eye"></i> Details
-                      </a>
-                      <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editUserModal{{this.id}}">
-                        <i class="bi bi-pencil"></i> Edit
+              {{#if (eq this.role 'instructor')}}
+              <tr>
+                <td class="text-center">{{@index}}</td>
+                <td>{{this.full_name}}</td>
+                <td>{{this.email}}</td>
+                <td class="text-center">{{formatDate this.created_at}}</td>
+                <td class="text-center">
+                  <div class="d-flex gap-2 justify-content-center">
+                    <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
+                      <i class="bi bi-eye"></i> View
+                    </a>
+                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                      data-bs-target="#editUserModal{{this.id}}">
+                      <i class="bi bi-pencil"></i> Edit
+                    </button>
+                    <form method="post" action="/admin/users/delete" class="d-inline frmDeleteUser"
+                      data-user-name="{{this.full_name}}">
+                      <input type="hidden" name="id" value="{{this.id}}">
+                      <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i> Delete
                       </button>
-                      <form method="post" action="/admin/users/delete" class="d-inline frmDeleteUser" data-user-name="{{this.full_name}}">
-                        <input type="hidden" name="id" value="{{this.id}}">
-                        <button type="submit" class="btn btn-sm btn-danger">
-                          <i class="bi bi-trash"></i> Delete
-                        </button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-                {{/if}}
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {{/if}}
               {{/each}}
             </tbody>
           </table>
@@ -124,30 +129,32 @@
             </thead>
             <tbody>
               {{#each users}}
-                {{#if (eq this.role 'student')}}
-                <tr>
-                  <td class="text-center">{{@index}}</td>
-                  <td>{{this.full_name}}</td>
-                  <td>{{this.email}}</td>
-                  <td class="text-center">{{formatDate this.created_at}}</td>
-                  <td>
-                    <div class="d-flex gap-2 justify-content-center">
-                      <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
-                        <i class="bi bi-eye"></i> Details
-                      </a>
-                      <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editUserModal{{this.id}}">
-                        <i class="bi bi-pencil"></i> Edit
+              {{#if (eq this.role 'student')}}
+              <tr>
+                <td class="text-center">{{@index}}</td>
+                <td>{{this.full_name}}</td>
+                <td>{{this.email}}</td>
+                <td class="text-center">{{formatDate this.created_at}}</td>
+                <td class="text-center">
+                  <div class="d-flex gap-2 justify-content-center">
+                    <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
+                      <i class="bi bi-eye"></i> View
+                    </a>
+                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                      data-bs-target="#editUserModal{{this.id}}">
+                      <i class="bi bi-pencil"></i> Edit
+                    </button>
+                    <form method="post" action="/admin/users/delete" class="d-inline frmDeleteUser"
+                      data-user-name="{{this.full_name}}">
+                      <input type="hidden" name="id" value="{{this.id}}">
+                      <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i> Delete
                       </button>
-                      <form method="post" action="/admin/users/delete" class="d-inline frmDeleteUser" data-user-name="{{this.full_name}}">
-                        <input type="hidden" name="id" value="{{this.id}}">
-                        <button type="submit" class="btn btn-sm btn-danger">
-                          <i class="bi bi-trash"></i> Delete
-                        </button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-                {{/if}}
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {{/if}}
               {{/each}}
             </tbody>
           </table>
@@ -170,7 +177,7 @@
             </thead>
             <tbody>
               {{#each users}}
-               {{#unless (eq this.role 'admin')}}
+              {{#unless (eq this.role 'admin')}}
               <tr>
                 <td class="text-center">{{@index}}</td>
                 <td>{{this.full_name}}</td>
@@ -181,15 +188,17 @@
                   </span>
                 </td>
                 <td class="text-center">{{formatDate this.created_at}}</td>
-                <td>
+                <td class="text-center">
                   <div class="d-flex gap-2 justify-content-center">
                     <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
-                      <i class="bi bi-eye"></i> Details
+                      <i class="bi bi-eye"></i> View
                     </a>
-                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editUserModal{{this.id}}">
+                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                      data-bs-target="#editUserModal{{this.id}}">
                       <i class="bi bi-pencil"></i> Edit
                     </button>
-                    <form method="post" action="/admin/users/delete" class="d-inline frmDeleteUser" data-user-name="{{this.full_name}}">
+                    <form method="post" action="/admin/users/delete" class="d-inline frmDeleteUser"
+                      data-user-name="{{this.full_name}}">
                       <input type="hidden" name="id" value="{{this.id}}">
                       <button type="submit" class="btn btn-sm btn-danger">
                         <i class="bi bi-trash"></i> Delete
@@ -204,6 +213,7 @@
           </table>
         </div>
       </div>
+
     </div>
   </div>
 </div>
@@ -214,28 +224,29 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit User Information</h5>
+        <h5 class="modal-title">Edit User</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
       <form method="post" action="/admin/users/update">
         <div class="modal-body">
           <input type="hidden" name="id" value="{{this.id}}">
-          
+
           <div class="mb-3">
             <label class="form-label">Full Name</label>
             <input type="text" class="form-control" name="full_name" value="{{this.full_name}}" required>
           </div>
-          
+
           <div class="mb-3">
             <label class="form-label">Email</label>
             <input type="email" class="form-control" name="email" value="{{this.email}}" required>
           </div>
-          
+
           <div class="mb-3">
             <label class="form-label">Role</label>
             <select name="role" class="form-select" required>
-              <option value="student" {{#if (eq this.role 'student')}}selected{{/if}}>Student</option>
-              <option value="instructor" {{#if (eq this.role 'instructor')}}selected{{/if}}>Instructor</option>
+              <option value="student" {{#if (eq this.role 'student' )}}selected{{/if}}>Student</option>
+              <option value="instructor" {{#if (eq this.role 'instructor' )}}selected{{/if}}>Instructor</option>
             </select>
           </div>
 
@@ -246,73 +257,52 @@
           </div>
           {{/if}}
         </div>
+
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
           <button type="submit" class="btn btn-primary">Save Changes</button>
         </div>
       </form>
+
     </div>
   </div>
 </div>
 {{/each}}
 
 <script>
-  // Handle create instructor form
-  document.querySelector('#frmCreateInstructor')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
+  // Validate password on create
+  document.querySelector('#frmCreateInstructor')?.addEventListener('submit', function (e) {
     const password = document.querySelector('#txtPassword').value.trim();
-    
     if (password.length < 6) {
-      alert('Password must be at least 6 characters long');
-      return;
+      e.preventDefault();
+      alert('Password must be at least 6 characters long.');
     }
-    
-    this.submit();
   });
 
-  // Confirm user deletion
+  // Confirm delete
   document.querySelectorAll('.frmDeleteUser').forEach(form => {
-    form.addEventListener('submit', function(e) {
-      const userName = this.getAttribute('data-user-name');
-      if (!confirm(`Are you sure you want to delete user "${userName}"?`)) {
+    form.addEventListener('submit', function (e) {
+      const name = this.getAttribute('data-user-name');
+      if (!confirm(`Are you sure you want to delete user "${name}"?`)) {
         e.preventDefault();
       }
     });
   });
 
-  // Renumber all tables
+  // Fix numbering when tab switches
   function renumberAllTables() {
-    const panes = document.querySelectorAll('.tab-pane');
-    panes.forEach(pane => {
-      const table = pane.querySelector('table tbody');
-      if (table) {
-        const rows = table.querySelectorAll('tr');
-        rows.forEach((row, index) => {
-          const sttCell = row.querySelector('td:first-child');
-          if (sttCell) {
-            sttCell.textContent = index + 1;
-          }
-        });
-      }
+    document.querySelectorAll('.tab-pane table tbody').forEach(tbody => {
+      tbody.querySelectorAll('tr').forEach((row, index) => {
+        const cell = row.querySelector('td:first-child');
+        if (cell) cell.textContent = index + 1;
+      });
     });
   }
 
-  // When page loads
-  document.addEventListener('DOMContentLoaded', function() {
-    // Renumber after page render
+  document.addEventListener('DOMContentLoaded', () => {
     setTimeout(renumberAllTables, 200);
-    
-    // Activate Bootstrap tabs
-    const triggerTabList = [].slice.call(document.querySelectorAll('#userTabs a'));
-    triggerTabList.forEach(function (triggerEl) {
-      const tabTrigger = new bootstrap.Tab(triggerEl);
-      triggerEl.addEventListener('click', function (event) {
-        event.preventDefault();
-        tabTrigger.show();
-        // Renumber after switching tabs
-        setTimeout(renumberAllTables, 100);
-      });
+    document.querySelectorAll('#userTabs a').forEach(tab => {
+      tab.addEventListener('shown.bs.tab', renumberAllTables);
     });
   });
 </script>

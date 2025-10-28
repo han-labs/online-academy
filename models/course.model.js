@@ -155,7 +155,8 @@ export default {
 
         // --- Order ---
         const orderBy = [];
-        if (q && q.trim()) {
+
+        if (q && q.trim() && sort === 'relevance') {
             const kw = q.trim();
             orderBy.push({
                 column: db.raw(
@@ -165,10 +166,23 @@ export default {
                 order: 'desc'
             });
         }
-        if (sort === 'price_asc') orderBy.push({ column: db.raw('COALESCE(c.promotional_price, c.price)'), order: 'asc' });
-        else if (sort === 'newest') orderBy.push({ column: 'c.last_updated', order: 'desc' });
-        else if (sort === 'best_seller') orderBy.push({ column: db.raw('COUNT(DISTINCT e2.user_id)'), order: 'desc' });
-        else orderBy.push({ column: db.raw('AVG(r.rating)'), order: 'desc' });
+        // Các tuỳ chọn sort còn lại:
+        if (sort === 'price_asc') {
+            orderBy.push({ column: db.raw('COALESCE(c.promotional_price, c.price)'), order: 'asc' });
+        } else if (sort === 'newest') {
+            orderBy.push({ column: 'c.last_updated', order: 'desc' });
+        } else if (sort === 'best_seller') {
+            orderBy.push({ column: db.raw('COUNT(DISTINCT e2.user_id)'), order: 'desc' });
+        } else {
+            // ⭐ Highest Rated: khóa có review trước, rồi điểm trung bình, rồi số review, rồi số học viên, rồi ngày cập nhật
+            orderBy.push({
+                column: db.raw('CASE WHEN COUNT(r.id)=0 THEN -1 ELSE AVG(r.rating) END'),
+                order: 'desc'
+            });
+            orderBy.push({ column: db.raw('COUNT(DISTINCT r.id)'), order: 'desc' });
+            orderBy.push({ column: db.raw('COUNT(DISTINCT e2.user_id)'), order: 'desc' });
+            orderBy.push({ column: 'c.last_updated', order: 'desc' });
+        }
 
         const rows = await qb.clone()
             .groupBy('c.id', 'cat.id', 'u.id')
@@ -300,21 +314,19 @@ export default {
 
     // ----- Teacher APIs -----
     async findByInstructor(instructorId) {
-        const cols = ['c.id', 'c.title', 'c.price', 'c.promotional_price', 'c.category_id', 'c.status', 'c.instructor_id'];
-        const courses = await db({ c: 'courses' })
-            .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
-            .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
-            .leftJoin({ u: 'users' }, 'u.id', 'c.instructor_id')
-            .leftJoin({ e2: 'enrollments' }, 'e2.course_id', 'c.id')
+        return db({ c: 'courses' })
+            .leftJoin({ e: 'enrollments' }, 'e.course_id', 'c.id')
             .where('c.instructor_id', instructorId)
-            .groupBy('c.id', 'cat.id', 'u.id')
+            .groupBy('c.id', 'c.title', 'c.status', 'c.price', 'c.promotional_price')
             .orderBy('c.id', 'desc')
-            .select(cols);
-
-        const withStats = await Promise.all(
-            courses.map(async (c) => ({ ...c, ...(await getStatistics(c.id)) }))
-        );
-        return withStats;
+            .select([
+                'c.id',
+                'c.title',
+                'c.status',
+                db.raw('COALESCE(c.price, 0) as price'),
+                db.raw('c.promotional_price as promotional_price'),
+                db.raw('COALESCE(COUNT(DISTINCT e.user_id), 0)::int as students')
+            ]);
     },
 
     async add(course) {

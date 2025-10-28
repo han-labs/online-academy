@@ -1,97 +1,122 @@
+{{!-- vwCourse/detail.handlebars --}}
 {{!-- Course Hero Section --}}
-<div class="bg-dark text-white py-4 mb-4 rounded">
-    <div class="row">
-        <div class="col-md-8">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a href="/" class="text-white-50">Home</a></li>
-                    <li class="breadcrumb-item">
-                        <a href="/categories/{{course.category_id}}" class="text-white-50">{{course.category_name}}</a>
-                    </li>
-                    <li class="breadcrumb-item active text-white" aria-current="page">{{course.title}}</li>
-                </ol>
-            </nav>
+<div class="course-hero text-white py-4 mb-4"
+    style="background: linear-gradient(135deg, #160438 0%, #2d0a5e 50%, #4a148c 100%);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb mb-0" style="background: transparent; padding: 0;">
+                        <li class="breadcrumb-item">
+                            <a href="/" class="text-white text-decoration-none">
+                                <i class="bi bi-house-door me-1"></i>Home
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/categories/{{course.category_id}}" class="text-white text-decoration-none">
+                                {{course.category_name}}
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active text-white-50">{{course.title}}</li>
+                    </ol>
+                </nav>
 
-            <h1 class="h2 mb-3">{{course.title}}</h1>
-            <p class="lead mb-3">{{course.short_description}}</p>
+                <h1 class="display-6 fw-semibold mb-2">{{course.title}}</h1>
+                <p class="lead text-white-50 mb-3">{{course.short_description}}</p>
 
-            <div class="d-flex align-items-center mb-3">
-                <span class="badge bg-warning text-dark me-2"><i class="bi bi-star-fill"></i> {{formatNumber
-                    course.rating}}</span>
-                <span class="me-3">({{formatNumber course.rating_count}} reviews)</span>
-                <span>{{formatNumber course.students}} students</span>
+                <div class="d-flex align-items-center flex-wrap mb-3">
+                    <span class="me-2 text-warning fw-bold"><i class="bi bi-star-fill"></i> {{formatNumber
+                        course.rating}}</span>
+                    <span class="me-3 small text-white-50">({{formatNumber course.rating_count}} ratings)</span>
+                    <span class="small text-white-50">{{formatNumber course.students}} students</span>
+                </div>
+
+                <p class="small mb-1">Created by <strong>{{course.instructor_name}}</strong></p>
+                <p class="small text-white-50 mb-0">Last updated {{formatDate course.last_updated}} •
+                    {{totalHours}}h{{remainingMinutes}}m</p>
             </div>
 
-            <p class="mb-2"><strong>Instructor:</strong> {{course.instructor_name}}</p>
-            <p class="mb-2"><strong>Last updated:</strong> {{formatDate course.last_updated}}</p>
-            <p class="mb-0"><strong>Duration:</strong> {{totalHours}} hours {{remainingMinutes}} minutes</p>
-        </div>
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div class="course-card-hero bg-white text-dark p-3 rounded-3 shadow-lg">
+                    <img src="{{course.image_url}}" alt="{{course.title}}" class="img-fluid rounded mb-3">
 
-        <div class="col-md-4">
-            <div class="card bg-white text-dark">
-                <img src="{{course.image_url}}" class="card-img-top" alt="{{course.title}}">
-                <div class="card-body text-center">
                     {{#ifPromo course.price course.promotional_price}}
-                    <div class="h3 text-danger mb-0">{{formatNumber course.promotional_price}}₫</div>
-                    <div class="text-muted text-decoration-line-through">{{formatNumber course.price}}₫</div>
+                    <div class="h4 text-danger fw-bold mb-1">{{formatNumber course.promotional_price}}₫</div>
+                    <div class="text-muted text-decoration-line-through small mb-3">{{formatNumber course.price}}₫</div>
                     {{else}}
-                    <div class="h3 mb-0">{{formatNumber course.price}}₫</div>
+                    <div class="h4 fw-bold mb-3">{{formatNumber course.price}}₫</div>
                     {{/ifPromo}}
 
-                    {{!-- Enroll / Login --}}
                     {{#if user}}
                     {{#if (eq user.role 'student')}}
-                    <a href="/checkout/{{course.id}}" class="btn btn-primary w-100 mt-3 mb-2">
-                        <i class="bi bi-cart-check"></i> Enroll now
+                    {{!-- Nếu đã ghi danh: ưu tiên biến isEnrolled; fallback course.is_enrolled --}}
+                    {{#if isEnrolled}}
+                    <a href="{{#if keepLearningUrl}}{{keepLearningUrl}}{{else}}/courses/{{course.id}}/learn{{/if}}"
+                        class="btn btn-brand w-100 mb-2 fw-semibold text-white" style="background-color:#160438;">
+                        <i class="bi bi-play-circle"></i> Keep learning
                     </a>
-                    {{/if}}
                     {{else}}
-                    <a href="/account/login?returnUrl=/courses/{{course.id}}" class="btn btn-primary w-100 mt-3 mb-2">
-                        <i class="bi bi-box-arrow-in-right"></i> Log in to enroll
+                    {{#if course.is_enrolled}}
+                    <a href="{{#if keepLearningUrl}}{{keepLearningUrl}}{{else}}/courses/{{course.id}}/learn{{/if}}"
+                        class="btn btn-brand w-100 mb-2 fw-semibold text-white" style="background-color:#160438;">
+                        <i class="bi bi-play-circle"></i> Keep learning
+                    </a>
+                    {{else}}
+                    <a href="/checkout/{{course.id}}" class="btn btn-brand w-100 mb-2 fw-semibold text-white"
+                        style="background-color:#160438;">
+                        <i class="bi bi-cart-check"></i> Enroll Now
                     </a>
                     {{/if}}
+                    {{/if}}
 
-
-                    {{!-- Watchlist --}}
-                    {{#if user}}
-                    {{#if (eq user.role 'student')}}
+                    {{!-- Favorites: giữ nguyên logic --}}
                     {{#if isInWatchlist}}
                     <form action="/student/watchlist/remove" method="POST" class="w-100">
                         <input type="hidden" name="course_id" value="{{course.id}}">
-                        <button type="submit" class="btn btn-outline-danger w-100">Favorited</button>
+                        <button type="submit" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-heart-fill"></i> Remove from Favorites
+                        </button>
                     </form>
                     {{else}}
                     <form action="/student/watchlist/add" method="POST" class="w-100">
                         <input type="hidden" name="course_id" value="{{course.id}}">
-                        <button type="submit" class="btn btn-outline-secondary w-100">Add to Favorites</button>
+                        <button type="submit" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-heart"></i> Add to Favorites
+                        </button>
                     </form>
                     {{/if}}
                     {{/if}}
+                    {{else}}
+                    {{!-- Guest: gợi ý đăng nhập để học --}}
+                    <a href="/account/login" class="btn btn-brand w-100 mb-2 fw-semibold text-white"
+                        style="background-color:#160438;">
+                        <i class="bi bi-box-arrow-in-right"></i> Log in to enroll
+                    </a>
                     {{/if}}
-
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
 {{!-- Course Content --}}
 <div class="row">
     <div class="col-md-8">
         {{!-- What you'll learn --}}
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">What you'll learn</h5>
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header text-white" style="background-color: #160438;">
+                <h5 class="mb-0"><i class="bi bi-lightbulb me-2"></i>What you'll learn</h5>
             </div>
             <div class="card-body">
-                <p>{{course.detailed_description}}</p>
+                <p class="mb-0">{{course.detailed_description}}</p>
             </div>
         </div>
 
         {{!-- Curriculum --}}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">Course Content</h5>
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header" style="background-color: #f8f9fa;">
+                <h5 class="mb-1"><i class="bi bi-list-ul me-2"></i>Course Content</h5>
                 <p class="text-muted mb-0 small">
                     {{totalChapters}} chapters • {{totalLectures}} lectures • {{totalHours}}h{{remainingMinutes}}m
                 </p>
@@ -99,12 +124,13 @@
             <div class="card-body p-0">
                 <div class="accordion" id="curriculumAccordion">
                     {{#each chapters}}
-                    <div class="accordion-item">
+                    <div class="accordion-item border-0 border-bottom">
                         <h2 class="accordion-header">
                             <button class="accordion-button {{#unless @first}}collapsed{{/unless}}" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#chapter{{id}}">
+                                data-bs-toggle="collapse" data-bs-target="#chapter{{id}}"
+                                style="background-color: #f8f9fa;">
                                 <strong>{{title}}</strong>
-                                <span class="text-muted ms-auto me-3">{{length lectures}} lectures</span>
+                                <span class="text-muted ms-auto me-3 small">{{length lectures}} lectures</span>
                             </button>
                         </h2>
                         <div id="chapter{{id}}" class="accordion-collapse collapse {{#if @first}}show{{/if}}"
@@ -114,12 +140,13 @@
                                     {{#each lectures}}
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         <div>
-                                            <span class="me-2"><i class="bi bi-play-fill"></i></span>
+                                            <span class="me-2" style="color: #160438;"><i
+                                                    class="bi bi-play-circle"></i></span>
                                             {{title}}
-                                            {{#if is_preview_allowed}}<span
-                                                class="badge bg-info ms-2">Preview</span>{{/if}}
+                                            {{#if is_preview_allowed}}<span class="badge ms-2"
+                                                style="background-color: #160438;">Preview</span>{{/if}}
                                         </div>
-                                        <span class="text-muted">{{duration_minutes}} min</span>
+                                        <span class="text-muted small">{{duration_minutes}} min</span>
                                     </li>
                                     {{/each}}
                                 </ul>
@@ -132,9 +159,9 @@
         </div>
 
         {{!-- Instructor --}}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">Instructor</h5>
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header" style="background-color: #f8f9fa;">
+                <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Instructor</h5>
             </div>
             <div class="card-body">
                 <div class="d-flex align-items-start">
@@ -142,13 +169,13 @@
                     <img src="{{course.instructor_avatar}}" alt="{{course.instructor_name}}" class="rounded-circle me-3"
                         style="width: 80px; height: 80px; object-fit: cover;">
                     {{else}}
-                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3"
-                        style="width: 80px; height: 80px; font-size: 2rem;">
+                    <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-3"
+                        style="width: 80px; height: 80px; font-size: 2rem; background-color: #160438;">
                         {{substring course.instructor_name 0 1}}
                     </div>
                     {{/if}}
                     <div>
-                        <h5>{{course.instructor_name}}</h5>
+                        <h5 class="mb-1">{{course.instructor_name}}</h5>
                         <p class="text-muted mb-0">{{course.instructor_bio}}</p>
                     </div>
                 </div>
@@ -156,12 +183,14 @@
         </div>
 
         {{!-- Reviews --}}
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Student Reviews</h5>
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center"
+                style="background-color: #f8f9fa;">
+                <h5 class="mb-0"><i class="bi bi-star me-2"></i>Student Reviews</h5>
                 <div>
-                    <span class="badge bg-dark text-light"><i class="bi bi-star-fill text-warning"></i> {{formatNumber
-                        course.rating}}</span>
+                    <span class="badge text-white" style="background-color: #160438;">
+                        <i class="bi bi-star-fill text-warning"></i> {{formatNumber course.rating}}
+                    </span>
                     <span class="text-muted ms-2">({{formatNumber course.rating_count}})</span>
                 </div>
             </div>
@@ -174,8 +203,8 @@
                         <img src="{{user_avatar}}" alt="{{user_name}}" class="rounded-circle me-2"
                             style="width: 40px; height: 40px; object-fit: cover;">
                         {{else}}
-                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
-                            style="width: 40px; height: 40px;">
+                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-2"
+                            style="width: 40px; height: 40px; background-color: #160438;">
                             {{substring user_name 0 1}}
                         </div>
                         {{/if}}
@@ -199,15 +228,16 @@
     {{!-- Sidebar --}}
     <div class="col-md-4">
         {{#if related}}
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Related Courses</h5>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header" style="background-color: #f8f9fa;">
+                <h5 class="mb-0"><i class="bi bi-collection me-2"></i>Related Courses</h5>
             </div>
             <div class="card-body p-2">
                 {{#each related}}
                 <div class="card mb-2 border-0 shadow-sm">
-                    <a href="/courses/{{id}}">
-                        <img src="{{cover}}" class="card-img-top" alt="{{title}}">
+                    <a href="/courses/{{id}}" class="text-decoration-none">
+                        <img src="{{cover}}" class="card-img-top" alt="{{title}}"
+                            style="height: 150px; object-fit: cover;">
                     </a>
                     <div class="card-body p-2">
                         <h6 class="card-title mb-1">
@@ -231,3 +261,56 @@
         {{/if}}
     </div>
 </div>
+
+<style>
+    /* Breadcrumb customization */
+    .breadcrumb-item+.breadcrumb-item::before {
+        content: "›";
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 1.2em;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #fff !important;
+        text-decoration: underline !important;
+    }
+
+    /* Hover effects for buttons */
+    .btn[style*="background-color: #160438"]:hover {
+        background-color: #2d0a5e !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+        border-color: #6c757d;
+    }
+
+    /* Card hover effects */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Accordion button customization */
+    .accordion-button:not(.collapsed) {
+        background-color: #160438 !important;
+        color: white !important;
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(22, 4, 56, 0.2);
+    }
+
+    /* Related courses hover effect */
+    .col-md-4 .card:hover {
+        box-shadow: 0 4px 12px rgba(22, 4, 56, 0.15) !important;
+    }
+</style>

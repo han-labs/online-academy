@@ -30,24 +30,33 @@
                 {{else if (eq sort 'best_seller')}}Best Seller
                 {{else}}Top Rated{{/if}}
             </button>
+
             <ul class="dropdown-menu">
-                {{#each global_categories_tree}}
                 <li>
-                    <h6 class="dropdown-header text-purple">
-                        <i class="bi bi-mortarboard-fill me-2"></i> {{name}}
-                    </h6>
+                    <a class="dropdown-item {{#if (eq sort 'rating_desc')}}active{{/if}}"
+                        href="?sort=rating_desc&page=1">
+                        <i class="bi bi-star-fill me-1"></i> Top Rated
+                    </a>
                 </li>
-                {{#each children}}
-                <li><a class="dropdown-item" href="/categories/{{id}}">
-                        <i class="bi bi-chevron-right small"></i> {{name}}
-                    </a></li>
-                {{/each}}
-                {{#unless @last}}<li>
-                    <hr class="dropdown-divider">
-                </li>{{/unless}}
-                {{/each}}
+                <li>
+                    <a class="dropdown-item {{#if (eq sort 'price_asc')}}active{{/if}}" href="?sort=price_asc&page=1">
+                        <i class="bi bi-currency-dollar me-1"></i> Price: Low to High
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item {{#if (eq sort 'newest')}}active{{/if}}" href="?sort=newest&page=1">
+                        <i class="bi bi-clock me-1"></i> Newest
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item {{#if (eq sort 'best_seller')}}active{{/if}}"
+                        href="?sort=best_seller&page=1">
+                        <i class="bi bi-graph-up-arrow me-1"></i> Best Seller
+                    </a>
+                </li>
             </ul>
         </div>
+
     </div>
 
     {{!-- Subcategories --}}

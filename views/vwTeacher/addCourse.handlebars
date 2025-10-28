@@ -1,60 +1,121 @@
 {{!-- vwTeacher/addCourse.handlebars --}}
 
 <div class="container my-5">
-  <h2 class="mb-4 text-center text-primary fw-bold">Add New Course</h2>
+  {{!-- Page heading + helper --}}
+  <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+    <div>
+      <h2 class="fw-bold mb-1" style="color:#160438;">
+        <i class="bi bi-easel2 me-2"></i> Add New Course
+      </h2>
+      <p class="text-muted mb-0">Fill out the basic information to create your course.</p>
+    </div>
+    <a href="/teacher/dashboard" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
 
-  <form action="/teacher/course/add" method="POST" enctype="multipart/form-data" class="bg-light p-4 rounded shadow-sm">
-    <div class="mb-3">
-      <label class="form-label">Course Title</label>
-      <input type="text" name="title" class="form-control" required>
+  {{!-- Progress / step vibe (UI only) --}}
+  <div class="mb-4">
+    <div class="d-flex align-items-center small">
+      <span class="badge rounded-pill me-2" style="background:#160438;">1</span>
+      <span class="me-3">Basic Info</span>
+      <div class="flex-grow-1 border-top" style="opacity:.2;"></div>
+      <span class="badge rounded-pill mx-2 bg-light text-muted">2</span>
+      <span class="text-muted">Curriculum</span>
+    </div>
+  </div>
+
+  <form action="/teacher/course/add" method="POST" enctype="multipart/form-data"
+    class="card border-0 shadow-sm rounded-3">
+    <div class="card-header" style="background:#f7f5fb;">
+      <strong style="color:#160438;"><i class="bi bi-info-circle me-2"></i>Basic Information</strong>
     </div>
 
-    <div class="mb-3">
-      <label class="form-label">Cover Image</label>
-      <input type="file" name="image" class="form-control">
-    </div>
+    <div class="card-body">
 
-    <div class="mb-3">
-      <label class="fw-semibold">Category</label>
-      <select name="category_id" class="form-select" required>
-        <option value="" disabled>-- Select Category --</option>
+      {{!-- Title --}}
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Course Title <span class="text-danger">*</span></label>
+        <input type="text" name="title" class="form-control" placeholder="e.g. Advanced React & TypeScript" required>
+      </div>
 
-        {{#each categoriesTree}}
+      {{!-- Cover image with preview (UI only, không đổi name/logic) --}}
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Cover Image</label>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <input type="file" name="image" class="form-control" id="coverInput" accept="image/*">
+            <small class="text-muted">Recommended: 1200×675px (16:9)</small>
+          </div>
+          <div class="col-md-4">
+            <div class="border rounded p-2 bg-light d-flex align-items-center justify-content-center"
+              style="height:140px;">
+              <img id="coverPreview" src="/static/images/default-course.jpg" class="img-fluid rounded shadow-sm"
+                style="max-height:120px; object-fit:cover;" alt="Cover preview">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {{!-- Category --}}
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+        <select name="category_id" class="form-select" required>
+          <option value="" disabled selected>-- Select Category --</option>
+          {{#each categoriesTree}}
           <optgroup label="📁 {{this.name}}">
             {{#each this.children}}
-              <option value="{{this.id}}"
-                {{#if (eq ../../selectedCategoryId this.id)}}selected{{/if}}>
-                — {{this.name}}
-              </option>
+            <option value="{{this.id}}" {{#if (eq ../../selectedCategoryId this.id)}}selected{{/if}}>
+              — {{this.name}}
+            </option>
             {{/each}}
           </optgroup>
-        {{/each}}
-      </select>
-    </div>
-
-    <div class="row">
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Price</label>
-        <input type="number" name="price" class="form-control" required>
+          {{/each}}
+        </select>
       </div>
 
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Promotional Price</label>
-        <input type="number" name="promotional_price" class="form-control">
+      {{!-- Price row --}}
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold">Price (VND) <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light"><i class="bi bi-cash-coin"></i></span>
+            <input type="number" name="price" class="form-control" min="0" step="1" required placeholder="e.g. 499000">
+          </div>
+          <small class="text-muted">Set the base price of your course.</small>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold">Promotional Price</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light"><i class="bi bi-percent"></i></span>
+            <input type="number" name="promotional_price" class="form-control" min="0" step="1" placeholder="Optional">
+          </div>
+          <small class="text-muted">Leave empty if no promotion.</small>
+        </div>
       </div>
+
+      {{!-- Short description --}}
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Short Description</label>
+        <textarea name="short_description" class="form-control" rows="3"
+          placeholder="A concise summary that appears in listings."></textarea>
+      </div>
+
+      {{!-- Detailed description --}}
+      <div class="mb-1">
+        <label class="form-label fw-semibold">Detailed Description</label>
+        <textarea name="detailed_description" id="editor" class="form-control" rows="8"></textarea>
+      </div>
+      <small class="text-muted">Use formatting, lists, images… to describe content & outcomes.</small>
     </div>
 
-    <div class="mb-3">
-      <label class="form-label">Short Description</label>
-      <textarea name="short_description" class="form-control" rows="3"></textarea>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+      <span class="small text-muted">You can edit everything later.</span>
+      <button type="submit" class="btn btn-brand px-4">
+        <i class="bi bi-check2-circle me-1"></i> Add Course
+      </button>
     </div>
-
-    <div class="mb-3">
-      <label class="form-label">Detailed Description</label>
-      <textarea name="detailed_description" id="editor" class="form-control" rows="8"></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-success px-4 py-2">Add Course</button>
   </form>
 </div>
 
@@ -63,8 +124,22 @@
 <script>
   tinymce.init({
     selector: '#editor',
-    height: 400,
+    height: 420,
     plugins: 'lists link image table code',
-    toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image table | code'
+    toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image table | code',
+    menubar: false
+  });
+
+  // Preview cover (UI only, không đổi logic submit)
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('coverInput');
+    const preview = document.getElementById('coverPreview');
+    if (!input || !preview) return;
+    input.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      preview.src = url;
+    });
   });
 </script>

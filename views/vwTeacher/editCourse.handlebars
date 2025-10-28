@@ -1,14 +1,21 @@
 {{!-- vwTeacher/editCourse.handlebars --}}
 
 <div class="container my-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-primary fw-bold">Edit Course: {{course.title}}</h2>
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-1" style="color:#160438;">
+        <i class="bi bi-pencil-square me-2"></i> Edit Course: {{course.title}}
+      </h2>
+      <p class="text-muted mb-0">Update basic info and manage content.</p>
+    </div>
   </div>
 
   {{!-- Basic Course Info --}}
   <form action="/teacher/course/{{course.id}}/edit" method="POST" enctype="multipart/form-data"
-    class="shadow p-4 rounded bg-light">
-    <h4 class="text-info mb-3"><i class="bi bi-info-circle"></i> Basic Information</h4>
+    class="card border-0 shadow p-4 rounded-3 mb-5">
+    <h4 class="mb-3 fw-semibold" style="color:#160438;">
+      <i class="bi bi-info-circle me-2"></i> Basic Information
+    </h4>
 
     <div class="mb-3">
       <label class="fw-semibold">Course Title <span class="text-danger">*</span></label>
@@ -17,14 +24,28 @@
 
     <div class="mb-3">
       <label class="fw-semibold">Cover Image</label>
-      <input type="file" name="image" class="form-control mb-2" accept="image/*">
-      {{#if course.cover}}
-      <img src="/static{{course.cover}}" alt="cover" width="200" class="rounded border shadow-sm">
-      {{/if}}
+      <div class="row g-3">
+        <div class="col-md-8">
+          <input type="file" name="image" class="form-control mb-2" id="coverInput" accept="image/*">
+          <small class="text-muted">Recommended: 1200×675px (16:9). Leave empty to keep current.</small>
+        </div>
+        <div class="col-md-4">
+          <div class="border rounded p-2 bg-light d-flex align-items-center justify-content-center"
+            style="height:140px;">
+            {{#if course.cover}}
+            <img id="coverPreview" src="/static{{course.cover}}" alt="cover" class="img-fluid rounded shadow-sm"
+              style="max-height:120px; object-fit:cover;">
+            {{else}}
+            <img id="coverPreview" src="/static/images/default-course.jpg" alt="cover"
+              class="img-fluid rounded shadow-sm" style="max-height:120px; object-fit:cover;">
+            {{/if}}
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="mb-3">
-      <label class="fw-semibold">Category</label>
+      <label class="fw-semibold">Category <span class="text-danger">*</span></label>
       <select name="category_id" class="form-select" required>
         <option value="" disabled>-- Select Category --</option>
         {{#each categoriesTree}}
@@ -42,11 +63,18 @@
     <div class="row">
       <div class="col-md-6 mb-3">
         <label class="fw-semibold">Original Price (VND) <span class="text-danger">*</span></label>
-        <input type="number" name="price" class="form-control" value="{{course.price}}" required min="0">
+        <div class="input-group">
+          <span class="input-group-text bg-light"><i class="bi bi-cash-coin"></i></span>
+          <input type="number" name="price" class="form-control" value="{{course.price}}" required min="0">
+        </div>
       </div>
       <div class="col-md-6 mb-3">
         <label class="fw-semibold">Promotional Price (VND)</label>
-        <input type="number" name="promotional_price" class="form-control" value="{{course.promotional_price}}" min="0">
+        <div class="input-group">
+          <span class="input-group-text bg-light"><i class="bi bi-percent"></i></span>
+          <input type="number" name="promotional_price" class="form-control" value="{{course.promotional_price}}"
+            min="0">
+        </div>
       </div>
     </div>
 
@@ -58,7 +86,7 @@
     <div class="mb-3">
       <label class="fw-semibold">Detailed Description</label>
       <textarea name="detailed_description" id="editor" class="form-control"
-        rows="3">{{course.detailed_description}}</textarea>
+        rows="6">{{course.detailed_description}}</textarea>
     </div>
 
     <div class="mb-3">
@@ -69,16 +97,14 @@
       </select>
     </div>
 
-    <button type="submit" class="btn btn-success w-100 mt-3">
+    <button type="submit" class="btn btn-brand w-100 mt-2">
       <i class="bi bi-check-circle"></i> Update Course Information
     </button>
   </form>
 
   {{!-- Course Content Management --}}
-  <hr class="my-5">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="text-secondary mb-0"><i class="bi bi-book"></i> Course Content (Chapters & Lectures)</h3>
-    <!-- NÚT DUY NHẤT mở modal -->
+    <h3 class="mb-0" style="color:#2d0a5e;"><i class="bi bi-book me-2"></i> Course Content (Chapters & Lectures)</h3>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addChapterModalCourse">
       <i class="bi bi-plus-circle"></i> Add New Chapter
     </button>
@@ -86,8 +112,8 @@
 
   {{#if chapters.length}}
   {{#each chapters}}
-  <div class="card mb-3 shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+  <div class="card mb-3 shadow-sm rounded-3">
+    <div class="card-header d-flex justify-content-between align-items-center text-white" style="background:#160438;">
       <div>
         <strong>Chapter {{chapter_order}}: {{title}}</strong>
         <span class="badge bg-light text-dark ms-2">
@@ -98,7 +124,7 @@
           {{/if}}
         </span>
       </div>
-      <div>
+      <div class="d-flex gap-1">
         <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editChapterModal{{id}}">
           <i class="bi bi-pencil"></i> Edit
         </button>
@@ -110,107 +136,110 @@
 
     <div class="card-body">
       {{#if (lookup ../lectures id)}}
-      <table class="table table-sm table-hover">
-        <thead class="table-light">
-          <tr>
-            <th width="50">#</th>
-            <th>Lecture Name</th>
-            <th width="120">Duration</th>
-            <th width="100">Preview</th>
-            <th width="150">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each (lookup ../lectures id)}}
-          <tr>
-            <td>{{lecture_order}}</td>
-            <td>{{title}}</td>
-            <td>{{#if duration_minutes}}{{duration_minutes}} min{{else}}-{{/if}}</td>
-            <td>
-              {{#if is_preview_allowed}}
-              <span class="badge bg-success">Yes</span>
-              {{else}}
-              <span class="badge bg-secondary">No</span>
-              {{/if}}
-            </td>
-            <td>
-              <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editLectureModal{{id}}">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteLectureModal{{id}}">
-                <i class="bi bi-trash"></i>
-              </button>
-            </td>
-          </tr>
+      <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th width="50">#</th>
+              <th>Lecture Name</th>
+              <th width="120">Duration</th>
+              <th width="100">Preview</th>
+              <th width="150">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each (lookup ../lectures id)}}
+            <tr>
+              <td>{{lecture_order}}</td>
+              <td>{{title}}</td>
+              <td>{{#if duration_minutes}}{{duration_minutes}} min{{else}}-{{/if}}</td>
+              <td>
+                {{#if is_preview_allowed}}
+                <span class="badge bg-success">Yes</span>
+                {{else}}
+                <span class="badge bg-secondary">No</span>
+                {{/if}}
+              </td>
+              <td>
+                <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editLectureModal{{id}}">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteLectureModal{{id}}">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
 
-          {{!-- Edit Lecture Modal --}}
-          <div class="modal fade" id="editLectureModal{{id}}" tabindex="-1" data-bs-focus="false"
-            data-bs-backdrop="static" data-bs-keyboard="false" data-bs-scroll="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form action="/teacher/lecture/{{id}}/edit" method="POST" enctype="multipart/form-data">
-                  <div class="modal-header">
-                    <h5 class="modal-title">Edit Lecture: {{title}}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="mb-3">
-                      <label class="fw-semibold">Lecture Name</label>
-                      <input type="text" name="title" class="form-control" value="{{title}}" required>
+            {{!-- Edit Lecture Modal --}}
+            <div class="modal fade" id="editLectureModal{{id}}" tabindex="-1" data-bs-focus="false"
+              data-bs-backdrop="static" data-bs-keyboard="false">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form action="/teacher/lecture/{{id}}/edit" method="POST" enctype="multipart/form-data">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Edit Lecture: {{title}}</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="mb-3">
-                      <label class="fw-semibold">New Video (leave blank if no change)</label>
-                      <input type="file" name="video" class="form-control" accept="video/*">
-                      <small class="text-muted">Current video: {{video_url}}</small>
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label class="fw-semibold">Lecture Name</label>
+                        <input type="text" name="title" class="form-control" value="{{title}}" required>
+                      </div>
+                      <div class="mb-3">
+                        <label class="fw-semibold">New Video (leave blank if no change)</label>
+                        <input type="file" name="video" class="form-control" accept="video/*">
+                        <small class="text-muted">Current video: {{video_url}}</small>
+                      </div>
+                      <div class="mb-3">
+                        <label class="fw-semibold">Duration (minutes)</label>
+                        <input type="number" name="duration_minutes" class="form-control" value="{{duration_minutes}}"
+                          min="0">
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="is_preview_allowed" id="preview{{id}}"
+                          {{#if is_preview_allowed}}checked{{/if}}>
+                        <label class="form-check-label" for="preview{{id}}">Allow free preview</label>
+                      </div>
                     </div>
-                    <div class="mb-3">
-                      <label class="fw-semibold">Duration (minutes)</label>
-                      <input type="number" name="duration_minutes" class="form-control" value="{{duration_minutes}}"
-                        min="0">
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" name="is_preview_allowed" id="preview{{id}}" {{#if
-                        is_preview_allowed}}checked{{/if}}>
-                      <label class="form-check-label" for="preview{{id}}">Allow free preview</label>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
 
-          {{!-- Delete Lecture Modal --}}
-          <div class="modal fade" id="deleteLectureModal{{id}}" tabindex="-1" data-bs-focus="false"
-            data-bs-backdrop="static" data-bs-keyboard="false" data-bs-scroll="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form action="/teacher/lecture/{{id}}/delete" method="POST">
-                  <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Confirm Delete</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                  </div>
-                  <div class="modal-body">
-                    <p>Are you sure you want to delete the lecture <strong>"{{title}}"</strong>?</p>
-                    <p class="text-danger"><i class="bi bi-exclamation-triangle"></i> This action cannot be undone!</p>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                  </div>
-                </form>
+            {{!-- Delete Lecture Modal --}}
+            <div class="modal fade" id="deleteLectureModal{{id}}" tabindex="-1" data-bs-focus="false"
+              data-bs-backdrop="static" data-bs-keyboard="false">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form action="/teacher/lecture/{{id}}/delete" method="POST">
+                    <div class="modal-header bg-danger text-white">
+                      <h5 class="modal-title">Confirm Delete</h5>
+                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure you want to delete the lecture <strong>"{{title}}"</strong>?</p>
+                      <p class="text-danger"><i class="bi bi-exclamation-triangle"></i> This action cannot be undone!
+                      </p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-danger">Delete</button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
 
-          {{/each}}
-        </tbody>
-      </table>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
       {{else}}
-      <p class="text-muted">No lectures yet.</p>
+      <p class="text-muted mb-0">No lectures yet.</p>
       {{/if}}
 
       <div class="border-top pt-3 mt-3">
@@ -221,7 +250,7 @@
 
       {{!-- Add Lecture Modal --}}
       <div class="modal fade" id="addLectureModal{{id}}" tabindex="-1" data-bs-focus="false" data-bs-backdrop="static"
-        data-bs-keyboard="false" data-bs-scroll="true">
+        data-bs-keyboard="false">
         <div class="modal-dialog">
           <div class="modal-content">
             <form action="/teacher/chapter/{{id}}/lecture/add" method="POST" enctype="multipart/form-data">
@@ -258,7 +287,7 @@
 
       {{!-- Edit Chapter Modal --}}
       <div class="modal fade" id="editChapterModal{{id}}" tabindex="-1" data-bs-focus="false" data-bs-backdrop="static"
-        data-bs-keyboard="false" data-bs-scroll="true">
+        data-bs-keyboard="false">
         <div class="modal-dialog">
           <div class="modal-content">
             <form action="/teacher/chapter/{{id}}/edit" method="POST">
@@ -283,7 +312,7 @@
 
       {{!-- Delete Chapter Modal --}}
       <div class="modal fade" id="deleteChapterModal{{id}}" tabindex="-1" data-bs-focus="false"
-        data-bs-backdrop="static" data-bs-keyboard="false" data-bs-scroll="true">
+        data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
           <div class="modal-content">
             <form action="/teacher/chapter/{{id}}/delete" method="POST">
@@ -293,8 +322,8 @@
               </div>
               <div class="modal-body">
                 <p>Are you sure you want to delete <strong>Chapter {{chapter_order}}: {{title}}</strong>?</p>
-                <p class="text-danger"><i class="bi bi-exclamation-triangle"></i> All lectures in this chapter will also
-                  be deleted!</p>
+                <p class="text-danger mb-0"><i class="bi bi-exclamation-triangle"></i> All lectures in this chapter will
+                  also be deleted!</p>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -315,14 +344,14 @@
   {{/if}}
 </div>
 
-{{!-- ROOT Add Chapter Modal (duy nhất) --}}
+{{!-- ROOT Add Chapter Modal (single) --}}
 <div class="modal fade" id="addChapterModalCourse" tabindex="-1" data-bs-focus="false" data-bs-backdrop="static"
-  data-bs-keyboard="false" data-bs-scroll="true">
+  data-bs-keyboard="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <form action="/teacher/course/{{course.id}}/chapter/add" method="POST">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title">Add New Chapter</h5>
+        <div class="modal-header" style="background:#160438;">
+          <h5 class="modal-title text-white">Add New Chapter</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -341,25 +370,28 @@
   </div>
 </div>
 
-{{!-- Back to Dashboard & View Details --}}
+{{!-- Footer actions --}}
 <div class="container my-4 d-flex gap-2">
-  <a href="/teacher/dashboard" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+  <a href="/teacher/dashboard" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
   <a href="/teacher/course/{{course.id}}/detail" class="btn btn-info"><i class="bi bi-eye"></i> View Details</a>
 </div>
 
-{{!-- TinyMCE Editor --}}
+{{!-- TinyMCE --}}
 <script src="hw9pfh30njixlu4voz8ag8msnnnr4ofingpiklyaaie8hhdy" referrerpolicy="origin"></script>
 <script>
-  tinymce.init({
-    selector: '#editor',
-    height: 400,
-    plugins: 'lists link image table code',
-    toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image table | code',
-    menubar: false
+  // Cover preview (UI only)
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('coverInput');
+    const preview = document.getElementById('coverPreview');
+    if (input && preview) {
+      input.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (file) preview.src = URL.createObjectURL(file);
+      });
+    }
   });
-</script>
 
-<script>
+  // Đưa tất cả modal về body 1 lần, KHÔNG ép khởi tạo instance hàng loạt
   document.addEventListener('DOMContentLoaded', function () {
     const selector =
       '#addChapterModalCourse,' +
@@ -367,21 +399,48 @@
       '[id^="editChapterModal"],[id^="deleteChapterModal"]';
 
     document.querySelectorAll(selector).forEach(m => {
-      if (m.parentElement !== document.body) document.body.appendChild(m);
-      bootstrap.Modal.getOrCreateInstance(m, { focus: false, keyboard: false });
+      if (m && m.parentElement !== document.body) {
+        document.body.appendChild(m); // move only once
+      }
     });
   });
 
-  // dọn backdrop thừa (phòng hờ)
+  // Dọn backdrop thừa nếu có (phòng trường hợp browser render đè)
   document.addEventListener('hidden.bs.modal', function () {
     const backs = document.querySelectorAll('.modal-backdrop');
-    if (backs.length > 1) backs.forEach((b, i) => { if (i < backs.length - 1) b.remove(); });
+    if (backs.length > 1) {
+      backs.forEach((b, i) => { if (i < backs.length - 1) b.remove(); });
+    }
   });
 </script>
 
+
 <style>
-  /* tránh xô lệch khi mở modal do scrollbar ẩn/hiện */
+  .btn-brand {
+    background: #160438;
+    color: #fff;
+    border-color: #160438;
+  }
+
+  .btn-brand:hover {
+    background: #2d0a5e;
+    border-color: #2d0a5e;
+    color: #fff;
+  }
+
+  /* Giữ thanh cuộn luôn hiện để tránh nhảy layout giữa các trang */
   html {
     overflow-y: scroll;
+  }
+
+  /* Khi modal mở, không tự cộng padding-right cho body */
+  body.modal-open {
+    padding-right: 0 !important;
+  }
+
+  /* Nếu header/sticky-top bị lệch do padding-right, cũng chặn luôn */
+  .navbar.sticky-top,
+  .sticky-top {
+    padding-right: 0 !important;
   }
 </style>

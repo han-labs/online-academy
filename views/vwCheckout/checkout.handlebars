@@ -1,20 +1,22 @@
 <div class="container py-4">
-    <div class="row">
+    <div class="row mx-auto">
+        <!-- Header -->
+        <div class="d-flex align-items-center mb-4">
+            <a href="/courses/{{course.id}}" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h2 class="mb-0">Checkout</h2>
+        </div>
+        <div class="border-top my-3"></div>
         <div class="col-lg-8">
-            <!-- Header -->
-            <div class="d-flex align-items-center mb-4">
-                <a href="/courses/{{course.id}}" class="btn btn-outline-secondary btn-sm me-3">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-                <h2 class="mb-0">Checkout</h2>
-            </div>
+
 
             <!-- Course Information -->
             <div class="card mb-4">
-                <div class="card-header">
+                <div class="card-header" style="background-color: #beccfc; border-left: 4px solid #6079f7;">
                     <h5 class="mb-0"><i class="bi bi-cart-check"></i> Course</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="background-color: #e0e7ff; border-left: 4px solid #a5b4fc;">
                     <div class="row">
                         <div class="col-md-3">
                             <img src="{{course.image_url}}" class="img-fluid rounded" alt="{{course.title}}">
@@ -33,14 +35,14 @@
 
             <!-- Payment Methods -->
             <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-credit-card"></i> Payment Methods</h5>
+                <div class="card-header" style="background-color: #beccfc; border-left: 4px solid #6079f7;">
+                    <h5 class="mb-0"><i class="bi bi-credit-card"></i> Payment Method</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="background-color: #e0e7ff; border-left: 4px solid #a5b4fc;">
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i>
-                        <strong>Payment demo:</strong> This is a simulated checkout page.
-                        Click “Complete Payment” to proceed.
+                        <strong>Demo Payment:</strong> This is a simulated payment page.
+                        Click "Complete Payment" to continue.
                     </div>
 
                     <div class="form-check mb-3">
@@ -53,7 +55,7 @@
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="radio" name="paymentMethod" id="momo">
                         <label class="form-check-label" for="momo">
-                            <i class="bi bi-wallet2"></i> MoMo e-wallet
+                            <i class="bi bi-wallet2"></i> MoMo E-Wallet
                         </label>
                     </div>
 
@@ -67,15 +69,15 @@
             </div>
         </div>
 
-        <!-- Sidebar Summary -->
+        <!-- Order Summary Sidebar -->
         <div class="col-lg-4">
             <div class="card position-sticky" style="top: 20px;">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-receipt"></i> Payment Summary</h5>
+                <div class="card-header" style="background-color: #beccfc; border-left: 4px solid #6079f7;">
+                    <h5 class="mb-0"><i class="bi bi-receipt"></i> Order Summary</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="background-color: #e0e7ff; border-left: 4px solid #a5b4fc;">
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Original price:</span>
+                        <span>Original Price:</span>
                         <span>{{formatNumber course.price}}₫</span>
                     </div>
 
@@ -99,17 +101,24 @@
                         </strong>
                     </div>
 
-                    <!-- Terms -->
-                    <div class="form-check small mb-3">
-                        <input class="form-check-input" type="checkbox" id="agreeTerms" required>
-                        <label class="form-check-label" for="agreeTerms">
-                            I agree to the <a href="#">Terms of Service</a> and the <a href="#">Refund Policy</a>
-                        </label>
+                    <!-- Terms - Bắt buộc phải tick -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                I agree to the <a href="/policy" target="_blank">terms of service</a> and <a
+                                    href="/policy" target="_blank">refund policy</a>
+                                <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                        <div class="invalid-feedback" id="termsError">
+                            You must agree to the terms and conditions to proceed with payment.
+                        </div>
                     </div>
 
-                    <!-- Pay button -->
-                    <form action="/checkout/{{course.id}}/process" method="POST">
-                        <button type="submit" class="btn btn-success w-100 btn-lg" id="btnCheckout">
+                    <!-- Payment Button -->
+                    <form action="/checkout/{{course.id}}/process" method="POST" id="paymentForm" novalidate>
+                        <button type="submit" class="btn btn-success w-100 btn-lg" id="btnCheckout" disabled>
                             <i class="bi bi-lock-fill"></i> Complete Payment
                         </button>
                     </form>
@@ -127,18 +136,70 @@
 </div>
 
 <script>
-    document.querySelector('form').addEventListener('submit', function (e) {
+    document.addEventListener('DOMContentLoaded', function () {
         const agreeTerms = document.getElementById('agreeTerms');
-        const btn = document.getElementById('btnCheckout');
+        const btnCheckout = document.getElementById('btnCheckout');
+        const termsError = document.getElementById('termsError');
+        const paymentForm = document.getElementById('paymentForm');
 
-        if (!agreeTerms.checked) {
-            e.preventDefault();
-            alert('Please agree to the Terms of Service.');
-            return;
-        }
+        // Enable/disable checkout button based on checkbox
+        agreeTerms.addEventListener('change', function () {
+            btnCheckout.disabled = !this.checked;
+            if (this.checked) {
+                termsError.style.display = 'none';
+                agreeTerms.classList.remove('is-invalid');
+            }
+        });
 
-        // Loading state
-        btn.disabled = true;
-        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+        // Form submission validation
+        paymentForm.addEventListener('submit', function (e) {
+            if (!agreeTerms.checked) {
+                e.preventDefault();
+                termsError.style.display = 'block';
+                agreeTerms.classList.add('is-invalid');
+
+                // Scroll to terms checkbox
+                agreeTerms.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                return;
+            }
+
+            // Loading state
+            btnCheckout.disabled = true;
+            btnCheckout.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+        });
+
+        // Real-time validation
+        agreeTerms.addEventListener('change', function () {
+            if (this.checked) {
+                this.classList.remove('is-invalid');
+                termsError.style.display = 'none';
+            }
+        });
     });
 </script>
+
+<style>
+    .form-check-input:invalid {
+        border-color: #dc3545;
+    }
+
+    .form-check-input:valid {
+        border-color: #198754;
+    }
+
+    .invalid-feedback {
+        display: none;
+    }
+
+    #btnCheckout:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+</style>
