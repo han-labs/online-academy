@@ -1,138 +1,145 @@
-# Online Academy - PTUDW Final Project
+# Online Academy — PTUDW Final Project
 
-[![Node.js](https://img.shields.io/badge/Node.js-v18+-green.svg)](https://nodejs.org/)
-[![Express.js](https://img.shields.io/badge/Express.js-v4.18-blue.svg)](https://expressjs.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-blue.svg)](https://supabase.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A518.x-green.svg)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.18-blue.svg)](https://expressjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-336791.svg)](https://supabase.com/)
 
-## 📋 Giới thiệu
+A full-stack web application for online learning (Udemy-style). Students can browse and enroll in courses, instructors can create and manage content, and admins oversee catalog and users.
 
-Ứng dụng web **Online Academy** - nền tảng học trực tuyến tương tự Udemy, cho phép học viên đăng ký học các khóa học, giảng viên đăng tải nội dung, và quản trị viên quản lý hệ thống.
+- **Course:** Web Programming  
+- **Class Code:** 251WEPR330479E_01FIE  
+- **Instructor:** ThS. Ngô Ngọc Đăng Khoa  
+- **Team:** 11
+---
 
-**Môn học:** Web Programming
+## 👥 Team & Responsibilities
 
-**Mã lớp:** 251WEPR330479E_01FIE 
+| Student ID | Name                         | Role / Responsibilities |
+|------------|------------------------------|-------------------------|
+| 23110019   | Huỳnh Gia Hân                | Team Lead — project scaffolding & repository setup; database design & migrations; authentication/session flow; code reviews & merges; UI polish and consistency; bug fixing and conflict resolution. |
+| 23110004   | Võ Nguyễn Ngọc Bích          | Guest Branch Owner — landing/home experience for guests; public search & browsing flows; prepared seed data and curated images/videos for public pages; supported data insertion scripts. |
+| 23110051   | Trần Thị Tố Như              | Student Branch Owner — enrollment/learning UX for students (watchlist, checkout handoff, learning page); profile & “My Courses”; contributed seed data and media assets. |
+| 23110028   | Trần Tuấn Kha                | Teacher Branch Owner — instructor workflows (course editor, chapters/lectures, uploads); instructor dashboard & profile; contributed seed data and course media. |
+| 23110065   | Mai Trần Thùy Trang          | Admin Branch Owner — admin dashboard, category/user/course moderation; system settings; prepared admin fixtures and data-loading scripts.|
 
-**Giảng viên hướng dẫn:** ThS. Ngô Ngọc Đăng Khoa
+> All members contributed to planning, code reviews, and documentation.
 
-**Nhóm:** 11  
 
-**Thành viên:**
-- 23110019	Huỳnh Gia Hân
-- 23110051	Trần Thị Tố Như
-- 23110065	Mai Trần Thùy Trang
-- 23110004	Võ Nguyễn Ngọc Bích
-- 23110028	Trần Tuấn Kha
+---
 
-## ✨ Tính năng chính
+## ✨ Key Features
 
-### 🔓 Người dùng Guest
-- Xem danh sách khóa học theo lĩnh vực (có phân trang)
-- Tìm kiếm full-text với từ khóa gần đúng
-- Xem chi tiết khóa học với preview một số chương
-- Trang chủ với slideshow, carousel hiển thị khóa học nổi bật
+### 👀 Guest
+- Browse courses by category (with pagination)
+- Full-text search with fuzzy matching
+- Course detail pages with previewable lessons
+- Engaging homepage: slideshow + featured carousels
 
-### 👨‍🎓 Học viên (Student)
-- Đăng ký tài khoản với xác thực OTP
-- Mua và tham gia khóa học
-- Xem video bài giảng với media player (Plyr.io)
-- Quản lý watchlist (danh sách yêu thích)
-- Đánh giá và feedback khóa học
+### 👨‍🎓 Student
+- Account registration with OTP email verification
+- Purchase/enroll in courses
+- Watch lectures with an integrated media player (Plyr)
+- Manage Favorites/Watchlist
+- Rate and review courses
 
-### 👨‍🏫 Giảng viên (Teacher)
-- Đăng khóa học với trình soạn thảo WYSIWYG
-- Upload video bài giảng
-- Quản lý và cập nhật nội dung khóa học
-- Xem thống kê khóa học
+### 👨‍🏫 Instructor
+- Create courses with WYSIWYG editor (TinyMCE/CKEditor)
+- Upload and manage lecture videos
+- Organize chapters/lectures; track course status
+- View basic course statistics
 
-### 👨‍💼 Quản trị viên (Admin)
-- Quản lý lĩnh vực (categories)
-- Quản lý khóa học (gỡ bỏ nếu vi phạm)
-- Quản lý học viên và giảng viên
-- Dashboard thống kê
+### 🧑‍💼 Admin
+- Manage categories
+- Moderate/remove courses that violate policies
+- Manage students and instructors
+- Dashboard overview
 
-## 🛠️ Công nghệ sử dụng
+---
 
-**Backend:** Node.js v18+, Express.js v4.18, Handlebars (View Engine)
+## 🛠 Tech Stack
 
-**Database:** PostgreSQL (qua Supabase), full-text search
+**Backend:** Node.js (≥18), Express 4.18, Express Session  
+**View Engine:** Handlebars  
+**Database:** PostgreSQL (Supabase), Full-Text Search (FTS)  
+**Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5, Plyr (video), TinyMCE/CKEditor  
+**Auth & Security:** bcrypt (password hashing), JWT, OTP Email verification
 
-**Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5, Plyr.io (Video Player), TinyMCE/CKEditor (WYSIWYG)
+---
 
-**Authentication & Security:** bcrypt (mã hóa mật khẩu), JWT (JSON Web Tokens), Express Session, OTP Email verification
+## 📦 Setup
 
-## 📦 Cài đặt
-
-### Các bước cài đặt
-
-1. **Clone repository**
+### 1) Clone
 ```bash
 git clone https://github.com/han-labs/online-academy.git
 cd online-academy
 ```
 
-2. **Cài đặt dependencies**
+### 2) Install deps
 ```bash
 npm install
 ```
 
-3. **Chạy ứng dụng**
+### 3) Run
 ```bash
-# Development mode
+# Development (nodemon recommended)
 npm run dev
 
-# Production mode
+# Production
 npm start
 ```
 
-Truy cập: `http://localhost:3000`
+Visit: `http://localhost:3000`
 
-## 🗂️ Cấu trúc thư mục
+---
 
-```
-online-academy/
-├── middlewares/    # Authentication, validation
-├── models/         # Database models
-├── routes/         # API routes
-├── utils/          # Helper functions
-├── static/         # Images, css
-└── views/          # Handlebars templates
-```
+## 🧪 Testing / Demo Accounts
+
+**Admin**
+- Email: `trangthuymai302@gmail.com`  
+- Password: `123456`
+
+**Instructor**
+- Email: `trantuankha030205@gmail.com`  
+- Password: `123456`
+
+**Student**
+- Email: `trantonhu1711@gmail.com`  
+- Password: `123456`
+
+> Replace with your actual demo accounts if they differ.
+
+---
 
 ## 🌿 Git Workflow
 
-### Branch Strategy
+**Branches**
 ```
-main/master    → Production code
-develop        → Development branch
-feature/*      → Feature branches
+main/master    → Production-ready
+develop        → Integration branch
+feature/*      → Per feature/task
 ```
-
-## Testing
-
-### 📝 Tài khoản Demo
-
-**Admin:**
-- Email: admin@example.com
-- Password: admin123
-
-**Giảng viên:**
-- Email: teacher@example.com
-- Password: teacher123
-
-**Học viên:**
-- Email: student@example.com
-- Password: student123
-
-
-## 📄 License
-
-MIT License - Online Academy Project
-
-## 🙏 Tham khảo
-- [Udemy](https://www.udemy.com) - UI/UX inspiration
-- [Express.js Documentation](https://expressjs.com/)
-- [Supabase Documentation](https://supabase.com/docs)
-- [Plyr.io Documentation](https://plyr.io/)
 
 ---
-© 2025 - Online Academy Project
+
+## 📚 Notes & Capabilities
+
+- Full-text search leverages PostgreSQL FTS with fallback to ILIKE for robust matching.
+- Instructor dashboard supports status transitions (draft → completed → published) based on chapter/lecture completeness.
+- Reviews and ratings include average computation and count; course cards summarize key stats.
+- OTP email verification for account activation (configurable SMTP).
+
+---
+
+## 📝 License
+
+MIT License — Online Academy Project  
+© 2025 Online Academy Team
+
+---
+
+## 🙏 References
+
+- [Udemy](https://www.udemy.com) — UI/UX inspiration  
+- [Express.js](https://expressjs.com/) — Documentation  
+- [Supabase](https://supabase.com/docs) — Documentation  
+- [Plyr](https://plyr.io/) — Video Player Docs
