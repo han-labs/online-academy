@@ -155,7 +155,8 @@ export default {
 
         // --- Order ---
         const orderBy = [];
-        if (q && q.trim()) {
+
+        if (q && q.trim() && sort === 'relevance') {
             const kw = q.trim();
             orderBy.push({
                 column: db.raw(
@@ -165,10 +166,23 @@ export default {
                 order: 'desc'
             });
         }
-        if (sort === 'price_asc') orderBy.push({ column: db.raw('COALESCE(c.promotional_price, c.price)'), order: 'asc' });
-        else if (sort === 'newest') orderBy.push({ column: 'c.last_updated', order: 'desc' });
-        else if (sort === 'best_seller') orderBy.push({ column: db.raw('COUNT(DISTINCT e2.user_id)'), order: 'desc' });
-        else orderBy.push({ column: db.raw('AVG(r.rating)'), order: 'desc' });
+        // Các tuỳ chọn sort còn lại:
+        if (sort === 'price_asc') {
+            orderBy.push({ column: db.raw('COALESCE(c.promotional_price, c.price)'), order: 'asc' });
+        } else if (sort === 'newest') {
+            orderBy.push({ column: 'c.last_updated', order: 'desc' });
+        } else if (sort === 'best_seller') {
+            orderBy.push({ column: db.raw('COUNT(DISTINCT e2.user_id)'), order: 'desc' });
+        } else {
+            // ⭐ Highest Rated: khóa có review trước, rồi điểm trung bình, rồi số review, rồi số học viên, rồi ngày cập nhật
+            orderBy.push({
+                column: db.raw('CASE WHEN COUNT(r.id)=0 THEN -1 ELSE AVG(r.rating) END'),
+                order: 'desc'
+            });
+            orderBy.push({ column: db.raw('COUNT(DISTINCT r.id)'), order: 'desc' });
+            orderBy.push({ column: db.raw('COUNT(DISTINCT e2.user_id)'), order: 'desc' });
+            orderBy.push({ column: 'c.last_updated', order: 'desc' });
+        }
 
         const rows = await qb.clone()
             .groupBy('c.id', 'cat.id', 'u.id')
