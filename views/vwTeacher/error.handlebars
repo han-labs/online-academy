@@ -1,6 +1,28 @@
 {{!-- views/vwTeacher/error.handlebars --}}
-<div class="container mt-5">
-  <h2 class="text-danger">🚨 An Error Occurred</h2>
-  <p>{{message}}</p>
-  <a href="/teacher/dashboard" class="btn btn-primary mt-3">Back to Dashboard</a>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card border-0 shadow rounded-3">
+        <div class="card-header text-white d-flex align-items-center" style="background:#a52834;">
+          <i class="bi bi-x-octagon-fill me-2 fs-5"></i>
+          <h5 class="mb-0 fw-semibold">An Error Occurred</h5>
+        </div>
+        <div class="card-body">
+          <p class="mb-0">{{message}}</p>
+          <div class="mt-3 d-flex gap-2">
+            <a href="/teacher/dashboard" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+            <a href="javascript:location.reload()" class="btn btn-danger">
+              <i class="bi bi-arrow-clockwise"></i> Retry
+            </a>
+          </div>
+        </div>
+        <div class="card-footer small text-muted">
+          If the issue persists, please try again later or contact support.
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

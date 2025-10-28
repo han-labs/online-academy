@@ -314,21 +314,19 @@ export default {
 
     // ----- Teacher APIs -----
     async findByInstructor(instructorId) {
-        const cols = ['c.id', 'c.title', 'c.price', 'c.promotional_price', 'c.category_id', 'c.status', 'c.instructor_id'];
-        const courses = await db({ c: 'courses' })
-            .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
-            .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
-            .leftJoin({ u: 'users' }, 'u.id', 'c.instructor_id')
-            .leftJoin({ e2: 'enrollments' }, 'e2.course_id', 'c.id')
+        return db({ c: 'courses' })
+            .leftJoin({ e: 'enrollments' }, 'e.course_id', 'c.id')
             .where('c.instructor_id', instructorId)
-            .groupBy('c.id', 'cat.id', 'u.id')
+            .groupBy('c.id', 'c.title', 'c.status', 'c.price', 'c.promotional_price')
             .orderBy('c.id', 'desc')
-            .select(cols);
-
-        const withStats = await Promise.all(
-            courses.map(async (c) => ({ ...c, ...(await getStatistics(c.id)) }))
-        );
-        return withStats;
+            .select([
+                'c.id',
+                'c.title',
+                'c.status',
+                db.raw('COALESCE(c.price, 0) as price'),
+                db.raw('c.promotional_price as promotional_price'),
+                db.raw('COALESCE(COUNT(DISTINCT e.user_id), 0)::int as students')
+            ]);
     },
 
     async add(course) {

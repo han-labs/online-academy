@@ -14,14 +14,14 @@
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   <strong>Error:</strong> An error has occurred. Please try again.
-</div>  
+</div>
 {{/if}}
 
 {{#if success}}
 <div class="alert alert-success alert-dismissible fade show" role="alert">
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   <strong>Success:</strong> The operation has been completed successfully.
-</div>  
+</div>
 {{/if}}
 
 <div class="row">
@@ -42,8 +42,9 @@
           <div class="col-md-6">
             <p><strong>Category:</strong> {{course.category_name}}</p>
             <p><strong>Price:</strong> {{formatCurrency course.price}}</p>
-            <p><strong>Promotional Price:</strong> {{#if course.promotional_price}}{{formatCurrency course.promotional_price}}{{else}}None{{/if}}</p>
-            <p><strong>Status:</strong> 
+            <p><strong>Promotional Price:</strong> {{#if course.promotional_price}}{{formatCurrency
+              course.promotional_price}}{{else}}None{{/if}}</p>
+            <p><strong>Status:</strong>
               <span class="badge bg-{{getStatusBadge course.status}}">
                 {{getStatusText course.status}}
               </span>
@@ -141,9 +142,10 @@
       <div class="card-body text-center">
         {{#if course.image_url}}
         <img src="{{course.image_url}}" alt="{{course.title}}" class="img-fluid rounded" style="max-height: 200px;"
-             onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=No+Image';">
+          onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=No+Image';">
         {{else}}
-        <img src="https://via.placeholder.com/300x200?text=No+Image" alt="No Image" class="img-fluid rounded" style="max-height: 200px;">
+        <img src="https://via.placeholder.com/300x200?text=No+Image" alt="No Image" class="img-fluid rounded"
+          style="max-height: 200px;">
         {{/if}}
       </div>
     </div>

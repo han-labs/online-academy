@@ -53,6 +53,7 @@ router.get('/search', async (req, res) => {
 
 
 // Detail
+// Detail
 router.get('/:id', async (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(404).render('vwAccount/404');
@@ -77,11 +78,23 @@ router.get('/:id', async (req, res) => {
     const totalHours = Math.floor(totalMinutes / 60);
     const remainingMinutes = totalMinutes % 60;
 
-    // watchlist state (nếu đã đăng nhập)
+    // Watchlist state (nếu đã đăng nhập)
     let isInWatchlist = false;
-    if (req.session.user) {
-        try { isInWatchlist = await watchlistModel.isInWatchlist(req.session.user.id, id); }
-        catch { isInWatchlist = false; }
+    try {
+        if (req.session.user) {
+            isInWatchlist = await watchlistModel.isInWatchlist(req.session.user.id, id);
+        }
+    } catch { isInWatchlist = false; }
+
+    // ✨ NEW: trạng thái đã ghi danh + URL tiếp tục học (chỉ áp dụng cho student)
+    let isEnrolled = false;
+    const keepLearningUrl = `/courses/${id}/learn`;
+    try {
+        if (req.session.user && req.session.user.role === 'student') {
+            isEnrolled = await enrollmentModel.isEnrolled(req.session.user.id, id);
+        }
+    } catch {
+        isEnrolled = false;
     }
 
     res.render('vwCourse/detail', {
@@ -89,11 +102,17 @@ router.get('/:id', async (req, res) => {
         chapters: chaptersWithLectures,
         totalChapters: curriculum.chapters.length,
         totalLectures: curriculum.lectures.length,
-        totalHours, remainingMinutes,
-        reviews, related,
-        isInWatchlist
+        totalHours,
+        remainingMinutes,
+        reviews,
+        related,
+        isInWatchlist,
+        // ✨ truyền thêm 2 biến này cho template
+        isEnrolled,
+        keepLearningUrl
     });
 });
+
 
 // Learn (student)
 router.get('/:id/learn', requireAuth, async (req, res) => {

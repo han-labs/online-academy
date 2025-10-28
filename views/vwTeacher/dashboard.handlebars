@@ -1,60 +1,204 @@
 {{!-- vwTeacher/dashboard.handlebars --}}
 
 <div class="container my-5">
-  <h2 class="mb-4 text-center text-primary fw-bold">Teacher Dashboard</h2>
 
-  <div class="d-flex justify-content-end mb-3">
-    <a href="/teacher/course/add" class="btn btn-success">
-      <i class="bi bi-plus-circle"></i> Add New Course
-    </a>
+  {{!-- Header row --}}
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div class="mb-2">
+      <h2 class="mb-1 fw-bold" style="color:#160438;">
+        <i class="bi bi-speedometer2 me-2"></i> Teacher Dashboard
+      </h2>
+      <p class="text-muted mb-0">Manage your courses, statuses, and enrollments.</p>
+    </div>
+
+    <div class="text-end">
+      <a href="/teacher/course/add" class="btn btn-brand d-inline-flex align-items-center">
+        <i class="bi bi-plus-circle me-2"></i> Add New Course
+      </a>
+    </div>
   </div>
 
   {{#if courses.length}}
-  <table class="table table-striped table-hover shadow-sm">
-    <thead class="table-primary">
-      <tr>
-        <th>#</th>
-        <th>Course</th>
-        <th>Status</th>
-        <th>Enrollments</th>
-        <th class="text-center">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each courses}}
-      <tr>
-        <td>{{add @index 1}}</td>
-        <td>
-          <a href="/teacher/course/{{id}}" class="fw-semibold text-decoration-none text-dark">
-            {{title}}
-          </a>
-        </td>
-        <td class="text-center">
-          <form action="/teacher/course/{{id}}/toggle-status" method="POST">
-            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-              <option value="draft" {{#ifEquals status "draft" }}selected{{/ifEquals}}>Draft</option>
-              <option value="completed" {{#ifEquals status "completed" }}selected{{/ifEquals}}>Completed</option>
-              <option value="published" {{#ifEquals status "published" }}selected{{/ifEquals}}>Published</option>
-            </select>
-          </form>
-        </td>
-        <td>{{students}}</td>
-        <td class="text-center">
-          <a href="/teacher/course/{{id}}/detail" class="btn btn-info btn-sm">Details</a>
-          <a href="/teacher/course/{{id}}/edit" class="btn btn-warning btn-sm">Edit</a>
-          <form method="POST" action="/teacher/course/{{id}}/delete" style="display: inline;"
-            onsubmit="return confirm('Are you sure you want to delete this course?');">
-            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-          </form>
-        </td>
-      </tr>
-      {{/each}}
-    </tbody>
-  </table>
+  <div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background:#f7f5fb;">
+      <span class="fw-semibold" style="color:#160438;">
+        <i class="bi bi-journal-text me-2"></i> Your Courses
+      </span>
+      <span class="badge rounded-pill" style="background:#160438;">{{length courses}} total</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead class="table-light sticky-top" style="top:0; z-index:1;">
+          <tr class="text-uppercase small text-muted">
+            <th style="width:64px;">#</th>
+            <th>Course</th>
+            <th style="width:160px;">Price</th>
+            <th style="width:160px;">Status</th>
+            <th style="width:140px;">Enrollments</th>
+            <th class="text-center" style="width:240px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each courses}}
+          <tr class="table-row-hover">
+            <td class="fw-semibold">{{add @index 1}}</td>
+
+            <td>
+              <a href="/teacher/course/{{id}}/detail" class="fw-semibold text-decoration-none link-dark">
+                {{title}}
+              </a>
+
+            </td>
+
+            <td>
+              {{#ifPromo price promotional_price}}
+              <span class="fw-semibold text-danger">{{formatNumber promotional_price}}₫</span>
+              <small class="text-muted text-decoration-line-through ms-1">{{formatNumber price}}₫</small>
+              {{else}}
+              <span class="fw-semibold">{{formatNumber price}}₫</span>
+              {{/ifPromo}}
+            </td>
+
+            {{!-- STATUS: view-only (no inline edit) --}}
+            <td>
+              {{#if (eq status "published")}}
+              <span class="badge bg-success" title="Change status in Edit">Published</span>
+              {{else if (eq status "completed")}}
+              <span class="badge bg-info" title="Change status in Edit">Completed</span>
+              {{else if (eq status "draft")}}
+              <span class="badge bg-warning text-dark" title="Change status in Edit">Draft</span>
+              {{else}}
+              <span class="badge bg-secondary" title="Change status in Edit">Unknown</span>
+              {{/if}}
+            </td>
+
+            {{!-- ENROLLMENTS with fallback fields --}}
+            <td>
+              <span class="d-inline-flex align-items-center">
+                <i class="bi bi-people me-2 text-muted"></i>
+                {{#if students}}
+                {{formatNumber students}}
+                {{else if total_students}}
+                {{formatNumber total_students}}
+                {{else if enrollments}}
+                {{formatNumber enrollments}}
+                {{else if enroll_count}}
+                {{formatNumber enroll_count}}
+                {{else}}
+                0
+                {{/if}}
+              </span>
+            </td>
+
+            <td class="text-center">
+              <div class="btn-group btn-group-sm action-group" role="group" aria-label="actions">
+                <a href="/teacher/course/{{id}}/detail" class="btn btn-action btn-action-details">
+                  <i class="bi bi-eye me-1"></i> Details
+                </a>
+                <a href="/teacher/course/{{id}}/edit" class="btn btn-action btn-action-edit">
+                  <i class="bi bi-pencil-square me-1"></i> Edit
+                </a>
+                <form method="POST" action="/teacher/course/{{id}}/delete" class="d-inline"
+                  onsubmit="return confirm('Are you sure you want to delete this course?');">
+                  <button type="submit" class="btn btn-action btn-action-delete">
+                    <i class="bi bi-trash me-1"></i> Delete
+                  </button>
+                </form>
+              </div>
+            </td>
+
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   {{else}}
-  <div class="alert alert-info text-center mt-4" role="alert">
-    You haven't created any courses yet.
-    <a href="/teacher/course/add" class="alert-link">Create one now!</a>
+  <div class="alert d-flex align-items-center justify-content-between mt-4 border-0 shadow-sm"
+    style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff;">
+    <div class="d-flex align-items-center">
+      <i class="bi bi-info-circle-fill fs-4 me-2"></i>
+      <div>
+        <div class="fw-semibold">You haven't created any courses yet.</div>
+        <small class="opacity-75">Start by creating your first course now.</small>
+      </div>
+    </div>
+    <a href="/teacher/course/add" class="btn btn-light btn-sm">
+      <i class="bi bi-plus-circle me-1"></i> Create one now
+    </a>
   </div>
   {{/if}}
 </div>
+
+<style>
+  .btn-brand {
+    background-color: #160438;
+    color: #fff;
+    border-color: #160438;
+  }
+
+  .btn-brand:hover {
+    background-color: #2d0a5e;
+    border-color: #2d0a5e;
+    color: #fff;
+  }
+
+  .btn-brand:focus {
+    box-shadow: 0 0 0 .2rem rgba(22, 4, 56, .25);
+  }
+
+  .table-row-hover {
+    transition: background-color .15s ease;
+  }
+
+  .table-row-hover:hover {
+    background-color: #faf7ff;
+  }
+
+  .action-group .btn-action {
+    min-width: 96px;
+    font-weight: 500;
+  }
+
+  .btn-action-details {
+    color: #160438;
+    border: 1px solid #d8cdf3;
+    background: #f3f0ff;
+  }
+
+  .btn-action-details:hover {
+    color: #fff;
+    background: #160438;
+    border-color: #160438;
+  }
+
+  .btn-action-edit {
+    color: #2d0a5e;
+    border: 1px solid #e5d9ff;
+    background: #efe9ff;
+  }
+
+  .btn-action-edit:hover {
+    color: #fff;
+    background: #2d0a5e;
+    border-color: #2d0a5e;
+  }
+
+  .btn-action-delete {
+    color: #a52834;
+    border: 1px solid #f3c2c7;
+    background: #fdecef;
+  }
+
+  .btn-action-delete:hover {
+    color: #fff;
+    background: #a52834;
+    border-color: #a52834;
+  }
+
+  thead.sticky-top th {
+    box-shadow: 0 2px 0 rgba(0, 0, 0, .04);
+  }
+</style>

@@ -14,157 +14,189 @@
     <div class="row">
         <!-- Sidebar -->
         <div class="col-lg-3 mb-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> Account</h6>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header text-white border-0" style="background-color: #160438;">
+                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> Account Settings</h6>
                 </div>
                 <div class="list-group list-group-flush">
-                    <a href="/account/profile" class="list-group-item list-group-item-action active">
-                        <i class="bi bi-person-gear"></i> Personal information
+                    <a href="/account/profile" class="list-group-item list-group-item-action active border-0"
+                        style="background-color: #667eea;">
+                        <i class="bi bi-person-gear me-2"></i> Personal Information
                     </a>
-                    <a href="/account/change-password" class="list-group-item list-group-item-action">
-                        <i class="bi bi-shield-lock"></i> Change password
+                    <a href="/account/change-password" class="list-group-item list-group-item-action border-0">
+                        <i class="bi bi-shield-lock me-2"></i> Change Password
                     </a>
                     {{!-- CHỈ hiển thị cho học viên --}}
                     {{#if (eq user.role 'student')}}
-                    <a href="/student/watchlist" class="list-group-item list-group-item-action">
-                        <i class="bi bi-bookmark-heart"></i> Favorite Courses
-                        <span class="badge bg-primary rounded-pill float-end">{{stats.watchlists}}</span>
+                    <a href="/student/watchlist" class="list-group-item list-group-item-action border-0">
+                        <i class="bi bi-heart me-2"></i> Favorite Courses
+                        <span class="badge rounded-pill float-end"
+                            style="background-color: #764ba2;">{{stats.watchlists}}</span>
                     </a>
-                    <a href="/account/my-courses" class="list-group-item list-group-item-action">
-                        <i class="bi bi-collection-play"></i> My courses
-                        <span class="badge bg-primary rounded-pill float-end">{{stats.enrollments}}</span>
+                    <a href="/account/my-courses" class="list-group-item list-group-item-action border-0">
+                        <i class="bi bi-collection-play me-2"></i> My Courses
+                        <span class="badge rounded-pill float-end"
+                            style="background-color: #764ba2;">{{stats.enrollments}}</span>
                     </a>
                     {{/if}}
 
-                    <form action="/account/logout" method="post" class="list-group-item">
+                    <form action="/account/logout" method="post" class="list-group-item border-0">
                         <button type="submit" class="btn btn-link text-danger p-0 border-0 text-start w-100">
-                            <i class="bi bi-box-arrow-right"></i> Log out
+                            <i class="bi bi-box-arrow-right me-2"></i> Log Out
                         </button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Header card -->
+        <!-- Main Content -->
         <div class="col-lg-9">
-            <div class="card mb-4">
-                <div class="card-body text-center">
+            <!-- Header Card -->
+            <div class="card mb-4 border-0 shadow-sm"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body text-center text-white py-4">
                     <div class="mb-3">
                         {{#if me.profile_picture_url}}
-                        <img src="{{me.profile_picture_url}}" class="rounded-circle"
-                            style="width:96px;height:96px;object-fit:cover;" alt="avatar">
+                        <img src="{{me.profile_picture_url}}" class="rounded-circle border border-3 border-white shadow"
+                            style="width:100px;height:100px;object-fit:cover;" alt="avatar">
                         {{else}}
-                        <i class="bi bi-person-circle" style="font-size:4rem;color:#6c757d;"></i>
+                        <div class="rounded-circle border border-3 border-white d-inline-flex align-items-center justify-content-center bg-white"
+                            style="width:100px;height:100px;">
+                            <i class="bi bi-person-circle" style="font-size:4.5rem;color:#764ba2;"></i>
+                        </div>
                         {{/if}}
                     </div>
-                    <h3 class="mb-0">Hi, {{me.full_name}}</h3>
-                    <p class="text-muted">{{me.email}}</p>
-                    <small
-                        class="badge {{#if (eq user.role 'admin')}}text-bg-success{{else if (eq user.role 'instructor')}}text-bg-primary{{else}}text-bg-secondary{{/if}}">
+                    <h3 class="mb-1 fw-bold">Hi, {{me.full_name}}</h3>
+                    <p class="mb-2 opacity-75">{{me.email}}</p>
+                    <span
+                        class="badge px-3 py-2 {{#if (eq user.role 'admin')}}bg-success{{else if (eq user.role 'instructor')}}bg-info{{else}}bg-light text-dark{{/if}}">
                         {{#if (eq user.role 'admin')}}Administrator{{else if (eq user.role
                         'instructor')}}Instructor{{else}}Student{{/if}}
-                    </small>
+                    </span>
                 </div>
             </div>
 
             <div class="row">
-                <!-- Profile form -->
+                <!-- Profile Form -->
                 <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-person-gear"></i> Personal info</h5>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 pt-4">
+                            <h5 class="mb-0 fw-bold"><i class="bi bi-person-gear me-2" style="color: #764ba2;"></i>
+                                Personal Information</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-4">
                             <form id="frmProfile" method="post" action="/account/profile">
-                                <div class="mb-3">
-                                    <label class="form-label">Full name</label>
-                                    <input class="form-control" id="txtName" name="full_name" value="{{me.full_name}}"
-                                        required>
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Full Name</label>
+                                    <input class="form-control form-control-lg" id="txtName" name="full_name"
+                                        value="{{me.full_name}}" required>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input class="form-control" id="txtEmail" type="email" name="email"
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Email Address</label>
+                                    <input class="form-control form-control-lg" id="txtEmail" type="email" name="email"
                                         value="{{me.email}}" {{#if (eq me.auth_provider 'google' )}}disabled{{/if}}
                                         required>
                                     {{#if (eq me.auth_provider 'google')}}
-                                    <small class="text-muted d-block mt-1">
-                                        Your email is linked with Google and can’t be changed here.
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="bi bi-info-circle me-1"></i>Your email is linked with Google and
+                                        cannot be changed here.
                                     </small>
                                     {{/if}}
                                 </div>
 
-                                <div class="d-flex gap-2 justify-content-end">
-                                    <button class="btn btn-primary"><i class="bi bi-check2-circle"></i> Save
-                                        changes</button>
-                                    <a class="btn btn-secondary" href="/">Back to Home</a>
+                                <div class="d-flex gap-2 justify-content-end pt-3 border-top">
+                                    <a class="btn btn-outline-secondary" href="/">Back to Home</a>
+                                    <button class="btn text-white" style="background-color: #160438;">
+                                        <i class="bi bi-check2-circle me-1"></i> Save Changes
+                                    </button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
 
-                <!-- Stats & quick actions -->
+                <!-- Stats & Quick Actions -->
                 <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="bi bi-info-circle"></i> Account</h6>
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-white border-0 pt-4">
+                            <h6 class="mb-0 fw-bold"><i class="bi bi-info-circle me-2" style="color: #764ba2;"></i>
+                                Account Details</h6>
                         </div>
                         <div class="card-body">
-                            <div class="mb-2">
-                                <small class="text-muted">User ID</small>
-                                <div class="fw-semibold text-break">{{me.id}}</div>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <small class="text-muted d-block mb-1">User ID</small>
+                                <div class="fw-semibold text-break small">{{me.id}}</div>
                             </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Account type</small>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <small class="text-muted d-block mb-1">Account Type</small>
                                 <div>
                                     <span
-                                        class="badge {{#if (eq user.role 'admin')}}text-bg-success{{else if (eq user.role 'instructor')}}text-bg-primary{{else}}text-bg-secondary{{/if}}">
+                                        class="badge {{#if (eq user.role 'admin')}}bg-success{{else if (eq user.role 'instructor')}}bg-info{{else}}bg-secondary{{/if}}">
                                         {{#if (eq user.role 'admin')}}Admin{{else if (eq user.role
                                         'instructor')}}Instructor{{else}}Student{{/if}}
                                     </span>
                                 </div>
                             </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Joined</small>
-                                <div>{{me.created_at}}</div>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <small class="text-muted d-block mb-1">Joined</small>
+                                <div class="small">{{me.created_at}}</div>
                             </div>
                             {{#if (eq user.role 'student')}}
-                            <div class="mb-2">
-                                <small class="text-muted">Enrolled</small>
-                                <div><span class="badge text-bg-dark">{{stats.enrollments}}</span> courses</div>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <small class="text-muted d-block mb-1">Enrolled</small>
+                                <div><span class="badge" style="background-color: #764ba2;">{{stats.enrollments}}</span>
+                                    courses</div>
                             </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Watchlist</small>
-                                <div><span class="badge text-bg-dark">{{stats.watchlists}}</span> courses</div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block mb-1">Watchlist</small>
+                                <div><span class="badge" style="background-color: #764ba2;">{{stats.watchlists}}</span>
+                                    courses</div>
                             </div>
                             {{/if}}
-
                         </div>
                     </div>
 
-                    <div class="card mt-3">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="bi bi-lightning"></i> Quick actions</h6>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 pt-4">
+                            <h6 class="mb-0 fw-bold"><i class="bi bi-lightning-fill me-2" style="color: #764ba2;"></i>
+                                Quick Actions</h6>
                         </div>
                         <div class="card-body">
                             <div class="d-grid gap-2">
-                                <a href="/categories/1" class="btn btn-outline-primary btn-sm"><i
-                                        class="bi bi-collection"></i> Courses</a>
+                                <a href="/categories/1" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-collection me-1"></i> Courses
+                                </a>
                                 <form action="/account/logout" method="post" class="d-inline">
-                                    <button class="btn btn-outline-danger btn-sm w-100"><i
-                                            class="bi bi-box-arrow-right"></i> Sign out</button>
+                                    <button class="btn btn-outline-danger btn-sm w-100">
+                                        <i class="bi bi-box-arrow-right me-1"></i> Sign Out
+                                    </button>
                                 </form>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .list-group-item-action:hover {
+        background-color: rgba(118, 75, 162, 0.05);
+        border-left: 3px solid #764ba2 !important;
+    }
+
+    .btn[style*="background-color: #160438"]:hover {
+        background-color: #2d0a5e !important;
+        transform: translateY(-1px);
+        transition: all 0.3s ease;
+    }
+
+    .card {
+        transition: box-shadow 0.2s ease;
+    }
+</style>
 
 <script>
     document.querySelector('#frmProfile')?.addEventListener('submit', (e) => {
