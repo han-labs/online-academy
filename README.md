@@ -58,16 +58,6 @@ A full-stack web application for online learning (Udemy-style). Students can bro
 
 ---
 
-## 🛠 Tech Stack
-
-**Backend:** Node.js (≥18), Express 4.18, Express Session  
-**View Engine:** Handlebars  
-**Database:** PostgreSQL (Supabase), Full-Text Search (FTS)  
-**Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5, Plyr (video), TinyMCE/CKEditor  
-**Auth & Security:** bcrypt (password hashing), JWT, OTP Email verification
-
----
-
 ## 📦 Setup
 
 ### 1) Clone
@@ -120,6 +110,16 @@ main/master    → Production-ready
 develop        → Integration branch
 feature/*      → Per feature/task
 ```
+
+---
+
+## 🛠 Tech Stack
+
+**Backend:** Node.js (≥18), Express 4.18, Express Session  
+**View Engine:** Handlebars  
+**Database:** PostgreSQL (Supabase), Full-Text Search (FTS)  
+**Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5, Plyr (video), TinyMCE/CKEditor  
+**Auth & Security:** bcrypt (password hashing), JWT, OTP Email verification
 
 ---
 
