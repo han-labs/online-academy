@@ -5,6 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-336791.svg)](https://supabase.com/)
 
 A full-stack web application for online learning (Udemy-style). Students can browse and enroll in courses, instructors can create and manage content, and admins oversee catalog and users.
+Demo: https://online-academy-2p87.onrender.com
 
 - **Course:** Web Programming  
 - **Class Code:** 251WEPR330479E_01FIE  
