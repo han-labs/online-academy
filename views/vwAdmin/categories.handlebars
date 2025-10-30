@@ -27,13 +27,13 @@
     <div class="card-body">
       <div class="table-responsive">
         <table class="table align-middle table-hover">
-          <thead class="table-light">
-            <tr>
+          <thead class="table-dark">
+            <tr class="text-center">
               <th>ID</th>
               <th>Category Name</th>
               <th>Type</th>
               <th>Parent Category</th>
-              <th class="text-center">Actions</th>
+              <th>Actions</th>
             </tr>
           </thead>
 
@@ -43,7 +43,7 @@
               <td>{{id}}</td>
               <td class="fw-semibold">{{name}}</td>
 
-              <td>
+              <td class="text-center">
                 {{#if (eq parent_id null)}}
                 <span class="badge bg-primary">Main Category</span>
                 {{else}}
@@ -51,23 +51,26 @@
                 {{/if}}
               </td>
 
-              <td>{{#if parent_id}}{{parent_id}}{{else}}—{{/if}}</td>
+              <td class="text-center">{{#if parent_id}}{{parent_id}}{{else}}—{{/if}}</td>
 
               <td class="text-center">
                 <div class="d-flex justify-content-center gap-2">
 
-                  <a href="/admin/categories/detail/{{id}}" class="btn btn-sm btn-outline-info" title="View Details">
+                  <a href="/admin/categories/detail/{{id}}" class="btn btn-sm btn-outline-primary" title="View Details">
                     <i class="bi bi-eye"></i>
+                    View
                   </a>
 
-                  <a href="/admin/categories/edit/{{id}}" class="btn btn-sm btn-outline-warning" title="Edit">
+                  <a href="/admin/categories/edit/{{id}}" class="btn btn-sm btn-warning" title="Edit">
                     <i class="bi bi-pencil"></i>
+                    Edit
                   </a>
 
                   <form class="frmDeleteCategory d-inline" data-category-id="{{id}}" data-category-name="{{name}}"
                     action="/admin/categories/delete/{{id}}" method="POST">
-                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                    <button type="submit" class="btn btn-sm btn-danger" title="Delete">
                       <i class="bi bi-trash"></i>
+                      Delete
                     </button>
                   </form>
 
