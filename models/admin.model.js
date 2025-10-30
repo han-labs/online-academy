@@ -482,6 +482,7 @@ export default {
           "full_name",
           "email",
           "role",
+          "is_active",
           "created_at",
           "profile_picture_url"
         )
@@ -500,6 +501,7 @@ export default {
           "full_name",
           "email",
           "role",
+          "is_active",
           "profile_picture_url",
           "instructor_bio",
           "created_at"
@@ -516,16 +518,14 @@ export default {
     try {
       return await knex("users").where({ email }).first();
     } catch (error) {
-      console.error("Get user by email error:", error);
+      console.error("Find by email error:", error);
       return null;
     }
   },
 
-  async add(user) {
+  async add(userData) {
     try {
-      const [newUser] = await knex("users")
-        .insert(user)
-        .returning(["id", "full_name", "email", "role", "created_at"]);
+      const [newUser] = await knex("users").insert(userData).returning("*");
       return newUser;
     } catch (error) {
       console.error("Add user error:", error);
@@ -533,10 +533,10 @@ export default {
     }
   },
 
-  async patch(id, user) {
+  async patch(id, userData) {
     try {
-      await knex("users").where({ id }).update(user);
-      return this.findById(id);
+      await knex("users").where({ id }).update(userData);
+      return await this.findById(id);
     } catch (error) {
       console.error("Patch user error:", error);
       throw error;
@@ -552,10 +552,27 @@ export default {
     }
   },
 
+  async toggleUserStatus(id, is_active) {
+    try {
+      await knex("users").where({ id }).update({ is_active });
+      return await this.findById(id);
+    } catch (error) {
+      console.error("Toggle user status error:", error);
+      throw error;
+    }
+  },
+
+  async deactivateUser(id) {
+    return await this.toggleUserStatus(id, false);
+  },
+
+  async activateUser(id) {
+    return await this.toggleUserStatus(id, true);
+  },
+
   async getCoursesByInstructor(instructorId) {
     try {
       return await knex("courses")
-        .select("id", "title", "status", "price", "created_at")
         .where({ instructor_id: instructorId })
         .orderBy("created_at", "desc");
     } catch (error) {
@@ -564,23 +581,52 @@ export default {
     }
   },
 
-  async getEnrolledCourses(userId) {
+  async getEnrolledCourses(studentId) {
     try {
       return await knex("enrollments")
-        .select(
-          "courses.id",
-          "courses.title",
-          "courses.price",
-          "enrollments.enrolled_at",
-          "users.full_name as instructor_name"
-        )
+        .select("courses.*", "users.full_name as instructor_name")
         .leftJoin("courses", "enrollments.course_id", "courses.id")
         .leftJoin("users", "courses.instructor_id", "users.id")
-        .where("enrollments.user_id", userId)
+        .where("enrollments.student_id", studentId)
         .orderBy("enrollments.enrolled_at", "desc");
     } catch (error) {
       console.error("Get enrolled courses error:", error);
       return [];
+    }
+  },
+
+  async getUserImpactAnalysis(userId) {
+    try {
+      const user = await this.findById(userId);
+      if (!user) return null;
+
+      let impact = {
+        user,
+        courses: [],
+        enrollments: 0,
+        reviews: 0,
+      };
+
+      if (user.role === "instructor") {
+        impact.courses = await this.getCoursesByInstructor(userId);
+      }
+
+      const enrollmentCount = await knex("enrollments")
+        .where({ user_id: userId })
+        .count("user_id as count")
+        .first();
+      impact.enrollments = parseInt(enrollmentCount?.count || 0);
+
+      const reviewCount = await knex("reviews")
+        .where({ user_id: userId })
+        .count("id as count")
+        .first();
+      impact.reviews = parseInt(reviewCount?.count || 0);
+
+      return impact;
+    } catch (error) {
+      console.error("Get user impact analysis error:", error);
+      return null;
     }
   },
 };

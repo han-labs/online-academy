@@ -774,4 +774,112 @@ router.post("/users/delete", async (req, res) => {
   }
 });
 
+// Toggle user status (activate/deactivate)
+router.post("/users/toggle-status", async (req, res) => {
+  try {
+    const { id, action } = req.body; // action: 'activate' or 'deactivate'
+
+    if (!id || !action) {
+      return res.status(400).json({
+        success: false,
+        message: "Thiếu thông tin bắt buộc",
+      });
+    }
+
+    let user;
+    if (action === "deactivate") {
+      user = await adminModel.deactivateUser(id); // SỬA: gọi deactivateUser
+    } else if (action === "activate") {
+      user = await adminModel.activateUser(id); // SỬA: gọi activateUser
+    }
+
+    res.json({
+      success: true,
+      message: `Đã ${
+        action === "deactivate" ? "khóa" : "mở khóa"
+      } tài khoản thành công`,
+      user,
+    });
+  } catch (err) {
+    console.error("Toggle user status error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi thay đổi trạng thái tài khoản",
+    });
+  }
+});
+
+// Get user impact analysis before deactivation
+router.get("/users/:id/impact-analysis", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const impact = await adminModel.getUserImpactAnalysis(userId);
+
+    if (!impact) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy người dùng",
+      });
+    }
+
+    res.json({
+      success: true,
+      impact,
+    });
+  } catch (err) {
+    console.error("Get user impact analysis error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi phân tích ảnh hưởng",
+    });
+  }
+});
+
+// Bulk user actions
+router.post("/users/bulk-actions", async (req, res) => {
+  try {
+    const { userIds, action } = req.body;
+
+    if (!userIds || !Array.isArray(userIds) || !action) {
+      return res.status(400).json({
+        success: false,
+        message: "Dữ liệu không hợp lệ",
+      });
+    }
+
+    const results = [];
+    for (const userId of userIds) {
+      try {
+        let user;
+        if (action === "deactivate") {
+          user = await adminModel.deactivateUser(userId);
+        } else if (action === "activate") {
+          user = await adminModel.activateUser(userId);
+        } else if (action === "delete") {
+          await adminModel.del(userId);
+          user = { id: userId, deleted: true };
+        }
+        results.push({ userId, success: true, user });
+      } catch (error) {
+        results.push({ userId, success: false, error: error.message });
+      }
+    }
+
+    const successCount = results.filter((r) => r.success).length;
+    const failCount = results.filter((r) => !r.success).length;
+
+    res.json({
+      success: true,
+      message: `Đã xử lý ${successCount} tài khoản thành công, ${failCount} thất bại`,
+      results,
+    });
+  } catch (err) {
+    console.error("Bulk user actions error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi xử lý hàng loạt",
+    });
+  }
+});
+
 export default router;

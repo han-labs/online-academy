@@ -77,6 +77,7 @@
                 <th>Full Name</th>
                 <th>Email</th>
                 <th>Created Date</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -88,6 +89,11 @@
                 <td>{{this.full_name}}</td>
                 <td>{{this.email}}</td>
                 <td class="text-center">{{formatDate this.created_at}}</td>
+                <td class="text-center">
+                  <span class="badge {{#if this.is_active}}bg-success{{else}}bg-secondary{{/if}}">
+                    {{#if this.is_active}}Active{{else}}Locked{{/if}}
+                  </span>
+                </td>
                 <td class="text-center">
                   <div class="d-flex gap-2 justify-content-center">
                     <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
@@ -104,6 +110,19 @@
                         <i class="bi bi-trash"></i> Delete
                       </button>
                     </form>
+                    {{#if this.is_active}}
+                    <button class="btn btn-sm btn-warning btn-lock-user" 
+                            data-user-id="{{this.id}}" 
+                            data-user-name="{{this.full_name}}">
+                      <i class="bi bi-lock"></i> Lock
+                    </button>
+                    {{else}}
+                    <button class="btn btn-sm btn-success btn-unlock-user" 
+                            data-user-id="{{this.id}}" 
+                            data-user-name="{{this.full_name}}">
+                      <i class="bi bi-unlock"></i> Unlock
+                    </button>
+                    {{/if}}
                   </div>
                 </td>
               </tr>
@@ -124,6 +143,7 @@
                 <th>Full Name</th>
                 <th>Email</th>
                 <th>Created Date</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -135,6 +155,11 @@
                 <td>{{this.full_name}}</td>
                 <td>{{this.email}}</td>
                 <td class="text-center">{{formatDate this.created_at}}</td>
+                <td class="text-center">
+                  <span class="badge {{#if this.is_active}}bg-success{{else}}bg-secondary{{/if}}">
+                    {{#if this.is_active}}Active{{else}}Locked{{/if}}
+                  </span>
+                </td>
                 <td class="text-center">
                   <div class="d-flex gap-2 justify-content-center">
                     <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
@@ -151,6 +176,19 @@
                         <i class="bi bi-trash"></i> Delete
                       </button>
                     </form>
+                    {{#if this.is_active}}
+                    <button class="btn btn-sm btn-warning btn-lock-user" 
+                            data-user-id="{{this.id}}" 
+                            data-user-name="{{this.full_name}}">
+                      <i class="bi bi-lock"></i> Lock
+                    </button>
+                    {{else}}
+                    <button class="btn btn-sm btn-success btn-unlock-user" 
+                            data-user-id="{{this.id}}" 
+                            data-user-name="{{this.full_name}}">
+                      <i class="bi bi-unlock"></i> Unlock
+                    </button>
+                    {{/if}}
                   </div>
                 </td>
               </tr>
@@ -172,6 +210,7 @@
                 <th>Email</th>
                 <th>Role</th>
                 <th>Created Date</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -189,6 +228,11 @@
                 </td>
                 <td class="text-center">{{formatDate this.created_at}}</td>
                 <td class="text-center">
+                  <span class="badge {{#if this.is_active}}bg-success{{else}}bg-secondary{{/if}}">
+                    {{#if this.is_active}}Active{{else}}Locked{{/if}}
+                  </span>
+                </td>
+                <td class="text-center">
                   <div class="d-flex gap-2 justify-content-center">
                     <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
                       <i class="bi bi-eye"></i> View
@@ -204,6 +248,19 @@
                         <i class="bi bi-trash"></i> Delete
                       </button>
                     </form>
+                    {{#if this.is_active}}
+                    <button class="btn btn-sm btn-warning btn-lock-user" 
+                            data-user-id="{{this.id}}" 
+                            data-user-name="{{this.full_name}}">
+                      <i class="bi bi-lock"></i> Lock
+                    </button>
+                    {{else}}
+                    <button class="btn btn-sm btn-success btn-unlock-user" 
+                            data-user-id="{{this.id}}" 
+                            data-user-name="{{this.full_name}}">
+                      <i class="bi bi-unlock"></i> Unlock
+                    </button>
+                    {{/if}}
                   </div>
                 </td>
               </tr>
@@ -269,6 +326,26 @@
 </div>
 {{/each}}
 
+<!-- Lock User Confirmation Modal -->
+<div class="modal fade" id="lockUserModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Lock User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to lock user account: <strong id="lockUserName"></strong>?</p>
+        <div id="lockImpactAnalysis" class="alert alert-warning d-none"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-warning" id="confirmLockUser">Lock Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   // Validate password on create
   document.querySelector('#frmCreateInstructor')?.addEventListener('submit', function (e) {
@@ -303,6 +380,117 @@
     setTimeout(renumberAllTables, 200);
     document.querySelectorAll('#userTabs a').forEach(tab => {
       tab.addEventListener('shown.bs.tab', renumberAllTables);
+    });
+  });
+  // User Lock/Unlock functionality
+  let currentLockUserId = null;
+
+  // Lock user button handler
+  document.querySelectorAll('.btn-lock-user').forEach(btn => {
+    btn.addEventListener('click', async function() {
+      const userId = this.dataset.userId;
+      const userName = this.dataset.userName;
+      
+      currentLockUserId = userId;
+      document.getElementById('lockUserName').textContent = userName;
+      
+      // Show impact analysis
+      try {
+        const response = await fetch(`/admin/users/${userId}/impact-analysis`);
+        const result = await response.json();
+        
+        const impactDiv = document.getElementById('lockImpactAnalysis');
+        if (result.success && result.impact) {
+          const impact = result.impact;
+          let impactHtml = '<strong>Impact when locking:</strong><ul>';
+          
+          if (impact.user.role === 'instructor' && impact.courses.length > 0) {
+            impactHtml += `<li>${impact.courses.length} courses will be affected</li>`;
+          }
+          if (impact.enrollments > 0) {
+            impactHtml += `<li>${impact.enrollments} enrollments</li>`;
+          }
+          if (impact.reviews > 0) {
+            impactHtml += `<li>${impact.reviews} reviews</li>`;
+          }
+          
+          impactHtml += '</ul>';
+          impactDiv.innerHTML = impactHtml;
+          impactDiv.classList.remove('d-none');
+        } else {
+          impactDiv.classList.add('d-none');
+        }
+      } catch (error) {
+        console.error('Error fetching impact analysis:', error);
+      }
+      
+      // Show modal
+      new bootstrap.Modal(document.getElementById('lockUserModal')).show();
+    });
+  });
+
+  // Confirm lock user
+  document.getElementById('confirmLockUser').addEventListener('click', async function() {
+  if (!currentLockUserId) return;
+  
+  try {
+    const response = await fetch('/admin/users/toggle-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: currentLockUserId,
+        action: 'deactivate'
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      // Đóng modal và reload trang
+      bootstrap.Modal.getInstance(document.getElementById('lockUserModal')).hide();
+      location.reload();
+    } else {
+      alert('Error: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error locking user:', error);
+    alert('Error locking user account');
+  }
+});
+
+  // Unlock user button handler
+  document.querySelectorAll('.btn-unlock-user').forEach(btn => {
+    btn.addEventListener('click', async function() {
+      const userId = this.dataset.userId;
+      const userName = this.dataset.userName;
+      
+      if (confirm(`Are you sure you want to unlock user account: ${userName}?`)) {
+        try {
+          const response = await fetch('/admin/users/toggle-status', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: userId,
+              action: 'activate'
+            })
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            location.reload();
+          } else {
+            alert('Error: ' + result.message);
+          }
+        } catch (error) {
+          console.error('Error unlocking user:', error);
+          alert('Error unlocking user account');
+        }
+      }
     });
   });
 </script>

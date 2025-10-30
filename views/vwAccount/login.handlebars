@@ -9,14 +9,21 @@
             </div>
 
             {{#if error}}
-            <div class="alert alert-danger alert-custom" role="alert">
-                <i class="bi bi-exclamation-circle"></i> {{error}}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error:</strong> {{error}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
             {{/if}}
 
-            {{#if success}}
-            <div class="alert alert-success alert-custom" role="alert">
-                <i class="bi bi-check-circle"></i> {{success}}
+            {{#if query.error}}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error:</strong> 
+            {{#if (eq query.error 'Account locked')}}
+            Your account has been locked. Please contact administrator.
+            {{else}}
+            {{query.error}}
+            {{/if}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
             {{/if}}
 
