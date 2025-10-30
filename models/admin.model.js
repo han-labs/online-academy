@@ -5,7 +5,6 @@ export default {
   /* ---------- DASHBOARD STATS ---------- */
   async getDashboardStats() {
     try {
-      // Sửa lại cú pháp count
       const total_students = await knex("users")
         .where({ role: "student" })
         .count("id as count")
@@ -20,7 +19,6 @@ export default {
 
       const total_users = await knex("users").count("id as count").first();
 
-      // Tính doanh thu từ các khóa học đã bán (giả sử)
       const revenueResult = await knex("courses")
         .sum("price as total_revenue")
         .first();
@@ -85,29 +83,22 @@ export default {
         parent_id: categoryData.parent_id || null,
       });
 
-      console.log("Insert result:", result);
-
-      // Lấy category mới nhất (vừa được tạo)
       const newCategory = await knex("categories")
         .where({ name: categoryData.name })
         .orderBy("id", "desc")
         .first();
 
-      console.log("New category created:", newCategory);
       return newCategory;
     } catch (error) {
       console.error("Add category error:", error);
 
-      // Xử lý các loại lỗi
       if (error.code === "23505") {
         if (error.constraint === "categories_pkey") {
-          // Lỗi sequence - cần reset
-          const err = new Error("Lỗi hệ thống. Vui lòng thử lại.");
+          const err = new Error("System error. Please try again.");
           err.code = "SEQUENCE_ERROR";
           throw err;
         } else if (error.constraint === "categories_name_unique") {
-          // Lỗi trùng tên
-          const err = new Error("Tên lĩnh vực đã tồn tại");
+          const err = new Error("Category name already exists");
           err.code = "CATEGORY_NAME_EXISTS";
           throw err;
         }
@@ -131,65 +122,55 @@ export default {
 
   async delCategory(id) {
     try {
-      // Chuyển đổi id sang number để đảm bảo so sánh đúng
       const categoryId = parseInt(id, 10);
 
-      // Kiểm tra xem category có tồn tại không
       const category = await knex("categories")
         .where({ id: categoryId })
         .first();
       if (!category) {
-        const err = new Error("Không tìm thấy lĩnh vực để xóa");
+        const err = new Error("Category not found");
         err.code = "CATEGORY_NOT_FOUND";
         throw err;
       }
 
-      // Kiểm tra xem có khóa học nào thuộc category này không
       const courseCount = await knex("courses")
         .where({ category_id: categoryId })
         .count("id as cnt")
         .first();
 
-      // Sửa lỗi: truy cập đúng property từ kết quả count
       const courseCountValue = parseInt(
         courseCount.cnt || courseCount.count || 0,
         10
       );
 
       if (courseCountValue > 0) {
-        const err = new Error("Không thể xóa: lĩnh vực này đã có khoá học.");
+        const err = new Error("Cannot delete: category has courses");
         err.code = "CATEGORY_HAS_COURSES";
         throw err;
       }
 
-      // Kiểm tra xem có lĩnh vực con nào không
       const childrenCount = await knex("categories")
         .where({ parent_id: categoryId })
         .count("id as cnt")
         .first();
 
-      // Sửa lỗi: truy cập đúng property từ kết quả count
       const childrenCountValue = parseInt(
         childrenCount.cnt || childrenCount.count || 0,
         10
       );
 
       if (childrenCountValue > 0) {
-        const err = new Error(
-          "Không thể xóa: lĩnh vực này có lĩnh vực con. Vui lòng xóa hoặc di chuyển các lĩnh vực con trước."
-        );
+        const err = new Error("Cannot delete: category has subcategories");
         err.code = "CATEGORY_HAS_CHILDREN";
         throw err;
       }
 
-      // Thực hiện xóa
       const result = await knex("categories").where({ id: categoryId }).del();
 
       return result;
     } catch (error) {
       console.error("Delete category error:", error);
 
-      // Nếu lỗi đã có code thì giữ nguyên, không thì thêm code mặc định
       if (!error.code) {
         error.code = "DELETE_CATEGORY_ERROR";
       }
@@ -203,19 +184,16 @@ export default {
       const category = await knex("categories").where({ id }).first();
       if (!category) return null;
 
-      // Lấy số lượng khóa học
       const courseCount = await knex("courses")
         .where({ category_id: id })
         .count("id as cnt")
         .first();
 
-      // Lấy số lượng lĩnh vực con
       const childrenCount = await knex("categories")
         .where({ parent_id: id })
         .count("id as cnt")
         .first();
 
-      // Lấy danh sách lĩnh vực con
       const children = await knex("categories")
         .select("id", "name")
         .where({ parent_id: id })
@@ -239,7 +217,6 @@ export default {
         .select("id", "name", "parent_id")
         .orderBy("name", "asc");
 
-      // Phân loại thành categories cha và con
       const parentCategories = allCategories.filter((cat) => !cat.parent_id);
       const childCategories = allCategories.filter((cat) => cat.parent_id);
 
@@ -295,25 +272,21 @@ export default {
       const course = await this.findCourseById(id);
       if (!course) return null;
 
-      // Lấy danh sách chapters
       const chapters = await knex("chapters")
         .where({ course_id: id })
         .orderBy("chapter_order", "asc");
 
-      // Lấy danh sách lectures cho mỗi chapter
       for (let chapter of chapters) {
         chapter.lectures = await knex("lectures")
           .where({ chapter_id: chapter.id })
           .orderBy("lecture_order", "asc");
       }
 
-      // Lấy thông tin enrollments count
       const enrollmentCount = await knex("enrollments")
         .where({ course_id: id })
         .count("user_id as count")
         .first();
 
-      // Lấy thông tin reviews
       const reviews = await knex("reviews")
         .select("reviews.*", "users.full_name")
         .leftJoin("users", "reviews.user_id", "users.id")
@@ -334,16 +307,12 @@ export default {
 
   async addCourse(courseData) {
     try {
-      console.log("Creating course with data:", courseData);
-
-      // Kiểm tra dữ liệu đầu vào
       if (!courseData.title || !courseData.instructor_id) {
-        const err = new Error("Tiêu đề và giảng viên là bắt buộc");
+        const err = new Error("Title and instructor are required");
         err.code = "MISSING_REQUIRED_FIELDS";
         throw err;
       }
 
-      // Chuẩn bị dữ liệu insert
       const insertData = {
         title: courseData.title.trim(),
         short_description: courseData.short_description?.trim() || "",
@@ -361,48 +330,39 @@ export default {
         last_updated: new Date(),
       };
 
-      console.log("Insert data:", insertData);
-
-      // Thử insert với returning, nếu lỗi thì thử không returning
       let newCourse;
       try {
         [newCourse] = await knex("courses").insert(insertData).returning("*");
       } catch (returningError) {
-        console.log("Returning not supported, trying without returning...");
         await knex("courses").insert(insertData);
 
-        // Lấy course mới nhất
         newCourse = await knex("courses")
           .where({ title: insertData.title })
           .orderBy("id", "desc")
           .first();
       }
 
-      console.log("Course created successfully:", newCourse);
       return newCourse;
     } catch (error) {
       console.error("Add course error details:", error);
 
-      // Xử lý lỗi cụ thể
       if (error.code === "23503") {
-        // Foreign key violation
         if (error.constraint && error.constraint.includes("instructor_id")) {
-          const err = new Error("Giảng viên không tồn tại");
+          const err = new Error("Instructor not found");
           err.code = "INSTRUCTOR_NOT_FOUND";
           throw err;
         } else if (
           error.constraint &&
           error.constraint.includes("category_id")
         ) {
-          const err = new Error("Lĩnh vực không tồn tại");
+          const err = new Error("Category not found");
           err.code = "CATEGORY_NOT_FOUND";
           throw err;
         }
       }
 
       if (error.code === "23505") {
-        // Unique violation
-        const err = new Error("Tiêu đề khóa học đã tồn tại");
+        const err = new Error("Course title already exists");
         err.code = "COURSE_TITLE_EXISTS";
         throw err;
       }
@@ -436,7 +396,6 @@ export default {
           throw err;
         }
 
-        // Delete lectures & chapters explicitly
         const chapterIds = await trx("chapters")
           .where({ course_id: id })
           .pluck("id");
@@ -446,12 +405,10 @@ export default {
           await trx("chapters").whereIn("id", chapterIds).del();
         }
 
-        // delete enrollments, reviews, watchlists
         await trx("enrollments").where({ course_id: id }).del();
         await trx("reviews").where({ course_id: id }).del();
         await trx("watchlists").where({ course_id: id }).del();
 
-        // finally delete course
         await trx("courses").where({ id }).del();
         return true;
       });
@@ -469,6 +426,57 @@ export default {
         .orderBy("full_name", "asc");
     } catch (error) {
       console.error("Find all instructors error:", error);
+      return [];
+    }
+  },
+
+  async getCourseFiltersData() {
+    try {
+      const [categories, instructors] = await Promise.all([
+        knex("categories").select("id", "name").orderBy("name", "asc"),
+        knex("users")
+          .select("id", "full_name")
+          .where("role", "instructor")
+          .orderBy("full_name", "asc"),
+      ]);
+
+      return {
+        categories: categories || [],
+        instructors: instructors || [],
+      };
+    } catch (error) {
+      console.error("Get course filters data error:", error);
+      return { categories: [], instructors: [] };
+    }
+  },
+
+  async findAllCoursesWithFilters(filters = {}) {
+    try {
+      let query = knex("courses")
+        .select(
+          "courses.*",
+          "users.full_name as instructor_name",
+          "categories.name as category_name"
+        )
+        .leftJoin("users", "courses.instructor_id", "users.id")
+        .leftJoin("categories", "courses.category_id", "categories.id");
+
+      if (filters.filter_type === "category" && filters.category_id) {
+        query = query.where(
+          "courses.category_id",
+          parseInt(filters.category_id)
+        );
+      } else if (
+        filters.filter_type === "instructor" &&
+        filters.instructor_id
+      ) {
+        query = query.where("courses.instructor_id", filters.instructor_id);
+      }
+
+      const results = await query.orderBy("courses.id", "asc");
+      return results;
+    } catch (error) {
+      console.error("Find all courses with filters error:", error);
       return [];
     }
   },

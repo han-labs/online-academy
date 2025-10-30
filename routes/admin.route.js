@@ -251,7 +251,6 @@ router.post("/categories/delete/:id", async (req, res) => {
   try {
     const categoryId = req.params.id;
 
-    // Validate categoryId
     if (!categoryId || isNaN(categoryId)) {
       throw new Error("Invalid category ID");
     }
@@ -275,7 +274,6 @@ router.post("/categories/delete/:id", async (req, res) => {
 
     let errorMessage = "An error occurred while deleting the category";
 
-    // Handle specific error types
     if (err.code === "CATEGORY_HAS_COURSES") {
       errorMessage = err.message;
     } else if (err.code === "CATEGORY_HAS_CHILDREN") {
@@ -298,10 +296,31 @@ router.post("/categories/delete/:id", async (req, res) => {
 /* ============= COURSE ============= */
 router.get("/courses", async (req, res) => {
   try {
-    const courses = await adminModel.findAllCourses();
+    const { filter_type, category_id, instructor_id } = req.query;
+
+    const filters = {};
+
+    if (filter_type && filter_type !== "none") {
+      filters.filter_type = filter_type;
+
+      if (filter_type === "category" && category_id) {
+        filters.category_id = parseInt(category_id);
+      } else if (filter_type === "instructor" && instructor_id) {
+        filters.instructor_id = instructor_id;
+      }
+    }
+
+    const [courses, filtersData] = await Promise.all([
+      adminModel.findAllCoursesWithFilters(filters),
+      adminModel.getCourseFiltersData(),
+    ]);
+
     res.render("vwAdmin/courses", {
       title: "Course Management",
       courses: courses,
+      filters: filtersData,
+      currentFilters: filters,
+      query: req.query,
     });
   } catch (err) {
     console.error("Courses error:", err);
@@ -309,6 +328,9 @@ router.get("/courses", async (req, res) => {
       title: "Course Management",
       error: true,
       courses: [],
+      filters: { categories: [], instructors: [] },
+      currentFilters: {},
+      query: {},
     });
   }
 });
@@ -319,7 +341,6 @@ router.get("/courses/create", async (req, res) => {
     const instructors = await adminModel.findAllInstructors();
     const categories = await adminModel.findAllCategories();
 
-    // If no instructors, show warning
     if (instructors.length === 0) {
       return res.render("vwAdmin/courseForm", {
         title: "Add New Course",
@@ -367,7 +388,6 @@ router.post(
         category_id,
       } = req.body;
 
-      // Validate data
       if (!title || !title.trim()) {
         const instructors = await adminModel.findAllInstructors();
         const categories = await adminModel.findAllCategories();
@@ -396,7 +416,6 @@ router.post(
         });
       }
 
-      // Process image path
       let image_url = null;
       if (req.file) {
         image_url = "/uploads/courses/" + req.file.filename;
@@ -525,7 +544,6 @@ router.post(
         category_id,
       } = req.body;
 
-      // Process image path
       let updateData = {
         title,
         short_description,
@@ -539,7 +557,6 @@ router.post(
         category_id: category_id ? parseInt(category_id) : null,
       };
 
-      // Only update image_url if there's a new file
       if (req.file) {
         updateData.image_url = "/uploads/courses/" + req.file.filename;
       }
@@ -659,7 +676,6 @@ router.post("/users/create-instructor", async (req, res) => {
   try {
     const { full_name, email, password, instructor_bio } = req.body;
 
-    // Check if email already exists
     const existingUser = await adminModel.findByEmail(email);
     if (existingUser) {
       const users = await adminModel.findAll();
@@ -705,7 +721,6 @@ router.post("/users/update", async (req, res) => {
   try {
     const { id, full_name, email, role, instructor_bio } = req.body;
 
-    // Check if email already exists (excluding current user)
     if (email) {
       const existingUser = await adminModel.findByEmail(email);
       if (existingUser && existingUser.id !== parseInt(id)) {
@@ -724,7 +739,6 @@ router.post("/users/update", async (req, res) => {
       role,
     };
 
-    // Only update instructor_bio if user is instructor
     if (role === "instructor") {
       updateData.instructor_bio = instructor_bio;
     } else {
@@ -777,34 +791,34 @@ router.post("/users/delete", async (req, res) => {
 // Toggle user status (activate/deactivate)
 router.post("/users/toggle-status", async (req, res) => {
   try {
-    const { id, action } = req.body; // action: 'activate' or 'deactivate'
+    const { id, action } = req.body;
 
     if (!id || !action) {
       return res.status(400).json({
         success: false,
-        message: "Thiếu thông tin bắt buộc",
+        message: "Missing required information",
       });
     }
 
     let user;
     if (action === "deactivate") {
-      user = await adminModel.deactivateUser(id); // SỬA: gọi deactivateUser
+      user = await adminModel.deactivateUser(id);
     } else if (action === "activate") {
-      user = await adminModel.activateUser(id); // SỬA: gọi activateUser
+      user = await adminModel.activateUser(id);
     }
 
     res.json({
       success: true,
-      message: `Đã ${
-        action === "deactivate" ? "khóa" : "mở khóa"
-      } tài khoản thành công`,
+      message: `Account ${
+        action === "deactivate" ? "deactivated" : "activated"
+      } successfully`,
       user,
     });
   } catch (err) {
     console.error("Toggle user status error:", err);
     res.status(500).json({
       success: false,
-      message: "Lỗi server khi thay đổi trạng thái tài khoản",
+      message: "Server error while changing account status",
     });
   }
 });
@@ -818,7 +832,7 @@ router.get("/users/:id/impact-analysis", async (req, res) => {
     if (!impact) {
       return res.status(404).json({
         success: false,
-        message: "Không tìm thấy người dùng",
+        message: "User not found",
       });
     }
 
@@ -830,7 +844,7 @@ router.get("/users/:id/impact-analysis", async (req, res) => {
     console.error("Get user impact analysis error:", err);
     res.status(500).json({
       success: false,
-      message: "Lỗi server khi phân tích ảnh hưởng",
+      message: "Server error while analyzing impact",
     });
   }
 });
@@ -843,7 +857,7 @@ router.post("/users/bulk-actions", async (req, res) => {
     if (!userIds || !Array.isArray(userIds) || !action) {
       return res.status(400).json({
         success: false,
-        message: "Dữ liệu không hợp lệ",
+        message: "Invalid data",
       });
     }
 
@@ -870,14 +884,14 @@ router.post("/users/bulk-actions", async (req, res) => {
 
     res.json({
       success: true,
-      message: `Đã xử lý ${successCount} tài khoản thành công, ${failCount} thất bại`,
+      message: `Processed ${successCount} accounts successfully, ${failCount} failed`,
       results,
     });
   } catch (err) {
     console.error("Bulk user actions error:", err);
     res.status(500).json({
       success: false,
-      message: "Lỗi server khi xử lý hàng loạt",
+      message: "Server error while processing bulk actions",
     });
   }
 });
