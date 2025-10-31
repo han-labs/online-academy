@@ -175,20 +175,21 @@
               data-bs-backdrop="static" data-bs-keyboard="false">
               <div class="modal-dialog">
                 <div class="modal-content">
-                  <form action="/teacher/lecture/{{id}}/edit" method="POST" enctype="multipart/form-data">
+                  <form action="/teacher/lecture/{{id}}/edit" method="POST">
                     <div class="modal-header">
                       <h5 class="modal-title">Edit Lecture: {{title}}</h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                       <div class="mb-3">
-                        <label class="fw-semibold">Lecture Name</label>
+                        <label class="fw-semibold">Lecture Name <span class="text-danger">*</span></label>
                         <input type="text" name="title" class="form-control" value="{{title}}" required>
                       </div>
                       <div class="mb-3">
-                        <label class="fw-semibold">New Video (leave blank if no change)</label>
-                        <input type="file" name="video" class="form-control" accept="video/*">
-                        <small class="text-muted">Current video: {{video_url}}</small>
+                        <label class="fw-semibold">Video URL <span class="text-danger">*</span></label>
+                        <input type="text" name="video_url" class="form-control" value="{{video_url}}"
+                          placeholder="https://www.youtube.com/watch?v=..." required>
+                        <small class="text-muted">Support: YouTube, Vimeo, or direct video links</small>
                       </div>
                       <div class="mb-3">
                         <label class="fw-semibold">Duration (minutes)</label>
@@ -253,7 +254,7 @@
         data-bs-keyboard="false">
         <div class="modal-dialog">
           <div class="modal-content">
-            <form action="/teacher/chapter/{{id}}/lecture/add" method="POST" enctype="multipart/form-data">
+            <form action="/teacher/chapter/{{id}}/lecture/add" method="POST">
               <div class="modal-header bg-success text-white">
                 <h5 class="modal-title">Add Lecture to Chapter {{chapter_order}}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -261,15 +262,18 @@
               <div class="modal-body">
                 <div class="mb-3">
                   <label class="fw-semibold">Lecture Name <span class="text-danger">*</span></label>
-                  <input type="text" name="title" class="form-control" required>
+                  <input type="text" name="title" class="form-control" placeholder="Ex: Introduction to React Hooks"
+                    required>
                 </div>
                 <div class="mb-3">
-                  <label class="fw-semibold">Video <span class="text-danger">*</span></label>
-                  <input type="file" name="video" class="form-control" accept="video/*" required>
+                  <label class="fw-semibold">Video URL <span class="text-danger">*</span></label>
+                  <input type="text" name="video_url" class="form-control"
+                    placeholder="https://www.youtube.com/watch?v=..." required>
+                  <small class="text-muted">Support: YouTube, Vimeo, or direct video links</small>
                 </div>
                 <div class="mb-3">
                   <label class="fw-semibold">Duration (minutes)</label>
-                  <input type="number" name="duration_minutes" class="form-control" min="0">
+                  <input type="number" name="duration_minutes" class="form-control" placeholder="Ex: 15" min="0">
                 </div>
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" name="is_preview_allowed" id="previewNew{{id}}">
@@ -413,7 +417,6 @@
     }
   });
 </script>
-
 
 <style>
   .btn-brand {
