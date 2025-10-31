@@ -609,6 +609,71 @@ router.post("/courses/delete", async (req, res) => {
     });
   }
 });
+// Disable/enable course
+router.post("/courses/toggle-status", async (req, res) => {
+  try {
+    const { id } = req.body;
+    const course = await adminModel.toggleCourseStatus(id);
+
+    res.json({
+      success: true,
+      message: `Course has been ${
+        course.status === "disabled" ? "disabled" : "enabled"
+      } successfully`,
+      course,
+    });
+  } catch (err) {
+    console.error("Toggle course status error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error while changing course status",
+    });
+  }
+});
+
+// Bulk course status actions
+router.post("/courses/bulk-status", async (req, res) => {
+  try {
+    const { courseIds, action } = req.body;
+
+    if (!courseIds || !Array.isArray(courseIds) || !action) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid data",
+      });
+    }
+
+    const results = [];
+    for (const courseId of courseIds) {
+      try {
+        let course;
+        if (action === "disable") {
+          course = await adminModel.disableCourse(courseId);
+        } else if (action === "enable") {
+          course = await adminModel.enableCourse(courseId);
+        }
+        results.push({ courseId, success: true, course });
+      } catch (error) {
+        results.push({ courseId, success: false, error: error.message });
+      }
+    }
+
+    const successCount = results.filter((r) => r.success).length;
+    const failCount = results.filter((r) => !r.success).length;
+
+    res.json({
+      success: true,
+      message: `Processed ${successCount} courses successfully, ${failCount} failed`,
+      results,
+    });
+  } catch (err) {
+    console.error("Bulk course status error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error while processing bulk actions",
+    });
+  }
+});
 
 /* ============= USERS ============= */
 router.get("/users", async (req, res) => {
