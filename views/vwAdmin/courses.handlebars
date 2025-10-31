@@ -151,6 +151,34 @@
   </div>
 </div>
 
+<!-- Bulk Actions Section -->
+<div class="card shadow-sm mb-3">
+  <div class="card-body">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="selectAllCourses">
+          <label class="form-check-label fw-semibold" for="selectAllCourses">
+            Select All
+          </label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="d-flex gap-2 justify-content-end">
+          <select class="form-select w-auto" id="bulkActionSelect">
+            <option value="">Bulk Actions</option>
+            <option value="disable">Disable Selected</option>
+            <option value="enable">Enable Selected</option>
+          </select>
+          <button type="button" class="btn btn-outline-primary" id="applyBulkAction">
+            Apply
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Course Count -->
 <div class="d-flex justify-content-between align-items-center mb-3">
   <p class="text-muted mb-0">
@@ -171,18 +199,24 @@
       <table class="table table-hover align-middle mb-0">
         <thead class="table-dark text-center">
           <tr>
+            <th style="width: 40px;">
+              <input type="checkbox" class="form-check-input m-0" id="selectAllHeader">
+            </th>
             <th style="width: 60px;">ID</th>
             <th>Course Name</th>
             <th>Instructor</th>
             <th>Category</th>
             <th style="width: 130px;">Status</th>
-            <th style="width: 200px;">Actions</th>
+            <th style="width: 280px;">Actions</th>
           </tr>
         </thead>
 
         <tbody>
           {{#each courses}}
           <tr>
+            <td class="text-center">
+              <input type="checkbox" class="form-check-input course-checkbox m-0" value="{{id}}">
+            </td>
             <td class="text-center fw-semibold">{{id}}</td>
             <td class="fw-semibold">{{title}}</td>
             <td>{{instructor_name}}</td>
@@ -192,6 +226,8 @@
               <span class="badge px-3 py-2 rounded-pill bg-{{getStatusBadge status}}">
                 {{getStatusText status}}
               </span>
+              {{#if (eq status 'disabled')}}
+              {{/if}}
             </td>
 
             <td class="text-center">
@@ -200,13 +236,27 @@
                   <i class="bi bi-eye"></i>
                   View
                 </a>
-                <a href="/admin/courses/{{id}}/edit"
-                  class="btn btn-sm btn-warning d-flex align-items-center gap-1">
+                <a href="/admin/courses/{{id}}/edit" class="btn btn-sm btn-warning d-flex align-items-center gap-1">
                   <i class="bi bi-pencil"></i>
                   Edit
                 </a>
-                <form method="post" action="/admin/courses/delete" class="frmDeleteCourse d-inline"
-                  data-course-title="{{title}}">
+                
+                <!-- Nút Disable/Enable -->
+                {{#if (eq status 'disabled')}}
+                <button type="button" class="btn btn-sm btn-success btn-toggle-status d-flex align-items-center gap-1" 
+                        data-course-id="{{id}}" data-course-title="{{title}}" data-action="enable">
+                  <i class="bi bi-play-circle"></i>
+                  Enable
+                </button>
+                {{else}}
+                <button type="button" class="btn btn-sm btn-secondary btn-toggle-status d-flex align-items-center gap-1" 
+                        data-course-id="{{id}}" data-course-title="{{title}}" data-action="disable">
+                  <i class="bi bi-pause-circle"></i>
+                  Disable
+                </button>
+                {{/if}}
+                
+                <form method="post" action="/admin/courses/delete" class="frmDeleteCourse d-inline" data-course-title="{{title}}">
                   <input type="hidden" name="id" value="{{id}}">
                   <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center gap-1">
                     <i class="bi bi-trash"></i>
@@ -218,7 +268,7 @@
           </tr>
           {{else}}
           <tr>
-            <td colspan="6" class="text-center py-4">
+            <td colspan="7" class="text-center py-4">
               <div class="text-muted">
                 <i class="bi bi-inbox display-4 d-block mb-2"></i>
                 No courses found
@@ -240,6 +290,99 @@
 </div>
 
 <script>
+  // Xử lý disable/enable course
+  document.querySelectorAll('.btn-toggle-status').forEach(button => {
+    button.addEventListener('click', function() {
+      const courseId = this.dataset.courseId;
+      const courseTitle = this.dataset.courseTitle;
+      const action = this.dataset.action;
+      const actionText = action === 'disable' ? 'disable' : 'enable';
+
+      if (confirm(`Are you sure you want to ${actionText} the course "${courseTitle}"?`)) {
+        fetch('/admin/courses/toggle-status', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: courseId })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            location.reload();
+          } else {
+            alert('Error: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while processing your request');
+        });
+      }
+    });
+  });
+
+  // Bulk actions
+  document.getElementById('selectAllHeader')?.addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.course-checkbox');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = this.checked;
+    });
+    document.getElementById('selectAllCourses').checked = this.checked;
+  });
+
+  document.getElementById('selectAllCourses')?.addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.course-checkbox');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = this.checked;
+    });
+    document.getElementById('selectAllHeader').checked = this.checked;
+  });
+
+  document.getElementById('applyBulkAction')?.addEventListener('click', function() {
+    const action = document.getElementById('bulkActionSelect').value;
+    const selectedCourses = Array.from(document.querySelectorAll('.course-checkbox:checked'))
+      .map(checkbox => checkbox.value);
+
+    if (!action) {
+      alert('Please select a bulk action');
+      return;
+    }
+
+    if (selectedCourses.length === 0) {
+      alert('Please select at least one course');
+      return;
+    }
+
+    const actionText = action === 'disable' ? 'disable' : 'enable';
+    if (confirm(`Are you sure you want to ${actionText} ${selectedCourses.length} course(s)?`)) {
+      fetch('/admin/courses/bulk-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          courseIds: selectedCourses, 
+          action: action 
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          location.reload();
+        } else {
+          alert('Error: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while processing your request');
+      });
+    }
+  });
+
   // Handle filter type selection
   document.querySelectorAll('input[name="filter_type"]').forEach(radio => {
     radio.addEventListener('change', function() {
