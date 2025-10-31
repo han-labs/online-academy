@@ -570,34 +570,48 @@
 
     // Lắng nghe click vào icon ô vuông / ô tick
     document.addEventListener('click', function (e) {
-        const link = e.target.closest('.lecture-link');
-        if (!link) return;
+    // Xử lý click vào icon toggle (ô vuông/ô tick)
+    const toggleIcon = e.target.closest('.toggle-icon');
+    if (toggleIcon) {
         e.preventDefault();
-
-        const id = Number(link.getAttribute('data-lecture-id'));
-        const url = link.getAttribute('data-video-url');
-        const title = link.getAttribute('data-lecture-title');
-        const duration = link.getAttribute('data-duration');
-
-        console.log(' Lecture clicked - ID:', id, 'URL:', url);
-
-        currentLectureIndex = allLectures.findIndex(l => l.id === id);
-        currentLectureId = id;
-
-        updateLectureUI(title, duration);
-
-        if (url) {
-            loadVideoWithPlyr(id, url, title);
-        } else {
-            console.error(' No video URL for lecture:', id);
-            showNotification('No video available for this lesson', 'error');
+        e.stopPropagation(); // Ngăn không cho event bubble lên
+        
+        const lectureId = Number(toggleIcon.getAttribute('data-lecture-id'));
+        console.log('📝 Toggle icon clicked - Lecture ID:', lectureId);
+        
+        if (lectureId) {
+            toggleLectureCompletion(lectureId);
         }
+        return;
+    }
 
-        // THÊM DÒNG NÀY - Update URL với lecture ID
-        updateURLWithLecture(id);
+    // Xử lý click vào lecture link (giữ nguyên phần cũ)
+    const link = e.target.closest('.lecture-link');
+    if (!link) return;
+    e.preventDefault();
 
-        setTimeout(updateNavButtonsState, 0);
-    });
+    const id = Number(link.getAttribute('data-lecture-id'));
+    const url = link.getAttribute('data-video-url');
+    const title = link.getAttribute('data-lecture-title');
+    const duration = link.getAttribute('data-duration');
+
+    console.log('🎬 Lecture clicked - ID:', id, 'URL:', url);
+
+    currentLectureIndex = allLectures.findIndex(l => l.id === id);
+    currentLectureId = id;
+
+    updateLectureUI(title, duration);
+
+    if (url) {
+        loadVideoWithPlyr(id, url, title);
+    } else {
+        console.error('❌ No video URL for lecture:', id);
+        showNotification('No video available for this lesson', 'error');
+    }
+
+    updateURLWithLecture(id);
+    setTimeout(updateNavButtonsState, 0);
+});
 
     // ========== NAVIGATION ==========
     function openLectureByIndex(idx) {
