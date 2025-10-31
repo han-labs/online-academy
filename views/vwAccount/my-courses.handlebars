@@ -109,3 +109,21 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Kiểm tra nếu cần refresh sau khi hoàn thành khóa học
+    if (localStorage.getItem('shouldRefreshMyCourses') === 'true') {
+        localStorage.removeItem('shouldRefreshMyCourses');
+        location.reload();
+    }
+    
+    // Thêm event listener cho nút back từ Learn page
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            // Page được load từ cache (back/forward) → refresh để cập nhật trạng thái
+            location.reload();
+        }
+    });
+});
+</script>
