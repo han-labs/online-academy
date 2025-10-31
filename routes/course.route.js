@@ -80,22 +80,26 @@ router.get('/:id', async (req, res) => {
 
     // Watchlist state (nếu đã đăng nhập)
     let isInWatchlist = false;
+    let isEnrolled = false;
+    let isCompleted = false; // THÊM BIẾN NÀY
+
     try {
         if (req.session.user) {
             isInWatchlist = await watchlistModel.isInWatchlist(req.session.user.id, id);
+            
+            // Kiểm tra enrollment và completion status
+            if (req.session.user.role === 'student') {
+                isEnrolled = await enrollmentModel.isEnrolled(req.session.user.id, id);
+                if (isEnrolled) {
+                    isCompleted = await progressModel.isCourseCompleted(req.session.user.id, id);
+                }
+            }
         }
-    } catch { isInWatchlist = false; }
-
-    // ✨ NEW: trạng thái đã ghi danh + URL tiếp tục học (chỉ áp dụng cho student)
-    let isEnrolled = false;
-    const keepLearningUrl = `/courses/${id}/learn`;
-    try {
-        if (req.session.user && req.session.user.role === 'student') {
-            isEnrolled = await enrollmentModel.isEnrolled(req.session.user.id, id);
-        }
-    } catch {
-        isEnrolled = false;
+    } catch (error) {
+        console.error('Error checking user states:', error);
     }
+
+    const keepLearningUrl = `/courses/${id}/learn`;
 
     res.render('vwCourse/detail', {
         course,
@@ -107,8 +111,8 @@ router.get('/:id', async (req, res) => {
         reviews,
         related,
         isInWatchlist,
-        // ✨ truyền thêm 2 biến này cho template
         isEnrolled,
+        isCompleted, // TRUYỀN BIẾN MỚI
         keepLearningUrl
     });
 });

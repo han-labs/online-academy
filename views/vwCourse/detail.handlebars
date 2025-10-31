@@ -22,6 +22,7 @@
                 </nav>
 
                 <h1 class="display-6 fw-semibold mb-2">{{course.title}}</h1>
+
                 <p class="lead text-white-50 mb-3">{{course.short_description}}</p>
 
                 <div class="d-flex align-items-center flex-wrap mb-3">
@@ -36,6 +37,7 @@
                     {{totalHours}}h{{remainingMinutes}}m</p>
             </div>
 
+            {{!-- Tìm phần button trong course-card-hero --}}
             <div class="col-lg-4 mt-4 mt-lg-0">
                 <div class="course-card-hero bg-white text-dark p-3 rounded-3 shadow-lg">
                     <img src="{{course.image_url}}" alt="{{course.title}}" class="img-fluid rounded mb-3">
@@ -49,24 +51,32 @@
 
                     {{#if user}}
                     {{#if (eq user.role 'student')}}
-                    {{!-- Nếu đã ghi danh: ưu tiên biến isEnrolled; fallback course.is_enrolled --}}
                     {{#if isEnrolled}}
-                    <a href="{{#if keepLearningUrl}}{{keepLearningUrl}}{{else}}/courses/{{course.id}}/learn{{/if}}"
-                        class="btn btn-brand w-100 mb-2 fw-semibold text-white" style="background-color:#160438;">
-                        <i class="bi bi-play-circle"></i> Keep learning
+                    {{#if isCompleted}}
+                    <!-- Nếu đã hoàn thành khóa học -->
+                    
+                    <div class="mb-2">
+                        <span class="badge bg-success fs-6 py-2 px-3">
+                            <i class="bi bi-check-circle-fill me-1"></i>Course Completed
+                        </span>
+                    </div>
+                    
+                    <a href="{{keepLearningUrl}}" class="btn btn-success w-100 mb-2 fw-semibold text-white">
+                        <i class="bi bi-arrow-repeat me-2"></i>Learn Again
                     </a>
                     {{else}}
-                    {{#if course.is_enrolled}}
-                    <a href="{{#if keepLearningUrl}}{{keepLearningUrl}}{{else}}/courses/{{course.id}}/learn{{/if}}"
-                        class="btn btn-brand w-100 mb-2 fw-semibold text-white" style="background-color:#160438;">
-                        <i class="bi bi-play-circle"></i> Keep learning
-                    </a>
-                    {{else}}
-                    <a href="/checkout/{{course.id}}" class="btn btn-brand w-100 mb-2 fw-semibold text-white"
+                    <!-- Nếu đang học chưa hoàn thành -->
+                    <a href="{{keepLearningUrl}}" class="btn btn-brand w-100 mb-2 fw-semibold text-white"
                         style="background-color:#160438;">
-                        <i class="bi bi-cart-check"></i> Enroll Now
+                        <i class="bi bi-play-circle me-2"></i>Keep Learning
                     </a>
                     {{/if}}
+                    {{else}}
+                    <!-- Nếu chưa ghi danh -->
+                    <a href="/checkout/{{course.id}}" class="btn btn-brand w-100 mb-2 fw-semibold text-white"
+                        style="background-color:#160438;">
+                        <i class="bi bi-cart-check me-2"></i>Enroll Now
+                    </a>
                     {{/if}}
 
                     {{!-- Favorites: giữ nguyên logic --}}
@@ -87,10 +97,10 @@
                     {{/if}}
                     {{/if}}
                     {{else}}
-                    {{!-- Guest: gợi ý đăng nhập để học --}}
+                    <!-- Guest: gợi ý đăng nhập để học -->
                     <a href="/account/login" class="btn btn-brand w-100 mb-2 fw-semibold text-white"
                         style="background-color:#160438;">
-                        <i class="bi bi-box-arrow-in-right"></i> Log in to enroll
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Log in to enroll
                     </a>
                     {{/if}}
                 </div>
