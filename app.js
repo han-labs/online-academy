@@ -146,6 +146,7 @@ app.engine(
           draft: "secondary",
           published: "success",
           completed: "primary",
+          disable: "danger",
         };
         return m[status] || "secondary";
       },
@@ -154,6 +155,7 @@ app.engine(
           draft: "Draft",
           published: "Published",
           completed: "Completed",
+          disable: "Suspended",
         };
         return m[status] || status;
       },
