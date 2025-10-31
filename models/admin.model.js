@@ -480,6 +480,51 @@ export default {
       return [];
     }
   },
+  async disableCourse(id) {
+    try {
+      await knex("courses").where({ id }).update({
+        status: "disabled",
+        last_updated: new Date(),
+      });
+      return await this.findCourseById(id);
+    } catch (error) {
+      console.error("Disable course error:", error);
+      throw error;
+    }
+  },
+
+  async enableCourse(id) {
+    try {
+      await knex("courses").where({ id }).update({
+        status: "published",
+        last_updated: new Date(),
+      });
+      return await this.findCourseById(id);
+    } catch (error) {
+      console.error("Enable course error:", error);
+      throw error;
+    }
+  },
+
+  async toggleCourseStatus(id) {
+    try {
+      const course = await this.findCourseById(id);
+      if (!course) {
+        const err = new Error("Course not found");
+        err.code = "COURSE_NOT_FOUND";
+        throw err;
+      }
+
+      if (course.status === "disabled") {
+        return await this.enableCourse(id);
+      } else {
+        return await this.disableCourse(id);
+      }
+    } catch (error) {
+      console.error("Toggle course status error:", error);
+      throw error;
+    }
+  },
 
   /* ---------- USERS ---------- */
   async findAll() {
