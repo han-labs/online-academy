@@ -377,65 +377,93 @@ document.addEventListener('DOMContentLoaded', function() {
         playerContainer.style.display = 'none';
         playerContainer.innerHTML = '';
         
-        // Đảm bảo đường dẫn đúng
-        let finalVideoUrl = videoUrl;
-        if (videoUrl && videoUrl.startsWith('uploads/')) {
-            finalVideoUrl = '/' + videoUrl;
-        }
+        console.log('📹 Loading preview video:', videoUrl);
         
-        console.log('📹 Loading preview video:', finalVideoUrl);
+        // Kiểm tra nếu là YouTube URL
+        const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
         
-        // Tạo video element sau 100ms để modal hiển thị
         setTimeout(() => {
-            playerContainer.innerHTML = `
-                <video id="preview-html5-video" playsinline controls 
-                       style="width:100%; height:100%; background:#000;">
-                    <source src="${finalVideoUrl}" type="video/mp4">
-                    Your browser does not support HTML5 video.
-                </video>
-            `;
+            if (isYouTube) {
+                // Xử lý YouTube URL
+                const videoId = extractYouTubeId(videoUrl);
+                if (videoId) {
+                    playerContainer.innerHTML = `
+                        <div class="plyr__video-embed" id="youtube-player">
+                            <iframe 
+                                src="https://www.youtube.com/embed/${videoId}?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1" 
+                                allowfullscreen 
+                                allowtransparency 
+                                allow="autoplay">
+                            </iframe>
+                        </div>
+                    `;
+                } else {
+                    showPreviewError('Invalid YouTube URL');
+                    return;
+                }
+            } else {
+                // Xử lý local video upload
+                let finalVideoUrl = videoUrl;
+                if (videoUrl && videoUrl.startsWith('uploads/')) {
+                    finalVideoUrl = '/' + videoUrl;
+                }
+                
+                playerContainer.innerHTML = `
+                    <video id="preview-html5-video" playsinline controls 
+                           style="width:100%; height:100%; background:#000;">
+                        <source src="${finalVideoUrl}" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                `;
+            }
             
             // Ẩn placeholder, hiện player
             placeholder.style.display = 'none';
             playerContainer.style.display = 'block';
             
-            // Khởi tạo Plyr cho preview
-            initializePreviewPlayer();
+            // Khởi tạo Plyr
+            initializePreviewPlayer(isYouTube);
         }, 100);
     }
     
-    function initializePreviewPlayer() {
+    function extractYouTubeId(url) {
+        const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[7].length === 11) ? match[7] : null;
+    }
+    
+    function initializePreviewPlayer(isYouTube = false) {
         // Destroy existing player
         if (previewPlayer) {
             previewPlayer.destroy();
             previewPlayer = null;
         }
         
-        const videoElement = document.getElementById('preview-html5-video');
-        if (!videoElement) {
-            console.error('❌ Preview video element not found');
+        const playerElement = isYouTube 
+            ? document.getElementById('youtube-player')
+            : document.getElementById('preview-html5-video');
+            
+        if (!playerElement) {
+            console.error('❌ Preview player element not found');
             return;
         }
         
         try {
-            // IMPORTANT: Load Plyr từ CDN vì không có trong layout
             if (typeof Plyr === 'undefined') {
                 loadPlyrCDN().then(() => {
-                    initializePlyrPlayer();
+                    initializePlyrPlayer(playerElement, isYouTube);
                 });
             } else {
-                initializePlyrPlayer();
+                initializePlyrPlayer(playerElement, isYouTube);
             }
-            
         } catch (error) {
             console.error('❌ Preview player initialization error:', error);
             showPreviewError('Video player initialization failed');
         }
     }
     
-    function initializePlyrPlayer() {
-        const videoElement = document.getElementById('preview-html5-video');
-        previewPlayer = new Plyr(videoElement, {
+    function initializePlyrPlayer(playerElement, isYouTube) {
+        previewPlayer = new Plyr(playerElement, {
             controls: [
                 'play-large',
                 'play',
@@ -444,13 +472,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 'duration',
                 'mute',
                 'volume',
+                'settings',
                 'fullscreen'
             ],
+            settings: isYouTube ? [] : ['quality', 'speed'],
             autoplay: true
         });
         
         previewPlayer.on('ready', () => {
-            console.log('✅ Preview player ready');
+            console.log('✅ Preview player ready - YouTube:', isYouTube);
         });
         
         previewPlayer.on('error', (error) => {
