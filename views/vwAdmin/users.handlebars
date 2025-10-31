@@ -1,5 +1,5 @@
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-  <h1 class="h2">User Management</h1>
+<div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
+  <h2 class="fw-bold">User Management</h2>
 </div>
 
 {{#if error}}
@@ -48,7 +48,7 @@
 <!-- User List -->
 <div class="card">
   <div class="card-header">
-    <h5 class="card-title mb-0">User List</h5>
+    <h5 class="mb-0">User List</h5>
   </div>
   <div class="card-body">
 
@@ -96,7 +96,7 @@
                 </td>
                 <td class="text-center">
                   <div class="d-flex gap-2 justify-content-center">
-                    <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-primary">
+                    <a href="/admin/users/{{this.id}}" class="btn btn-sm btn-outline-primary">
                       <i class="bi bi-eye"></i> View
                     </a>
                     <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
@@ -111,7 +111,7 @@
                       </button>
                     </form>
                     {{#if this.is_active}}
-                    <button class="btn btn-sm btn-warning btn-lock-user" 
+                    <button class="btn btn-sm btn-secondary btn-lock-user" 
                             data-user-id="{{this.id}}" 
                             data-user-name="{{this.full_name}}">
                       <i class="bi bi-lock"></i> Lock
