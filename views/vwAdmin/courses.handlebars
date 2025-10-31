@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
-  <h1 class="h3 fw-bold">Course Management</h1>
+  <h2 class="fw-bold">Course Management</h2>
   <a href="/admin/courses/create" class="btn btn-primary d-flex align-items-center gap-1">
     <i class="bi bi-plus-lg"></i>
     Add Course
@@ -21,7 +21,6 @@
 {{/if}}
 
 <!-- Filter Section -->
-<div class="card shadow-sm mb-4">
   <div class="card-header bg-light">
     <h5 class="card-title mb-0">
       <i class="bi bi-funnel me-2"></i>Filters
@@ -31,26 +30,34 @@
     <!-- Filter Type Selection -->
     <div class="row mb-3">
       <div class="col-md-12">
-        <label class="form-label fw-semibold">Filter by:</label>
-        <div class="btn-group" role="group">
-          <input type="radio" class="btn-check" name="filter_type" id="filter_none" value="none" 
-                 {{#unless currentFilters.filter_type}}checked{{/unless}}
-                 {{#if (eq currentFilters.filter_type 'none')}}checked{{/if}}>
-          <label class="btn btn-outline-primary" for="filter_none">
-            <i class="bi bi-x-circle me-1"></i>No Filter
-          </label>
+        <div class="d-flex gap-3">
+          <!-- No Filter -->
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="filter_type" id="filter_none" value="none" 
+                  {{#unless currentFilters.filter_type}}checked{{/unless}}
+                  {{#if (eq currentFilters.filter_type 'none')}}checked{{/if}}>
+            <label class="form-check-label" for="filter_none">
+              No Filter
+            </label>
+          </div>
 
-          <input type="radio" class="btn-check" name="filter_type" id="filter_category" value="category" 
-                 {{#if (eq currentFilters.filter_type 'category')}}checked{{/if}}>
-          <label class="btn btn-outline-primary" for="filter_category">
-            <i class="bi bi-tags me-1"></i>Category
-          </label>
+          <!-- Category -->
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="filter_type" id="filter_category" value="category" 
+                  {{#if (eq currentFilters.filter_type 'category')}}checked{{/if}}>
+            <label class="form-check-label" for="filter_category">
+              Category
+            </label>
+          </div>
 
-          <input type="radio" class="btn-check" name="filter_type" id="filter_instructor" value="instructor" 
-                 {{#if (eq currentFilters.filter_type 'instructor')}}checked{{/if}}>
-          <label class="btn btn-outline-primary" for="filter_instructor">
-            <i class="bi bi-person me-1"></i>Instructor
-          </label>
+          <!-- Instructor -->
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="filter_type" id="filter_instructor" value="instructor" 
+                  {{#if (eq currentFilters.filter_type 'instructor')}}checked{{/if}}>
+            <label class="form-check-label" for="filter_instructor">
+              Instructor
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -149,35 +156,7 @@
     </div>
     {{/if}}
   </div>
-</div>
 
-<!-- Bulk Actions Section -->
-<div class="card shadow-sm mb-3">
-  <div class="card-body">
-    <div class="row align-items-center">
-      <div class="col-md-6">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="selectAllCourses">
-          <label class="form-check-label fw-semibold" for="selectAllCourses">
-            Select All
-          </label>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="d-flex gap-2 justify-content-end">
-          <select class="form-select w-auto" id="bulkActionSelect">
-            <option value="">Bulk Actions</option>
-            <option value="disable">Disable Selected</option>
-            <option value="enable">Enable Selected</option>
-          </select>
-          <button type="button" class="btn btn-outline-primary" id="applyBulkAction">
-            Apply
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Course Count -->
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -191,9 +170,38 @@
       {{/if}}
     {{/if}}
   </p>
+
+  <!-- Bulk Actions Section -->
+  <div class="card-body">
+    <div class="d-flex gap-3 justify-content-end align-items-center">
+        <div class="form-check justify-content-between">
+          <input class="form-check-input" type="checkbox" id="selectAllCourses">
+          <label class="form-check-label fw-semibold" for="selectAllCourses">
+            Select All
+          </label>
+        </div>
+        <div class="d-flex gap-3 justify-content-end">
+          <select class="form-select w-auto" id="bulkActionSelect">
+            <option value="">Bulk Actions</option>
+            <option value="disable">Disable Selected</option>
+            <option value="enable">Enable Selected</option>
+          </select>
+          <button type="button" class="btn btn-outline-primary" id="applyBulkAction">
+            Apply
+          </button>
+        </div>
+    </div>
+  </div>
+
+
 </div>
 
-<div class="card shadow-sm">
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">Course List</h5>
+  </div>
+  <div class="card-body">
+    <div class="card shadow-sm">
   <div class="card-body p-0">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
@@ -239,8 +247,14 @@
                 <a href="/admin/courses/{{id}}/edit" class="btn btn-sm btn-warning d-flex align-items-center gap-1">
                   <i class="bi bi-pencil"></i>
                   Edit
-                </a>
-                
+                </a>                
+                <form method="post" action="/admin/courses/delete" class="frmDeleteCourse d-inline" data-course-title="{{title}}">
+                  <input type="hidden" name="id" value="{{id}}">
+                  <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center gap-1">
+                    <i class="bi bi-trash"></i>
+                    Delete
+                  </button>
+                </form>
                 <!-- Nút Disable/Enable -->
                 {{#if (eq status 'disabled')}}
                 <button type="button" class="btn btn-sm btn-success btn-toggle-status d-flex align-items-center gap-1" 
@@ -255,14 +269,6 @@
                   Disable
                 </button>
                 {{/if}}
-                
-                <form method="post" action="/admin/courses/delete" class="frmDeleteCourse d-inline" data-course-title="{{title}}">
-                  <input type="hidden" name="id" value="{{id}}">
-                  <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center gap-1">
-                    <i class="bi bi-trash"></i>
-                    Delete
-                  </button>
-                </form>
               </div>
             </td>
           </tr>
@@ -288,6 +294,10 @@
     </div>
   </div>
 </div>
+  </div>
+</div>
+
+
 
 <script>
   // Xử lý disable/enable course
