@@ -86,10 +86,10 @@ export default {
             throw error;
         }
     },
-    // Thêm hàm này vào cuối file models/progress.model.js
+    
     // models/progress.model.js - Thêm debug
 async isCourseCompleted(userId, courseId) {
-    console.log(`🔍 Checking if course ${courseId} completed by user ${userId}`);
+   
     
     // Lấy tất cả lectures của khóa học
     const totalLectures = await db('lectures as l')
@@ -99,10 +99,10 @@ async isCourseCompleted(userId, courseId) {
         .first();
 
     const total = parseInt(totalLectures?.total) || 0;
-    console.log(`📊 Total lectures in course ${courseId}: ${total}`);
+   
 
     if (total === 0) {
-        console.log(`⚠️ Course ${courseId} has no lectures`);
+        
         return false;
     }
 
@@ -116,7 +116,7 @@ async isCourseCompleted(userId, courseId) {
         .first();
 
     const completed = parseInt(completedLectures?.completed) || 0;
-    console.log(`✅ Completed lectures: ${completed}/${total}`);
+    
 
     // Khóa học hoàn thành khi tất cả bài giảng đã được tích
     return completed === total;

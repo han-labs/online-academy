@@ -32,7 +32,7 @@ export default {
             .leftJoin({ u: 'users' }, 'u.id', 'c.instructor_id')
             .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
             .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
-            .leftJoin({ e2: 'enrollments' }, 'e2.course_id', 'c.id') // 👈 THÊM DÒNG NÀY
+            .leftJoin({ e2: 'enrollments' }, 'e2.course_id', 'c.id') 
             .where('e.user_id', userId)
             .andWhere('c.status', 'published')
             .groupBy('e.enrolled_at', 'c.id', 'u.id', 'cat.id')
