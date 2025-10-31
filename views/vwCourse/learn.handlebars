@@ -260,30 +260,53 @@
     let currentLectureId = null;
 
     // ========== FIXED: Hàm load video UPLOAD ==========
+    // ========== FIXED: Hàm load video hỗ trợ cả UPLOAD và YOUTUBE ==========
     function loadVideoWithPlyr(lectureId, videoUrl, lectureTitle) {
-        console.log('🎬 Loading video:', lectureId, videoUrl);
+        console.log(' Loading video:', lectureId, videoUrl);
 
         // Ẩn placeholder, hiện player
         document.getElementById('video-placeholder').style.display = 'none';
         const videoContainer = document.getElementById('plyr-player');
         videoContainer.style.display = 'block';
 
-        // Đảm bảo đường dẫn đúng cho video upload
-        let finalVideoUrl = videoUrl;
-        if (videoUrl && videoUrl.startsWith('uploads/')) {
-            finalVideoUrl = '/' + videoUrl;
-        }
+        // Kiểm tra nếu là YouTube URL
+        const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
 
-        console.log('📹 Final video URL:', finalVideoUrl);
+        if (isYouTube) {
+            // Xử lý YouTube URL
+            const videoId = extractYouTubeId(videoUrl);
+            if (videoId) {
+                videoContainer.innerHTML = `
+                <div class="plyr__video-embed" id="youtube-player">
+                    <iframe 
+                        src="https://www.youtube.com/embed/${videoId}?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1" 
+                        allowfullscreen 
+                        allowtransparency 
+                        allow="autoplay">
+                    </iframe>
+                </div>
+            `;
+            } else {
+                showNotification('Invalid YouTube URL', 'error');
+                return;
+            }
+        } else {
+            // Xử lý local video upload
+            let finalVideoUrl = videoUrl;
+            if (videoUrl && videoUrl.startsWith('uploads/')) {
+                finalVideoUrl = '/' + videoUrl;
+            }
 
-        // Tạo HTML5 video element cho video upload
-        videoContainer.innerHTML = `
+            console.log('📹 Final video URL:', finalVideoUrl);
+
+            videoContainer.innerHTML = `
             <video id="html5-video-player" playsinline controls 
                    style="width:100%; height:100%; background:#000;">
                 <source src="${finalVideoUrl}" type="video/mp4">
                 Your browser does not support HTML5 video.
             </video>
         `;
+        }
 
         // Destroy existing Plyr player
         if (window.coursePlayer) {
@@ -291,21 +314,23 @@
             window.coursePlayer = null;
         }
 
-        // Initialize Plyr với HTML5 video
+        // Initialize Plyr
         setTimeout(() => {
             try {
-                const videoElement = document.getElementById('html5-video-player');
+                const playerElement = isYouTube
+                    ? document.getElementById('youtube-player')
+                    : document.getElementById('html5-video-player');
 
-                if (!videoElement) {
+                if (!playerElement) {
                     console.error(' Video element not found');
                     showNotification('Không thể khởi tạo video player', 'error');
                     return;
                 }
 
-                console.log(' Initializing Plyr for uploaded video...');
+                console.log(`🎮 Initializing Plyr for ${isYouTube ? 'YouTube' : 'uploaded'} video...`);
 
-                // Khởi tạo Plyr cho HTML5 video
-                window.coursePlayer = new Plyr(videoElement, {
+                // Khởi tạo Plyr
+                window.coursePlayer = new Plyr(playerElement, {
                     controls: [
                         'play-large',
                         'play',
@@ -318,13 +343,13 @@
                         'pip',
                         'fullscreen'
                     ],
-                    settings: ['quality', 'speed'],
+                    settings: isYouTube ? [] : ['quality', 'speed'],
                     autoplay: true
                 });
 
                 // Handle Plyr events
                 window.coursePlayer.on('ready', (event) => {
-                    console.log(' Plyr ready with uploaded video');
+                    console.log(` Plyr ready with ${isYouTube ? 'YouTube' : 'uploaded'} video`);
                 });
 
                 window.coursePlayer.on('play', (event) => {
@@ -338,10 +363,19 @@
 
                 // Auto-mark as completed khi video kết thúc
                 window.coursePlayer.on('ended', (event) => {
-                    console.log(' Video ended - auto marking as completed');
-                    if (!completedLectureIds.includes(lectureId)) {
-                        toggleLectureCompletion(lectureId);
+                    console.log('⏹ Video ended - auto marking as completed');
+
+                    // THÊM DEBOUNCE - tránh gọi nhiều lần
+                    if (window.autoMarkTimeout) {
+                        clearTimeout(window.autoMarkTimeout);
                     }
+
+                    window.autoMarkTimeout = setTimeout(() => {
+                        if (!completedLectureIds.includes(lectureId)) {
+                            console.log(' Auto-marking lecture as completed');
+                            toggleLectureCompletion(lectureId);
+                        }
+                    }, 500); // Delay 500ms
                 });
 
             } catch (error) {
@@ -349,6 +383,13 @@
                 showNotification('Lỗi khởi tạo video player', 'error');
             }
         }, 100);
+    }
+
+    // Hàm trích xuất YouTube ID
+    function extractYouTubeId(url) {
+        const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[7].length === 11) ? match[7] : null;
     }
 
     function updateLectureUI(title, duration) {
@@ -570,48 +611,48 @@
 
     // Lắng nghe click vào icon ô vuông / ô tick
     document.addEventListener('click', function (e) {
-    // Xử lý click vào icon toggle (ô vuông/ô tick)
-    const toggleIcon = e.target.closest('.toggle-icon');
-    if (toggleIcon) {
-        e.preventDefault();
-        e.stopPropagation(); // Ngăn không cho event bubble lên
-        
-        const lectureId = Number(toggleIcon.getAttribute('data-lecture-id'));
-        console.log('📝 Toggle icon clicked - Lecture ID:', lectureId);
-        
-        if (lectureId) {
-            toggleLectureCompletion(lectureId);
+        // Xử lý click vào icon toggle (ô vuông/ô tick)
+        const toggleIcon = e.target.closest('.toggle-icon');
+        if (toggleIcon) {
+            e.preventDefault();
+            e.stopPropagation(); // Ngăn không cho event bubble lên
+
+            const lectureId = Number(toggleIcon.getAttribute('data-lecture-id'));
+            console.log('📝 Toggle icon clicked - Lecture ID:', lectureId);
+
+            if (lectureId) {
+                toggleLectureCompletion(lectureId);
+            }
+            return;
         }
-        return;
-    }
 
-    // Xử lý click vào lecture link (giữ nguyên phần cũ)
-    const link = e.target.closest('.lecture-link');
-    if (!link) return;
-    e.preventDefault();
+        // Xử lý click vào lecture link (giữ nguyên phần cũ)
+        const link = e.target.closest('.lecture-link');
+        if (!link) return;
+        e.preventDefault();
 
-    const id = Number(link.getAttribute('data-lecture-id'));
-    const url = link.getAttribute('data-video-url');
-    const title = link.getAttribute('data-lecture-title');
-    const duration = link.getAttribute('data-duration');
+        const id = Number(link.getAttribute('data-lecture-id'));
+        const url = link.getAttribute('data-video-url');
+        const title = link.getAttribute('data-lecture-title');
+        const duration = link.getAttribute('data-duration');
 
-    console.log('🎬 Lecture clicked - ID:', id, 'URL:', url);
+        console.log('🎬 Lecture clicked - ID:', id, 'URL:', url);
 
-    currentLectureIndex = allLectures.findIndex(l => l.id === id);
-    currentLectureId = id;
+        currentLectureIndex = allLectures.findIndex(l => l.id === id);
+        currentLectureId = id;
 
-    updateLectureUI(title, duration);
+        updateLectureUI(title, duration);
 
-    if (url) {
-        loadVideoWithPlyr(id, url, title);
-    } else {
-        console.error('❌ No video URL for lecture:', id);
-        showNotification('No video available for this lesson', 'error');
-    }
+        if (url) {
+            loadVideoWithPlyr(id, url, title);
+        } else {
+            console.error('❌ No video URL for lecture:', id);
+            showNotification('No video available for this lesson', 'error');
+        }
 
-    updateURLWithLecture(id);
-    setTimeout(updateNavButtonsState, 0);
-});
+        updateURLWithLecture(id);
+        setTimeout(updateNavButtonsState, 0);
+    });
 
     // ========== NAVIGATION ==========
     function openLectureByIndex(idx) {
