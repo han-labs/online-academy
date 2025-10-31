@@ -32,7 +32,7 @@ export default {
             ])
             .limit(limit)
             .select(baseCols);
-        
+
         return result;
     },
 
@@ -76,7 +76,7 @@ export default {
     // FULL-TEXT SEARCH với remove_accents
     async search({ q = '', categoryId = null, sort = 'rating_desc', page = 1, pageSize = 12 }) {
         const offset = (page - 1) * pageSize;
-        
+
         const qb = db({ c: 'courses' })
             .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
             .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
@@ -96,12 +96,11 @@ export default {
 
         // Sorting
         let orderBy = [];
-        
+
         // Nếu có search query, ưu tiên rank theo độ liên quan
         if (q && q.trim()) {
-            const keywords = q.trim().replace(/ /g, ' & ');
             orderBy.push({
-                column: db.raw('ts_rank(c.fts, to_tsquery(remove_accents(?)))', [keywords]),
+                column: db.raw("ts_rank(c.fts, plainto_tsquery('english', ?))", [q.trim()]),
                 order: 'desc'
             });
         }
@@ -145,7 +144,7 @@ export default {
     // Search by multiple categories (parent + children)
     async searchByCategories({ categoryIds = [], sort = 'newest', page = 1, pageSize = 12 }) {
         const offset = (page - 1) * pageSize;
-        
+
         const qb = db({ c: 'courses' })
             .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
             .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
@@ -361,7 +360,7 @@ export default {
 
     async search({ q = '', categoryId = null, sort = 'rating_desc', page = 1, pageSize = 12 }) {
         const offset = (page - 1) * pageSize;
-        
+
         const qb = db({ c: 'courses' })
             .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
             .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
@@ -371,10 +370,11 @@ export default {
 
         // Full-text search
         if (q && q.trim()) {
-            qb.andWhereRaw(
-                "to_tsvector('simple', c.title || ' ' || COALESCE(c.short_description,'') || ' ' || COALESCE(c.detailed_description,'')) @@ plainto_tsquery('simple', ?)",
-                [q.trim()]
-            );
+            const cleanQ = q.trim();
+            qb.andWhere(function () {
+                this.whereRaw("c.fts @@ plainto_tsquery('english', ?)", [cleanQ])
+                    .orWhereRaw("c.title ILIKE ?", [`%${cleanQ}%`]);
+            });
         }
 
         if (categoryId) {
@@ -417,10 +417,11 @@ export default {
             .where('c.status', 'published');
 
         if (q && q.trim()) {
-            countQb.andWhereRaw(
-                "to_tsvector('simple', c.title || ' ' || COALESCE(c.short_description,'') || ' ' || COALESCE(c.detailed_description,'')) @@ plainto_tsquery('simple', ?)",
-                [q.trim()]
-            );
+            const cleanQ = q.trim();
+            countQb.andWhere(function () {
+                this.whereRaw("c.fts @@ plainto_tsquery('english', ?)", [cleanQ])
+                    .orWhereRaw("c.title ILIKE ?", [`%${cleanQ}%`]);
+            });
         }
         if (categoryId) {
             countQb.andWhere('c.category_id', categoryId);
