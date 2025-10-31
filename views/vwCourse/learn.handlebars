@@ -230,13 +230,12 @@
     // ===== Inject server data safely =====
     const course = {{{ json course }}};
     const chapters = {{{ json chapters }}};
-    const lectures = {{{ json lectures }}};         // bạn đã truyền ở route
+    const lectures = {{{ json lectures }}};
     const progress = {{{ json progress }}};
     const completedIds = {{{ json completedLectureIds }}};
 
     console.log('=== DEBUG SERVER DATA ===');
     console.log('completedLectureIds:', completedIds);
-    console.log('Progress:', progress);
     console.log('Course:', course);
     console.log('Chapters:', chapters);
     console.log('Lectures:', lectures);
@@ -260,27 +259,96 @@
     let currentLectureIndex = -1;
     let currentLectureId = null;
 
-
-    function getYouTubeId(url) {
-        const r = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-        const m = (url || '').match(r);
-        return m ? m[1] : null;
-    }
-
+    // ========== FIXED: Hàm load video UPLOAD ==========
     function loadVideoWithPlyr(lectureId, videoUrl, lectureTitle) {
+        console.log('🎬 Loading video:', lectureId, videoUrl);
+        
+        // Ẩn placeholder, hiện player
         document.getElementById('video-placeholder').style.display = 'none';
-        document.getElementById('plyr-player').style.display = 'block';
-        const youtubeId = getYouTubeId(videoUrl);
-        if (!youtubeId) { showNotification('Invalid video URL', 'error'); return; }
-        const iframe = document.querySelector('#plyr-player iframe');
-        iframe.src = `https://www.youtube.com/embed/${youtubeId}`;
-        if (window.coursePlayer) { window.coursePlayer.destroy(); }
-        window.coursePlayer = new Plyr('#plyr-player', {
-            youtube: { noCookie: true, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 },
-            controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'airplay', 'fullscreen'],
-            settings: ['quality', 'speed'],
-            autoplay: true
-        });
+        const videoContainer = document.getElementById('plyr-player');
+        videoContainer.style.display = 'block';
+        
+        // Đảm bảo đường dẫn đúng cho video upload
+        let finalVideoUrl = videoUrl;
+        if (videoUrl && videoUrl.startsWith('uploads/')) {
+            finalVideoUrl = '/' + videoUrl;
+        }
+        
+        console.log('📹 Final video URL:', finalVideoUrl);
+        
+        // Tạo HTML5 video element cho video upload
+        videoContainer.innerHTML = `
+            <video id="html5-video-player" playsinline controls 
+                   style="width:100%; height:100%; background:#000;">
+                <source src="${finalVideoUrl}" type="video/mp4">
+                Your browser does not support HTML5 video.
+            </video>
+        `;
+        
+        // Destroy existing Plyr player
+        if (window.coursePlayer) {
+            window.coursePlayer.destroy();
+            window.coursePlayer = null;
+        }
+        
+        // Initialize Plyr với HTML5 video
+        setTimeout(() => {
+            try {
+                const videoElement = document.getElementById('html5-video-player');
+                
+                if (!videoElement) {
+                    console.error('❌ Video element not found');
+                    showNotification('Không thể khởi tạo video player', 'error');
+                    return;
+                }
+                
+                console.log('🔧 Initializing Plyr for uploaded video...');
+                
+                // Khởi tạo Plyr cho HTML5 video
+                window.coursePlayer = new Plyr(videoElement, {
+                    controls: [
+                        'play-large', 
+                        'play', 
+                        'progress', 
+                        'current-time', 
+                        'duration', 
+                        'mute', 
+                        'volume', 
+                        'settings', 
+                        'pip', 
+                        'fullscreen'
+                    ],
+                    settings: ['quality', 'speed'],
+                    autoplay: true
+                });
+                
+                // Handle Plyr events
+                window.coursePlayer.on('ready', (event) => {
+                    console.log('✅ Plyr ready with uploaded video');
+                });
+                
+                window.coursePlayer.on('play', (event) => {
+                    console.log('▶️ Video started playing');
+                });
+                
+                window.coursePlayer.on('error', (error) => {
+                    console.error('❌ Plyr error:', error);
+                    showNotification('Lỗi phát video', 'error');
+                });
+                
+                // Auto-mark as completed khi video kết thúc
+                window.coursePlayer.on('ended', (event) => {
+                    console.log('🏁 Video ended - auto marking as completed');
+                    if (!completedLectureIds.includes(lectureId)) {
+                        toggleLectureCompletion(lectureId);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('❌ Plyr initialization error:', error);
+                showNotification('Lỗi khởi tạo video player', 'error');
+            }
+        }, 100);
     }
 
     function updateLectureUI(title, duration) {
@@ -288,46 +356,61 @@
         document.getElementById('current-lecture-title').textContent = title;
         document.getElementById('lecture-nav').style.display = 'flex';
         const html = `
-      <div class="lecture-details">
-        <h3 class="mb-3">${title}</h3>
-        <div class="row mt-4">
-          <div class="col-md-8">
-            <h5 class="mb-3">Lesson description</h5>
-            <p class="text-muted">This lesson is part of the course curriculum: "${course?.title || ''}". Thời lượng: ${duration} phút.</p>
-          </div>
-          <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-              <div class="card-body">
-                <h5 class="card-title">Lesson information</h5>
-                <div class="lecture-meta">
-                  <div class="d-flex justify-content-between mb-2 py-2 border-bottom">
-                    <span class="text-muted">Duration:</span><span class="fw-medium">${duration} minute</span>
-                  </div>
-                  <div class="d-flex justify-content-between mb-2 py-2 border-bottom">
-                    <span class="text-muted">Status:</span><span class="text-success fw-medium">Studying</span>
-                  </div>
+            <div class="lecture-details">
+                <h3 class="mb-3">${title}</h3>
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <h5 class="mb-3">Lesson description</h5>
+                        <p class="text-muted">This lesson is part of the course curriculum: "${course?.title || ''}". Thời lượng: ${duration} phút.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Lesson information</h5>
+                                <div class="lecture-meta">
+                                    <div class="d-flex justify-content-between mb-2 py-2 border-bottom">
+                                        <span class="text-muted">Duration:</span><span class="fw-medium">${duration} minute</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2 py-2 border-bottom">
+                                        <span class="text-muted">Status:</span><span class="text-success fw-medium">Studying</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>`;
+            </div>`;
         document.getElementById('default-lecture-message').style.display = 'none';
         document.getElementById('dynamic-lecture-info').innerHTML = html;
         document.getElementById('dynamic-lecture-info').style.display = 'block';
     }
 
-    // Delegation cho .lecture-link (vì phần này render từ server)
+    // ========== EVENT HANDLERS ==========
     document.addEventListener('click', function (e) {
         const link = e.target.closest('.lecture-link');
         if (!link) return;
         e.preventDefault();
+        
         const id = Number(link.getAttribute('data-lecture-id'));
         const url = link.getAttribute('data-video-url');
         const title = link.getAttribute('data-lecture-title');
         const duration = link.getAttribute('data-duration');
+        
+        console.log('🖱️ Lecture clicked - ID:', id, 'URL:', url);
+        
         currentLectureIndex = allLectures.findIndex(l => l.id === id);
+        currentLectureId = id;
+        
         updateLectureUI(title, duration);
-        if (url) loadVideoWithPlyr(id, url, title);
+        
+        if (url) {
+            loadVideoWithPlyr(id, url, title);
+        } else {
+            console.error('❌ No video URL for lecture:', id);
+            showNotification('No video available for this lesson', 'error');
+        }
+        
+        setTimeout(updateNavButtonsState, 0);
     });
 
     function showNotification(msg, type = 'info') {
@@ -342,12 +425,12 @@
         t.className = `toast align-items-center text-bg-${type === 'error' ? 'danger' : 'success'} border-0`;
         t.setAttribute('role', 'alert');
         t.innerHTML = `
-      <div class="d-flex">
-        <div class="toast-body">
-          <i class="bi bi-${type === 'error' ? 'exclamation-triangle' : 'check-circle'} me-2"></i>${msg}
-        </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-      </div>`;
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-${type === 'error' ? 'exclamation-triangle' : 'check-circle'} me-2"></i>${msg}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>`;
         c.appendChild(t);
         new bootstrap.Toast(t).show();
         t.addEventListener('hidden.bs.toast', () => t.remove());
@@ -368,9 +451,8 @@
             toggle.style.display = 'none';
         }
     }
-    document.getElementById('toggleSidebar')?.addEventListener('click', toggleSidebar);
-    document.getElementById('openSidebar')?.addEventListener('click', toggleSidebar);
 
+    // ========== CHAPTER COLLAPSE ==========
     function setupChapterCollapse() {
         document.querySelectorAll('.chapter-header').forEach(h => {
             h.addEventListener('click', function () {
@@ -405,11 +487,6 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        setupChapterCollapse();
-        autoCollapseLongChapters();
-    });
-
     // ========== PROGRESS TOGGLE ==========
     async function toggleLectureCompletion(lectureId) {
         try {
@@ -423,7 +500,6 @@
                 showNotification(data.message || 'An error occurred.', 'error');
                 return;
             }
-            // data.data = { action: 'added'|'removed', completed: true|false }
             updateProgressUI(lectureId, data.data.completed);
             updateProgressBar();
             showNotification(data.message, 'success');
@@ -434,49 +510,40 @@
     }
 
     function updateProgressUI(lectureId, isCompleted) {
-        // Cập nhật tất cả icon của lecture này (nếu trùng lặp ở nhiều nơi)
-        document
-            .querySelectorAll(`.toggle-icon[data-lecture-id="${lectureId}"]`)
-            .forEach(icon => {
-                const isListItem = icon.closest('.list-group-item') != null;
-                if (isCompleted) {
-                    icon.className = `bi bi-check-square-fill text-purple ${isListItem ? 'me-3' : 'me-2'} toggle-icon completed`;
-                    icon.style.color = '#6f42c1';
-                    icon.title = 'Click to unmark completed';
-                } else {
-                    icon.className = `bi bi-square text-muted ${isListItem ? 'me-3' : 'me-2'} toggle-icon not-completed`;
-                    icon.style.color = '';
-                    icon.title = 'Click to mark complete';
-                }
-            });
+        document.querySelectorAll(`.toggle-icon[data-lecture-id="${lectureId}"]`).forEach(icon => {
+            const isListItem = icon.closest('.list-group-item') != null;
+            if (isCompleted) {
+                icon.className = `bi bi-check-square-fill text-purple ${isListItem ? 'me-3' : 'me-2'} toggle-icon completed`;
+                icon.style.color = '#6f42c1';
+                icon.title = 'Click to unmark completed';
+            } else {
+                icon.className = `bi bi-square text-muted ${isListItem ? 'me-3' : 'me-2'} toggle-icon not-completed`;
+                icon.style.color = '';
+                icon.title = 'Click to mark complete';
+            }
+        });
 
-        // Cập nhật badge Completed ở dòng thông tin bài học (nếu có)
-        document
-            .querySelectorAll(`.list-group-item [data-lecture-id="${lectureId}"]`)
-            .forEach(link => {
-                const wrap = link.closest('.list-group-item');
-                if (!wrap) return;
-                const statusBadge = wrap.querySelector('.text-success'); // <small class="text-success">Completed</small>
-                if (isCompleted) {
-                    if (!statusBadge) {
-                        const small = document.createElement('small');
-                        small.className = 'text-success';
-                        small.innerHTML = `<i class="bi bi-check-circle me-1"></i>Completed`;
-                        // chèn vào bên phải phần small.text-muted
-                        const rightMeta = wrap.querySelector('.d-flex.justify-content-between.align-items-center.mt-1');
-                        rightMeta?.appendChild(small);
-                    }
-                } else {
-                    statusBadge?.remove();
+        document.querySelectorAll(`.list-group-item [data-lecture-id="${lectureId}"]`).forEach(link => {
+            const wrap = link.closest('.list-group-item');
+            if (!wrap) return;
+            const statusBadge = wrap.querySelector('.text-success');
+            if (isCompleted) {
+                if (!statusBadge) {
+                    const small = document.createElement('small');
+                    small.className = 'text-success';
+                    small.innerHTML = `<i class="bi bi-check-circle me-1"></i>Completed`;
+                    const rightMeta = wrap.querySelector('.d-flex.justify-content-between.align-items-center.mt-1');
+                    rightMeta?.appendChild(small);
                 }
-            });
+            } else {
+                statusBadge?.remove();
+            }
+        });
 
-        // Đồng bộ mảng completedLectureIds ở client
         const idx = completedLectureIds.indexOf(lectureId);
         if (isCompleted && idx === -1) completedLectureIds.push(lectureId);
         if (!isCompleted && idx > -1) completedLectureIds.splice(idx, 1);
     }
-
 
     async function updateProgressBar() {
         try {
@@ -484,24 +551,23 @@
             const data = await res.json();
             if (!data.success) return;
 
-            const p = data.data; // {completed, total, percentage}
-            // Thanh phía trên sidebar
+            const p = data.data;
             const bars = document.querySelectorAll('.progress-bar');
             bars.forEach(b => {
                 b.style.width = `${p.percentage}%`;
                 b.setAttribute('aria-valuenow', p.percentage);
             });
-            // Dòng text “x/y lesson (z%)”
-            // - dòng trên sidebar
+            
             const sidebarText = document.querySelector('.sidebar-curriculum small.text-muted');
             if (sidebarText) sidebarText.textContent = `${p.completed}/${p.total} lesson (${p.percentage}%)`;
-            // - dòng trong tab Course content
+            
             const tabText = document.querySelector('#course-content .progress-info small.text-muted');
             if (tabText) tabText.textContent = `${p.completed}/${p.total} lesson completed`;
         } catch (e) {
             console.error('updateProgressBar error:', e);
         }
     }
+
     // Lắng nghe click vào icon ô vuông / ô tick
     document.addEventListener('click', (e) => {
         const icon = e.target.closest('.toggle-icon');
@@ -513,23 +579,20 @@
         toggleLectureCompletion(lectureId);
     });
 
-
-    // === NAV: mở bài học theo index trong mảng allLectures
+    // ========== NAVIGATION ==========
     function openLectureByIndex(idx) {
         if (idx < 0 || idx >= allLectures.length) return;
 
         const lec = allLectures[idx];
         currentLectureIndex = idx;
+        currentLectureId = lec.id;
 
-        // cập nhật UI + play video
         updateLectureUI(lec.title, lec.duration);
         if (lec.video_url) loadVideoWithPlyr(lec.id, lec.video_url, lec.title);
 
-        // scroll tới item đang mở (nếu có)
         const link = document.querySelector(`.lecture-link[data-lecture-id="${lec.id}"]`);
         link?.scrollIntoView({ block: 'nearest' });
 
-        // bật/disable 2 nút điều hướng
         updateNavButtonsState();
     }
 
@@ -542,7 +605,7 @@
         nextBtn.disabled = currentLectureIndex >= allLectures.length - 1;
     }
 
-    // === Gán handler cho 2 nút
+    // Gán handler cho 2 nút
     document.getElementById('prev-lecture')?.addEventListener('click', (e) => {
         e.preventDefault();
         if (currentLectureIndex > 0) openLectureByIndex(currentLectureIndex - 1);
@@ -553,24 +616,13 @@
         if (currentLectureIndex < allLectures.length - 1) openLectureByIndex(currentLectureIndex + 1);
     });
 
-    // === Sau khi click 1 bài bất kỳ, nhớ cập nhật trạng thái 2 nút
-    document.addEventListener('click', function (e) {
-        const link = e.target.closest('.lecture-link');
-        if (!link) return;
-        e.preventDefault();
-        const id = Number(link.getAttribute('data-lecture-id'));
-        const url = link.getAttribute('data-video-url');
-        const title = link.getAttribute('data-lecture-title');
-        const duration = link.getAttribute('data-duration');
-
-        // cập nhật index + id từ mảng đã sắp đúng thứ tự
-        currentLectureIndex = allLectures.findIndex(l => l.id === id);
-        currentLectureId = id;
-
-        updateLectureUI(title, duration);
-        if (url) loadVideoWithPlyr(id, url, title);
-
-        setTimeout(updateNavButtonsState, 0);
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', function () {
+        setupChapterCollapse();
+        autoCollapseLongChapters();
     });
 
+    // Event listeners
+    document.getElementById('toggleSidebar')?.addEventListener('click', toggleSidebar);
+    document.getElementById('openSidebar')?.addEventListener('click', toggleSidebar);
 </script>
