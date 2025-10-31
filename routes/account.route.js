@@ -360,18 +360,41 @@ router.post('/change-password', requireAuth, async (req, res) => {
 });
 
 // ========== MY COURSES ==========
+// routes/account.route.js - Sửa phần my-courses
 router.get('/my-courses', requireAuth, async (req, res) => {
   try {
     const userId = req.session.user.id;
+    
+    // Lấy danh sách khóa học đã ghi danh (đầy đủ thông tin)
     const enrolledCourses = await enrollmentModel.getEnrolledCourses(userId);
+    
+    
+    
+    // Thêm completion status vào mỗi khóa học
+    const progressModel = await import('../models/progress.model.js');
+    const coursesWithCompletion = await Promise.all(
+        enrolledCourses.map(async (course) => {
+            const isCompleted = await progressModel.default.isCourseCompleted(userId, course.id);
+            
+            return {
+                ...course,
+                is_completed: isCompleted
+            };
+        })
+    );
+
     res.render('vwAccount/my-courses', {
-      courses: enrolledCourses,
-      hasCourses: enrolledCourses.length > 0,
+      courses: coursesWithCompletion,
+      hasCourses: coursesWithCompletion.length > 0,
       user: req.session.user
     });
   } catch (error) {
     console.error('My courses error:', error);
-    res.render('vwAccount/my-courses', { courses: [], hasCourses: false, user: req.session.user });
+    res.render('vwAccount/my-courses', { 
+      courses: [], 
+      hasCourses: false, 
+      user: req.session.user 
+    });
   }
 });
 
