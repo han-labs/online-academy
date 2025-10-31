@@ -7,7 +7,7 @@ const router = Router();
 
 // Search courses - Route này phải đặt TRƯỚC /:id
 router.get('/search', async (req, res) => {
-    const q = req.query.q || '';
+    const q = req.query.q?.trim() || null;
     const categoryId = req.query.category ? Number(req.query.category) : null;
     const sort = req.query.sort || 'rating_desc';
     const page = Number(req.query.page) || 1;
@@ -31,7 +31,7 @@ router.get('/search', async (req, res) => {
 
     res.render('vwCourse/search', {
         courses: rows,
-        q,
+        q: q || '',
         categoryId,
         categoryInfo,
         sort,
@@ -88,13 +88,13 @@ router.get('/:id', async (req, res) => {
 // Learn page - Route cho học viên đã đăng ký (student feature)
 router.get('/:id/learn', requireAuth, async (req, res) => {
     const id = Number(req.params.id);
-    
+
     if (isNaN(id)) {
         return res.status(404).render('vwAccount/404');
     }
 
     const course = await courseModel.detail(id);
-    
+
     if (!course) {
         return res.status(404).render('vwAccount/404');
     }
@@ -107,7 +107,7 @@ router.get('/:id/learn', requireAuth, async (req, res) => {
 
     const curriculum = await courseModel.curriculum(id);
 
-    res.render('vwCourse/learn', { 
+    res.render('vwCourse/learn', {
         course,
         chapters: curriculum.chapters,
         lectures: curriculum.lectures

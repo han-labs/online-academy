@@ -5,7 +5,7 @@ const router = Router();
 router.get('/', async (req, res) => {
     try {
         let [featured, mostViewed, newest, hotCats] = await Promise.all([
-            courseModel.mostViewed(5),
+            courseModel.mostViewed(3),
             courseModel.mostViewed(10),
             courseModel.newest(10),
             courseModel.topCategoriesThisWeek(8)

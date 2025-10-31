@@ -378,7 +378,10 @@ export default {
         }
 
         if (categoryId) {
-            qb.andWhere('c.category_id', categoryId);
+            qb.where(function () {
+                this.where('c.category_id', categoryId)
+                    .orWhereIn('c.category_id', db('categories').select('id').where('parent_id', categoryId));
+            });
         }
 
         // Sorting
