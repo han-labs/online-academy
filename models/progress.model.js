@@ -85,5 +85,40 @@ export default {
             console.error('Toggle progress error:', error);
             throw error;
         }
+    },
+    
+    // models/progress.model.js - Thêm debug
+async isCourseCompleted(userId, courseId) {
+   
+    
+    // Lấy tất cả lectures của khóa học
+    const totalLectures = await db('lectures as l')
+        .leftJoin('chapters as ch', 'ch.id', 'l.chapter_id')
+        .where('ch.course_id', courseId)
+        .count('* as total')
+        .first();
+
+    const total = parseInt(totalLectures?.total) || 0;
+   
+
+    if (total === 0) {
+        
+        return false;
     }
+
+    // Đếm số bài đã hoàn thành
+    const completedLectures = await db('lecture_progress as lp')
+        .leftJoin('lectures as l', 'l.id', 'lp.lecture_id')
+        .leftJoin('chapters as ch', 'ch.id', 'l.chapter_id')
+        .where('lp.user_id', userId)
+        .where('ch.course_id', courseId)
+        .count('* as completed')
+        .first();
+
+    const completed = parseInt(completedLectures?.completed) || 0;
+    
+
+    // Khóa học hoàn thành khi tất cả bài giảng đã được tích
+    return completed === total;
+}
 };

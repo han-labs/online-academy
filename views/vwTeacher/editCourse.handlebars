@@ -32,8 +32,8 @@
         <div class="col-md-4">
           <div class="border rounded p-2 bg-light d-flex align-items-center justify-content-center"
             style="height:140px;">
-            {{#if course.cover}}
-            <img id="coverPreview" src="/static{{course.cover}}" alt="cover" class="img-fluid rounded shadow-sm"
+            {{#if course.image_url}}
+            <img id="coverPreview" src="{{course.image_url}}" alt="cover" class="img-fluid rounded shadow-sm"
               style="max-height:120px; object-fit:cover;">
             {{else}}
             <img id="coverPreview" src="/static/images/default-course.jpg" alt="cover"
@@ -47,17 +47,18 @@
     <div class="mb-3">
       <label class="fw-semibold">Category <span class="text-danger">*</span></label>
       <select name="category_id" class="form-select" required>
-        <option value="" disabled>-- Select Category --</option>
+        <option value="" disabled {{#unless selectedCategoryId}}selected{{/unless}}>-- Select Category --</option>
         {{#each categoriesTree}}
         <optgroup label="📁 {{this.name}}">
           {{#each this.children}}
-          <option value="{{this.id}}" {{#if (eq ../selectedCategoryId this.id)}}selected{{/if}}>
+          <option value="{{this.id}}" {{#if (eq ../../selectedCategoryId this.id)}}selected{{/if}}>
             — {{this.name}}
           </option>
           {{/each}}
         </optgroup>
         {{/each}}
       </select>
+
     </div>
 
     <div class="row">
@@ -173,9 +174,9 @@
             {{!-- Edit Lecture Modal --}}
             <div class="modal fade" id="editLectureModal{{id}}" tabindex="-1" data-bs-focus="false"
               data-bs-backdrop="static" data-bs-keyboard="false">
-              <div class="modal-dialog">
+              <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                  <form action="/teacher/lecture/{{id}}/edit" method="POST">
+                  <form action="/teacher/lecture/{{id}}/edit" method="POST" enctype="multipart/form-data">
                     <div class="modal-header">
                       <h5 class="modal-title">Edit Lecture: {{title}}</h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -185,12 +186,47 @@
                         <label class="fw-semibold">Lecture Name <span class="text-danger">*</span></label>
                         <input type="text" name="title" class="form-control" value="{{title}}" required>
                       </div>
+
+                      {{!-- Video Upload or URL Selection --}}
                       <div class="mb-3">
-                        <label class="fw-semibold">Video URL <span class="text-danger">*</span></label>
-                        <input type="text" name="video_url" class="form-control" value="{{video_url}}"
-                          placeholder="https://www.youtube.com/watch?v=..." required>
-                        <small class="text-muted">Support: YouTube, Vimeo, or direct video links</small>
+                        <label class="fw-semibold d-block mb-2">Video Source <span class="text-danger">*</span></label>
+                        <div class="btn-group mb-3 w-100" role="group">
+                          <input type="radio" class="btn-check" name="video_source_{{id}}" id="url_{{id}}" value="url"
+                            checked>
+                          <label class="btn btn-outline-primary" for="url_{{id}}">
+                            <i class="bi bi-link-45deg"></i> Video URL
+                          </label>
+                          <input type="radio" class="btn-check" name="video_source_{{id}}" id="upload_{{id}}"
+                            value="upload">
+                          <label class="btn btn-outline-primary" for="upload_{{id}}">
+                            <i class="bi bi-cloud-upload"></i> Upload Video File
+                          </label>
+                        </div>
+
+                        {{!-- URL Input --}}
+                        <div id="urlInput_{{id}}" class="video-input-section">
+                          <input type="text" name="video_url" class="form-control" value="{{video_url}}"
+                            placeholder="https://www.youtube.com/watch?v=... or direct video URL">
+                          <small class="text-muted">Support: YouTube, Vimeo, or direct video links</small>
+                        </div>
+
+                        {{!-- File Upload --}}
+                        <div id="fileInput_{{id}}" class="video-input-section" style="display:none;">
+                          <input type="file" name="video_file" class="form-control" accept="video/*">
+                          <small class="text-muted">Max file size: 500MB. Supported: MP4, WebM, MOV</small>
+                          {{#if video_url}}
+                          <div class="alert alert-info mt-2 mb-0">
+                            <i class="bi bi-info-circle"></i> Current:
+                            {{#if (startsWith video_url "/uploads/")}}
+                            <strong>Uploaded file</strong>
+                            {{else}}
+                            <strong>{{video_url}}</strong>
+                            {{/if}}
+                          </div>
+                          {{/if}}
+                        </div>
                       </div>
+
                       <div class="mb-3">
                         <label class="fw-semibold">Duration (minutes)</label>
                         <input type="number" name="duration_minutes" class="form-control" value="{{duration_minutes}}"
@@ -252,9 +288,9 @@
       {{!-- Add Lecture Modal --}}
       <div class="modal fade" id="addLectureModal{{id}}" tabindex="-1" data-bs-focus="false" data-bs-backdrop="static"
         data-bs-keyboard="false">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
           <div class="modal-content">
-            <form action="/teacher/chapter/{{id}}/lecture/add" method="POST">
+            <form action="/teacher/chapter/{{id}}/lecture/add" method="POST" enctype="multipart/form-data">
               <div class="modal-header bg-success text-white">
                 <h5 class="modal-title">Add Lecture to Chapter {{chapter_order}}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -265,12 +301,37 @@
                   <input type="text" name="title" class="form-control" placeholder="Ex: Introduction to React Hooks"
                     required>
                 </div>
+
+                {{!-- Video Upload or URL Selection --}}
                 <div class="mb-3">
-                  <label class="fw-semibold">Video URL <span class="text-danger">*</span></label>
-                  <input type="text" name="video_url" class="form-control"
-                    placeholder="https://www.youtube.com/watch?v=..." required>
-                  <small class="text-muted">Support: YouTube, Vimeo, or direct video links</small>
+                  <label class="fw-semibold d-block mb-2">Video Source <span class="text-danger">*</span></label>
+                  <div class="btn-group mb-3 w-100" role="group">
+                    <input type="radio" class="btn-check" name="video_source_new_{{id}}" id="url_new_{{id}}" value="url"
+                      checked>
+                    <label class="btn btn-outline-primary" for="url_new_{{id}}">
+                      <i class="bi bi-link-45deg"></i> Video URL
+                    </label>
+                    <input type="radio" class="btn-check" name="video_source_new_{{id}}" id="upload_new_{{id}}"
+                      value="upload">
+                    <label class="btn btn-outline-primary" for="upload_new_{{id}}">
+                      <i class="bi bi-cloud-upload"></i> Upload Video File
+                    </label>
+                  </div>
+
+                  {{!-- URL Input --}}
+                  <div id="urlInput_new_{{id}}" class="video-input-section">
+                    <input type="text" name="video_url" class="form-control"
+                      placeholder="https://www.youtube.com/watch?v=...">
+                    <small class="text-muted">Support: YouTube, Vimeo, or direct video links</small>
+                  </div>
+
+                  {{!-- File Upload --}}
+                  <div id="fileInput_new_{{id}}" class="video-input-section" style="display:none;">
+                    <input type="file" name="video_file" class="form-control" accept="video/*">
+                    <small class="text-muted">Max file size: 500MB. Supported: MP4, WebM, MOV</small>
+                  </div>
                 </div>
+
                 <div class="mb-3">
                   <label class="fw-semibold">Duration (minutes)</label>
                   <input type="number" name="duration_minutes" class="form-control" placeholder="Ex: 15" min="0">
@@ -348,7 +409,7 @@
   {{/if}}
 </div>
 
-{{!-- ROOT Add Chapter Modal (single) --}}
+{{!-- ROOT Add Chapter Modal --}}
 <div class="modal fade" id="addChapterModalCourse" tabindex="-1" data-bs-focus="false" data-bs-backdrop="static"
   data-bs-keyboard="false">
   <div class="modal-dialog">
@@ -383,7 +444,7 @@
 {{!-- TinyMCE --}}
 <script src="hw9pfh30njixlu4voz8ag8msnnnr4ofingpiklyaaie8hhdy" referrerpolicy="origin"></script>
 <script>
-  // Cover preview (UI only)
+  // Cover preview
   document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('coverInput');
     const preview = document.getElementById('coverPreview');
@@ -393,10 +454,30 @@
         if (file) preview.src = URL.createObjectURL(file);
       });
     }
-  });
 
-  // Đưa tất cả modal về body 1 lần, KHÔNG ép khởi tạo instance hàng loạt
-  document.addEventListener('DOMContentLoaded', function () {
+    // Video source toggle for all modals
+    document.querySelectorAll('[name^="video_source"]').forEach(radio => {
+      radio.addEventListener('change', function () {
+        const value = this.value;
+        const id = this.name.replace('video_source_', '');
+        const urlDiv = document.getElementById('urlInput_' + id);
+        const fileDiv = document.getElementById('fileInput_' + id);
+
+        if (value === 'url') {
+          urlDiv.style.display = 'block';
+          fileDiv.style.display = 'none';
+          fileDiv.querySelector('input').removeAttribute('required');
+          urlDiv.querySelector('input').setAttribute('required', 'required');
+        } else {
+          urlDiv.style.display = 'none';
+          fileDiv.style.display = 'block';
+          urlDiv.querySelector('input').removeAttribute('required');
+          fileDiv.querySelector('input').setAttribute('required', 'required');
+        }
+      });
+    });
+
+    // Move modals to body
     const selector =
       '#addChapterModalCourse,' +
       '[id^="addLectureModal"],[id^="editLectureModal"],[id^="deleteLectureModal"],' +
@@ -404,12 +485,12 @@
 
     document.querySelectorAll(selector).forEach(m => {
       if (m && m.parentElement !== document.body) {
-        document.body.appendChild(m); // move only once
+        document.body.appendChild(m);
       }
     });
   });
 
-  // Dọn backdrop thừa nếu có (phòng trường hợp browser render đè)
+  // Clean up backdrops
   document.addEventListener('hidden.bs.modal', function () {
     const backs = document.querySelectorAll('.modal-backdrop');
     if (backs.length > 1) {
@@ -431,19 +512,25 @@
     color: #fff;
   }
 
-  /* Giữ thanh cuộn luôn hiện để tránh nhảy layout giữa các trang */
   html {
     overflow-y: scroll;
   }
 
-  /* Khi modal mở, không tự cộng padding-right cho body */
   body.modal-open {
     padding-right: 0 !important;
   }
 
-  /* Nếu header/sticky-top bị lệch do padding-right, cũng chặn luôn */
   .navbar.sticky-top,
   .sticky-top {
     padding-right: 0 !important;
+  }
+
+  .video-input-section {
+    transition: all 0.3s ease;
+  }
+
+  .btn-check:checked+.btn-outline-primary {
+    background-color: #160438;
+    border-color: #160438;
   }
 </style>

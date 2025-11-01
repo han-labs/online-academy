@@ -463,23 +463,47 @@ router.post("/change-password", requireAuth, async (req, res) => {
 });
 
 // ========== MY COURSES ==========
-router.get("/my-courses", requireAuth, async (req, res) => {
+router.get('/my-courses', requireAuth, async (req, res) => {
   try {
     const userId = req.session.user.id;
+
+    // Lấy danh sách khóa học đã ghi danh (logic có sẵn ở main)
     const enrolledCourses = await enrollmentModel.getEnrolledCourses(userId);
-    res.render("vwAccount/my-courses", {
-      courses: enrolledCourses,
-      hasCourses: enrolledCourses.length > 0,
+
+    // Bổ sung: tính trạng thái hoàn thành từ nhánh student
+    // Dùng dynamic import để tránh khả năng circular deps khi chạy ESM
+    let courses = enrolledCourses;
+    try {
+      const progressModel = (await import('../models/progress.model.js')).default;
+      courses = await Promise.all(
+        enrolledCourses.map(async (course) => {
+          const isCompleted = await progressModel.isCourseCompleted(userId, course.id);
+          return {
+            ...course,
+            is_completed: !!isCompleted, // field mới cho view phân biệt "chưa hoàn thành"
+          };
+        })
+      );
+    } catch (e) {
+      console.error('progress check failed:', e);
+      // Nếu có lỗi ở progress, fallback: vẫn render danh sách cũ
+      courses = enrolledCourses;
+    }
+
+    return res.render('vwAccount/my-courses', {
+      courses,
+      hasCourses: courses.length > 0,
       user: req.session.user,
     });
   } catch (error) {
-    console.error("My courses error:", error);
-    res.render("vwAccount/my-courses", {
+    console.error('My courses error:', error);
+    return res.render('vwAccount/my-courses', {
       courses: [],
       hasCourses: false,
       user: req.session.user,
     });
   }
 });
+
 
 export default router;

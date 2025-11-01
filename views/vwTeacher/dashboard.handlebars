@@ -34,6 +34,7 @@
             <th style="width:64px;">#</th>
             <th>Course</th>
             <th style="width:160px;">Price</th>
+            <th style="width:180px;">Category</th>
             <th style="width:160px;">Status</th>
             <th style="width:140px;">Enrollments</th>
             <th class="text-center" style="width:240px;">Actions</th>
@@ -43,14 +44,8 @@
           {{#each courses}}
           <tr class="table-row-hover">
             <td class="fw-semibold">{{add @index 1}}</td>
-
-            <td>
-              <a href="/teacher/course/{{id}}/detail" class="fw-semibold text-decoration-none link-dark">
-                {{title}}
-              </a>
-
+            <td><a href="/teacher/course/{{id}}/detail" class="fw-semibold text-decoration-none link-dark">{{title}}</a>
             </td>
-
             <td>
               {{#ifPromo price promotional_price}}
               <span class="fw-semibold text-danger">{{formatNumber promotional_price}}₫</span>
@@ -60,24 +55,30 @@
               {{/ifPromo}}
             </td>
 
-            {{!-- STATUS: view-only (no inline edit) --}}
+            {{!-- CATEGORY --}}
             <td>
-              {{#if (eq status "published")}}
-              <span class="badge bg-success" title="Change status in Edit">Published</span>
-              {{else if (eq status "completed")}}
-              <span class="badge bg-info" title="Change status in Edit">Completed</span>
-              {{else if (eq status "draft")}}
-              <span class="badge bg-warning text-dark" title="Change status in Edit">Draft</span>
+              {{#if category_name}}
+              <span class="badge" style="background:#e9e3ff; color:#160438;">{{category_name}}</span>
               {{else}}
-              <span class="badge bg-secondary" title="Change status in Edit">Unknown</span>
+              <span class="text-muted">Uncategorized</span>
               {{/if}}
             </td>
 
-            {{!-- ENROLLMENTS with fallback fields --}}
+            {{!-- STATUS: view-only (no inline edit) --}}
+            <td>
+              {{#if (eq status "published")}}<span class="badge bg-success">Published</span>
+              {{else if (eq status "completed")}}<span class="badge bg-info">Completed</span>
+              {{else if (eq status "draft")}}<span class="badge bg-warning text-dark">Draft</span>
+              {{else}}<span class="badge bg-secondary">Unknown</span>{{/if}}
+            </td>
+
+            {{!-- ENROLLMENTS (fallback-friendly) --}}
             <td>
               <span class="d-inline-flex align-items-center">
                 <i class="bi bi-people me-2 text-muted"></i>
-                {{#if students}}
+                {{#if total_students}}
+                {{formatNumber total_students}}
+                {{else if students}}
                 {{formatNumber students}}
                 {{else if total_students}}
                 {{formatNumber total_students}}
