@@ -32,8 +32,8 @@
         <div class="col-md-4">
           <div class="border rounded p-2 bg-light d-flex align-items-center justify-content-center"
             style="height:140px;">
-            {{#if course.cover}}
-            <img id="coverPreview" src="/static{{course.cover}}" alt="cover" class="img-fluid rounded shadow-sm"
+            {{#if course.image_url}}
+            <img id="coverPreview" src="{{course.image_url}}" alt="cover" class="img-fluid rounded shadow-sm"
               style="max-height:120px; object-fit:cover;">
             {{else}}
             <img id="coverPreview" src="/static/images/default-course.jpg" alt="cover"
@@ -47,17 +47,18 @@
     <div class="mb-3">
       <label class="fw-semibold">Category <span class="text-danger">*</span></label>
       <select name="category_id" class="form-select" required>
-        <option value="" disabled>-- Select Category --</option>
+        <option value="" disabled {{#unless selectedCategoryId}}selected{{/unless}}>-- Select Category --</option>
         {{#each categoriesTree}}
         <optgroup label="📁 {{this.name}}">
           {{#each this.children}}
-          <option value="{{this.id}}" {{#if (eq ../selectedCategoryId this.id)}}selected{{/if}}>
+          <option value="{{this.id}}" {{#if (eq ../../selectedCategoryId this.id)}}selected{{/if}}>
             — {{this.name}}
           </option>
           {{/each}}
         </optgroup>
         {{/each}}
       </select>
+
     </div>
 
     <div class="row">

@@ -89,7 +89,7 @@ router.post('/course/add', requireAuth, requireInstructor, upload.single('image'
     detailed_description,
     price: parseFloat(price) || 0,
     promotional_price: promotional_price ? parseFloat(promotional_price) : null,
-    category_id: category_id || null,
+    category_id: category_id ? Number(category_id) : null,
     image_url: image,
     instructor_id: userId,
     status: 'draft',
@@ -203,6 +203,8 @@ router.post('/course/:id/edit', requireAuth, requireInstructor, upload.single('i
 
   const { title, short_description, detailed_description, price, promotional_price, category_id, status } = req.body;
   const image = req.file ? `/uploads/courses/${req.file.filename}` : course.image_url;
+  const allowedStatus = ['draft', 'published', 'completed'];
+  const safeStatus = allowedStatus.includes(status) ? status : course.status;
 
   await courseModel.update(id, {
     title,
@@ -212,7 +214,7 @@ router.post('/course/:id/edit', requireAuth, requireInstructor, upload.single('i
     promotional_price: promotional_price ? parseFloat(promotional_price) : null,
     category_id: category_id ? Number(category_id) : null,
     image_url: image,
-    status,
+    status: safeStatus,
     last_updated: db.fn.now()
   });
 

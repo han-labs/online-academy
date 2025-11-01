@@ -1,7 +1,25 @@
 // models/admin.model.js
 import knex from "../utils/db.js";
 
+// Helper: lấy toàn bộ id con/cháu của 1 category (Postgres)
+async function getDescendantCategoryIds(rootId) {
+  const sql = `
+    WITH RECURSIVE subcats AS (
+      SELECT id FROM categories WHERE id = ?
+      UNION ALL
+      SELECT c.id
+      FROM categories c
+      INNER JOIN subcats s ON c.parent_id = s.id
+    )
+    SELECT id FROM subcats
+  `;
+  const result = await knex.raw(sql, [Number(rootId)]);
+  const rows = result?.rows ?? result; // PG trả { rows }, đề phòng driver khác
+  return rows.map(r => r.id);
+}
+
 export default {
+
   /* ---------- DASHBOARD STATS ---------- */
   async getDashboardStats() {
     try {
@@ -462,14 +480,13 @@ export default {
         .leftJoin("categories", "courses.category_id", "categories.id");
 
       if (filters.filter_type === "category" && filters.category_id) {
-        query = query.where(
-          "courses.category_id",
-          parseInt(filters.category_id)
-        );
-      } else if (
-        filters.filter_type === "instructor" &&
-        filters.instructor_id
-      ) {
+        const ids = await getDescendantCategoryIds(filters.category_id);
+        if (ids.length > 0) {
+          query = query.whereIn("courses.category_id", ids);
+        } else {
+          query = query.where("courses.category_id", Number(filters.category_id));
+        }
+      } else if (filters.filter_type === "instructor" && filters.instructor_id) {
         query = query.where("courses.instructor_id", filters.instructor_id);
       }
 
@@ -480,6 +497,8 @@ export default {
       return [];
     }
   },
+
+
   async disableCourse(id) {
     try {
       await knex("courses").where({ id }).update({
@@ -682,4 +701,5 @@ export default {
       return null;
     }
   },
+
 };
