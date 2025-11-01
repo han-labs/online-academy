@@ -1,0 +1,244 @@
+Folder PATH listing for volume New Volume
+Volume serial number is 28C8-B82F
+D:.
+�   .gitignore
+�   app.js
+�   desktop.ini
+�   package-lock.json
+�   package.json
+�   project
+�   project_structure.txt
+�   README.md
+�   SETUP.md
+�   
++---middlewares
+�       auth.js
+�       google.oauth.js
+�       
++---models
+�       admin.model.js
+�       category.model.js
+�       chapter.model.js
+�       course.model.js
+�       enrollment.model.js
+�       lecture.model.js
+�       progress.model.js
+�       review.model.js
+�       student.model.js
+�       teacher.model.js
+�       user.model.js
+�       watchlist.model.js
+�       
++---node_modules
+
+�           
++---public
+�   +---uploads
+�       +---avatars
+�       �       profile_picture-1761305415860-874029148.jpg
+�       �       profile_picture-1761315574600-516095338.png
+�       �       profile_picture-1761319186159-459410482.png
+�       �       profile_picture-1761414119219-262669956.jpg
+�       �       profile_picture-1761415086979-870833032.jpg
+�       �       profile_picture-1761415159245-251490871.jpg
+�       �       profile_picture-1761415159301-171943162.jpg
+�       �       profile_picture-1761415181359-413541824.jpg
+�       �       profile_picture-1761416462771-491041384.jpg
+�       �       profile_picture-1761457400379-20400429.jpg
+�       �       profile_picture-1761457819713-558078074.jpg
+�       �       profile_picture-1761458571458-406012417.jpg
+�       �       profile_picture-1761458989069-580803442.jpg
+�       �       profile_picture-1761459019401-892007271.jpg
+�       �       profile_picture-1761459185461-880480915.jpg
+�       �       profile_picture-1761459204111-72446377.jpg
+�       �       profile_picture-1761459252388-567897763.jpg
+�       �       profile_picture-1761459881673-743400123.jpg
+�       �       profile_picture-1761460616355-678837924.jpg
+�       �       profile_picture-1761460960663-25747153.jpg
+�       �       profile_picture-1761460967010-890941594.jpg
+�       �       profile_picture-1761461852984-413755275.jpg
+�       �       profile_picture-1761462737292-488354338.jpg
+�       �       profile_picture-1761464057834-535684111.jpg
+�       �       profile_picture-1761465376902-759030670.jpg
+�       �       profile_picture-1761467647510-516996718.jpg
+�       �       profile_picture-1761467654682-824704768.jpg
+�       �       profile_picture-1761482025829-166634288.jpg
+�       �       profile_picture-1761483186044-635788168.jpg
+�       �       profile_picture-1761483190909-720158120.jpg
+�       �       profile_picture-1761483614357-665643293.jpg
+�       �       profile_picture-1761485543432-709368465.jpg
+�       �       profile_picture-1761516488355-643162185.jpg
+�       �       
+�       +---courses
+�       �       Basic Japanese for Beginners Daily Conversation Essentials.jpg
+�       �       Basic Japanese Grammar & Vocabulary Builder.jpg
+�       �       Business Management Fundamentals.jpg
+�       �       course-1761482721422-397061681.jpg
+�       �       course-1761483714109-995771031.jpg
+�       �       course-1761526748055-675581253.jpg
+�       �       course-1761527938079-608603697.jpg
+�       �       course-1761530470476-859306772.jpg
+�       �       course-1761570981679-246421009.png
+�       �       course-1761571036058-772723389.webp
+�       �       course-1761571091897-517086198.webp
+�       �       course-1761571149658-208800838.webp
+�       �       course-1761571192319-850480768.webp
+�       �       course-1761571237418-727876002.webp
+�       �       course-1761571300046-65714287.webp
+�       �       course-1761571333671-936239925.webp
+�       �       course-1761571376445-336193325.webp
+�       �       course-1761571409250-611120205.webp
+�       �       course-1761571458681-407035554.webp
+�       �       course-1761571503015-316426886.webp
+�       �       course-1761571536333-211047993.webp
+�       �       course-1761571575006-998848610.webp
+�       �       course-1761571612485-598109133.webp
+�       �       image-1761595996357-748653998.jpg
+�       �       image-1761840137357-678224137.png
+�       �       image-1761840184210-967745234.png
+�       �       image-1761840364880-919465023.png
+�       �       image-1761840391472-96796709.jpg
+�       �       image-1761840419871-602611332.jpg
+�       �       image-1761840441110-186753258.jpg
+�       �       image-1761840456326-566979259.png
+�       �       image-1761840481254-713747271.png
+�       �       image-1761840497391-606106741.png
+�       �       image-1761840531370-816483478.png
+�       �       image-1761840546309-307236897.png
+�       �       image-1761840567780-713822742.jpg
+�       �       image-1761840627450-848738114.jpg
+�       �       image-1761840663872-243442343.jpg
+�       �       
+�       +---lectures
+�               image-1761303629446-926036672.mp4
+�               video-1761296734751-993912477.mp4
+�               video-1761296770732-286451649.mp4
+�               video-1761299345943-54072179.mp4
+�               video-1761299493449-666475302.mp4
+�               video-1761299672709-348037208.mp4
+�               video-1761303499338-272754676.mp4
+�               video-1761303514843-295252424.mp4
+�               video-1761303667193-908038041.mp4
+�               video-1761303669008-909930544.mp4
+�               video-1761303694331-789732157.mp4
+�               video-1761310605954-604941217.mp4
+�               video-1761310799692-772896777.mp4
+�               video-1761311285310-97184961.mp4
+�               video-1761317219458-698952016.mp4
+�               video-1761317676178-602946125.mp4
+�               video-1761319116414-106169030.mp4
+�               video-1761406808380-982979703.mp4
+�               video-1761416066479-722081446.mp4
+�               video-1761467680230-126457827.mp4
+�               video-1761482405416-238118010.mp4
+�               video-1761482512859-400205903.mp4
+�               video-1761483128937-490220169.mp4
+�               video-1761485606564-249986085.mp4
+�               video-1761486466652-584453381.mp4
+�               video-1761600252312-119217668.mp4
+�               
++---routes
+�       about.route.js
+�       account.route.js
+�       admin.category.route.js
+�       admin.route.js
+�       category.route.js
+�       checkout.route.js
+�       course.route.js
+�       guest.route.js
+�       home.route.js
+�       progress.route.js
+�       student.route.js
+�       teacher.route.js
+�       watchlist.route.js
+�       
++---static
+�   +---css
+�   �       auth.css
+�   �       style.css
+�   �       
+�   +---js
+�           main.js
+�           rating.js
+�           
++---tmp
+�       app.GUEST.js
+�       app.HEAD.js
+�       header.GUEST.hbs
+�       header.HEAD.hbs
+�       
++---utils
+�       db.js
+�       email.service.js
+�       otp.service.js
+�       upload.js
+�       
++---views
+    +---layouts
+    �       main.handlebars
+    �       
+    +---partials
+    �       _courseCard.handlebars
+    �       _footer.handlebars
+    �       _header.handlebars
+    �       _ratingModal.handlebars
+    �       _reviewsSection.handlebars
+    �       
+    +---vwAbout
+    �       aboutus.handlebars
+    �       contactus.handlebars
+    �       faq.handlebars
+    �       policy.handlebars
+    �       
+    +---vwAccount
+    �       403.handlebars
+    �       404.handlebars
+    �       change-password.handlebars
+    �       forgot-password.handlebars
+    �       login.handlebars
+    �       my-courses.handlebars
+    �       profile.handlebars
+    �       register.handlebars
+    �       reset-password.handlebars
+    �       verify-otp.handlebars
+    �       
+    +---vwAdmin
+    �       categories.handlebars
+    �       category.add.handlebars
+    �       category.detail.handlebars
+    �       category.edit.handlebars
+    �       courseDetail.handlebars
+    �       courseForm.handlebars
+    �       courses.handlebars
+    �       dashboard.handlebars
+    �       userDetail.handlebars
+    �       users.handlebars
+    �       
+    +---vwCategory
+    �       list.handlebars
+    �       
+    +---vwCheckout
+    �       checkout.handlebars
+    �       success.handlebars
+    �       
+    +---vwCourse
+    �       detail.handlebars
+    �       learn.handlebars
+    �       search.handlebars
+    �       
+    +---vwHome
+    �       404.handlebars
+    �       home.handlebars
+    �       
+    +---vwStudent
+    �       watchlist.handlebars
+    �       
+    +---vwTeacher
+            addCourse.handlebars
+            courseDetail.handlebars
+            dashboard.handlebars
+            editCourse.handlebars
+            editLecture.handlebars
+            error.handlebars
+            profile.handlebars
+            
