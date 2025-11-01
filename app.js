@@ -175,7 +175,10 @@ app.engine(
         };
         return map[role] || role;
       },
-
+      startsWith(str, prefix) {
+        if (typeof str !== "string" || typeof prefix !== "string") return false;
+        return str.startsWith(prefix);
+      },
       // ===== Học liệu =====
       calculateChapterDuration(lectures) {
         if (!Array.isArray(lectures)) return 0;

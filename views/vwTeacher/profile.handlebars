@@ -77,6 +77,7 @@
             <th style="width:64px;">#</th>
             <th>Course</th>
             <th style="width:160px;">Price</th>
+            <th style="width:180px;">Category</th>
             <th style="width:160px;">Status</th>
             <th style="width:140px;">Enrollments</th>
             <th class="text-end" style="width:280px;">Actions</th>
@@ -102,7 +103,18 @@
               {{/ifPromo}}
             </td>
 
-            {{!-- STATUS: view-only (no inline edit) --}}
+            {{!-- CATEGORY COLUMN --}}
+            <td>
+              {{#if category_name}}
+              <span class="badge" style="background:#e9e3ff; color:#160438;">
+                {{category_name}}
+              </span>
+              {{else}}
+              <span class="text-muted">Uncategorized</span>
+              {{/if}}
+            </td>
+
+            {{!-- STATUS --}}
             <td>
               {{#if (eq status "published")}}
               <span class="badge bg-success" title="Change status in Edit">Published</span>
@@ -115,21 +127,11 @@
               {{/if}}
             </td>
 
-            {{!-- ENROLLMENTS with fallback fields --}}
+            {{!-- ENROLLMENTS --}}
             <td>
               <span class="d-inline-flex align-items-center">
                 <i class="bi bi-people me-2 text-muted"></i>
-                {{#if students}}
-                {{formatNumber students}}
-                {{else if total_students}}
                 {{formatNumber total_students}}
-                {{else if enrollments}}
-                {{formatNumber enrollments}}
-                {{else if enroll_count}}
-                {{formatNumber enroll_count}}
-                {{else}}
-                0
-                {{/if}}
               </span>
             </td>
 
