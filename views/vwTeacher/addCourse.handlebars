@@ -39,7 +39,7 @@
         <input type="text" name="title" class="form-control" placeholder="e.g. Advanced React & TypeScript" required>
       </div>
 
-      {{!-- Cover image with preview (UI only, không đổi name/logic) --}}
+      {{!-- Cover image with preview --}}
       <div class="mb-3">
         <label class="form-label fw-semibold">Cover Image</label>
         <div class="row g-3">
@@ -95,17 +95,18 @@
         </div>
       </div>
 
-      {{!-- Short description --}}
+      {{!-- Short description with WYSIWYG --}}
       <div class="mb-3">
-        <label class="form-label fw-semibold">Short Description</label>
-        <textarea name="short_description" class="form-control" rows="3"
-          placeholder="A concise summary that appears in listings."></textarea>
+        <label class="form-label fw-semibold">Short Description <span class="text-danger">*</span></label>
+        <textarea name="short_description" id="shortDescEditor" class="form-control wysiwyg-editor" rows="4"></textarea>
+        <small class="text-muted">A concise summary that appears in listings (2-3 sentences).</small>
       </div>
 
-      {{!-- Detailed description --}}
+      {{!-- Detailed description with WYSIWYG --}}
       <div class="mb-1">
-        <label class="form-label fw-semibold">Detailed Description</label>
-        <textarea name="detailed_description" id="editor" class="form-control" rows="8"></textarea>
+        <label class="form-label fw-semibold">Detailed Description <span class="text-danger">*</span></label>
+        <textarea name="detailed_description" id="detailedDescEditor" class="form-control wysiwyg-editor"
+          rows="8"></textarea>
       </div>
       <small class="text-muted">Use formatting, lists, images… to describe content & outcomes.</small>
     </div>
@@ -122,15 +123,42 @@
 {{!-- TinyMCE --}}
 <script src="hw9pfh30njixlu4voz8ag8msnnnr4ofingpiklyaaie8hhdy" referrerpolicy="origin"></script>
 <script>
-  tinymce.init({
-    selector: '#editor',
-    height: 420,
-    plugins: 'lists link image table code',
-    toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image table | code',
-    menubar: false
+  // Initialize TinyMCE for ALL textareas with class 'wysiwyg-editor'
+  document.addEventListener('DOMContentLoaded', function () {
+    // Short Description Editor - Simple toolbar
+    tinymce.init({
+      selector: '#shortDescEditor',
+      height: 200,
+      menubar: false,
+      plugins: 'lists link emoticons',
+      toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link emoticons',
+      content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; }',
+      statusbar: false,
+      placeholder: 'Write a compelling short description...'
+    });
+
+    // Detailed Description Editor - Full toolbar
+    tinymce.init({
+      selector: '#detailedDescEditor',
+      height: 450,
+      menubar: 'edit insert view format table tools',
+      plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
+      ],
+      toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
+        'forecolor backcolor | alignleft aligncenter alignright alignjustify | ' +
+        'bullist numlist outdent indent | removeformat | link image media table | ' +
+        'emoticons charmap | preview code fullscreen | help',
+      content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.6; }',
+      image_advtab: true,
+      image_caption: true,
+      placeholder: 'Describe your course in detail: what students will learn, requirements, outcomes...'
+    });
   });
 
-  // Preview cover (UI only, không đổi logic submit)
+  // Preview cover image
   document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('coverInput');
     const preview = document.getElementById('coverPreview');
@@ -143,3 +171,26 @@
     });
   });
 </script>
+
+<style>
+  .btn-brand {
+    background-color: #160438;
+    color: #fff;
+    border-color: #160438;
+  }
+
+  .btn-brand:hover {
+    background-color: #2d0a5e;
+    border-color: #2d0a5e;
+    color: #fff;
+  }
+
+  .btn-brand:focus {
+    box-shadow: 0 0 0 .2rem rgba(22, 4, 56, .25);
+  }
+
+  /* Hide original textarea when TinyMCE loads */
+  .wysiwyg-editor {
+    min-height: 150px;
+  }
+</style>
