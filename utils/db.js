@@ -27,10 +27,13 @@ import knex from 'knex';
 const isRender = !!process.env.RENDER || !!process.env.PORT;
 
 const connection = process.env.DATABASE_URL
-    ? process.env.DATABASE_URL // DSN Session pooler từ Supabase (có sslmode=require)
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false },
+    }
     : {
         host: 'aws-1-ap-southeast-1.pooler.supabase.com',
-        port: 5432,
+        port: 5432, // local của bạn vẫn chạy cổng này được
         user: 'postgres.hcfyjxhpsvqtdgwounbo',
         password: 'Abc@123*#**',
         database: 'postgres',
@@ -42,9 +45,9 @@ const db = knex({
     connection,
     pool: {
         min: 0,
-        max: isRender ? 3 : 10,
+        max: isRender ? 2 : 10,          // Render: 2 là đủ, tránh cạn slot
+        acquireTimeoutMillis: 15000,
         idleTimeoutMillis: 5000,
-        acquireTimeoutMillis: 20000,
         propagateCreateError: false,
     },
 });
