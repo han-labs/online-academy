@@ -305,14 +305,9 @@ mountGoogleAuth(app);
 app.use((req, res) => res.status(404).render("vwAccount/404"));
 
 
-// start
-// const PORT = 3000;
-// app.listen(PORT, () => console.log(`Server http://localhost:${PORT}`));
-const PORT = Number(process.env.PORT) || 3000;
-const HOST = '0.0.0.0'; // bắt buộc trên Render
+start
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Server http://localhost:${PORT}`));
 
-app.listen(PORT, HOST, () => {
-  console.log(`✅ Server listening on ...`);
-});
 
 export default app;
