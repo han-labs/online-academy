@@ -45,40 +45,16 @@ const db = knex({
     connection,
     pool: {
         min: 0,
-        max: isRender ? 5 : 10, // tăng lên 5 cho Render
+        max: isRender ? 5 : 10,
         acquireTimeoutMillis: 30000,
         idleTimeoutMillis: 30000,
         createTimeoutMillis: 30000,
-        // Quan trọng: propagate timeout để tránh hang
-        propagateCreateError: false,
     },
-    // Transaction mode không support prepared statements
-    ...(process.env.DATABASE_URL?.includes('pgbouncer=true') && {
-        pool: {
-            ...db?.pool,
-            afterCreate: (conn, done) => {
-                conn.query('SET statement_timeout = 30000', (err) => done(err, conn));
-            }
-        }
-    })
 });
 
-// Test connection với retry
-const testConnection = async (retries = 3) => {
-    for (let i = 0; i < retries; i++) {
-        try {
-            await db.raw('SELECT 1');
-            console.log('✅ Database connected successfully');
-            return;
-        } catch (err) {
-            console.error(`❌ Database connection attempt ${i + 1} failed:`, err.message);
-            if (i < retries - 1) {
-                await new Promise(resolve => setTimeout(resolve, 2000)); // wait 2s
-            }
-        }
-    }
-};
-
-testConnection();
+// Test connection
+db.raw('SELECT 1')
+    .then(() => console.log('✅ Database connected successfully'))
+    .catch(err => console.error('❌ Database connection failed:', err.message));
 
 export default db;
