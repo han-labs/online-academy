@@ -21,8 +21,13 @@
 // //export ra để mà dùng
 // export default db;
 
+// utils/db.js
 import knex from 'knex';
 
+// Detect môi trường Render
+const isRender = !!(process.env.RENDER_SERVICE_NAME || process.env.RENDER);
+
+// Ưu tiên DATABASE_URL trên production
 const connection = process.env.DATABASE_URL
     ? {
         connectionString: process.env.DATABASE_URL,
@@ -30,29 +35,30 @@ const connection = process.env.DATABASE_URL
     }
     : {
         host: process.env.DB_HOST || 'aws-1-ap-southeast-1.pooler.supabase.com',
-        port: parseInt(process.env.DB_PORT) || 5432,
+        port: parseInt(process.env.DB_PORT) || (isRender ? 6543 : 5432),
         user: process.env.DB_USER || 'postgres.hcfyjxhpsvqtdgwounbo',
         password: process.env.DB_PASSWORD || 'Abc@123*#**',
         database: process.env.DB_NAME || 'postgres',
         ssl: { rejectUnauthorized: false },
     };
 
-const isRender = !!process.env.RENDER;
-
 const db = knex({
     client: 'pg',
     connection,
     pool: {
         min: 0,
-        max: isRender ? 2 : 10,
-        acquireTimeoutMillis: 30000, // tăng timeout
-        idleTimeoutMillis: 10000
+        max: isRender ? 3 : 10,
+        acquireTimeoutMillis: 30000,
+        idleTimeoutMillis: 30000,
+        createTimeoutMillis: 30000,
     },
 });
 
 // Test connection
 db.raw('SELECT 1')
-    .then(() => console.log('✅ Database connected'))
-    .catch(err => console.error('❌ Database connection failed:', err.message));
+    .then(() => console.log('✅ Database connected successfully'))
+    .catch(err => {
+        console.error('❌ Database connection failed:', err.message);
+    });
 
 export default db;
