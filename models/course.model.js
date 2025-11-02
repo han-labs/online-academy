@@ -67,68 +67,80 @@ async function checkAndUpdateStatus(courseId) {
 }
 
 export default {
+    // helper an toàn
+    const maybeTx = (qb, trx) => (trx ? qb.transacting(trx) : qb);
+
     // 1) featuredThisWeek
     async featuredThisWeek(limit = 4, trx = null) {
-        return db({ c: 'courses' })
-            .leftJoin({ e: 'enrollments' }, 'e.course_id', 'c.id')
-            .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
-            .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
-            .leftJoin({ u: 'users' }, 'u.id', 'c.instructor_id')
-            .leftJoin({ e2: 'enrollments' }, 'e2.course_id', 'c.id')
-            .where('c.status', 'published')
-            .andWhere('e.enrolled_at', '>=', db.raw("now() - interval '7 days'"))
-            .groupBy('c.id', 'cat.id', 'u.id')
-            .orderBy([
-                { column: db.raw('COUNT(DISTINCT e.user_id)'), order: 'desc' },
-                { column: 'c.last_updated', order: 'desc' }
-            ])
-            .limit(limit)
-            .transacting(trx)
-            .select(baseCols);
+        return maybeTx(
+            db({ c: 'courses' })
+                .leftJoin({ e: 'enrollments' }, 'e.course_id', 'c.id')
+                .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
+                .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
+                .leftJoin({ u: 'users' }, 'u.id', 'c.instructor_id')
+                .leftJoin({ e2: 'enrollments' }, 'e2.course_id', 'c.id')
+                .where('c.status', 'published')
+                .andWhere('e.enrolled_at', '>=', db.raw("now() - interval '7 days'"))
+                .groupBy('c.id', 'cat.id', 'u.id')
+                .orderBy([
+                    { column: db.raw('COUNT(DISTINCT e.user_id)'), order: 'desc' },
+                    { column: 'c.last_updated', order: 'desc' }
+                ])
+                .limit(limit)
+                .select(baseCols),
+            trx
+        );
     },
 
     // 2) mostViewed
     async mostViewed(limit = 10, trx = null) {
-        return db({ c: 'courses' })
-            .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
-            .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
-            .leftJoin({ u: 'users' }, 'u.id', 'c.instructor_id')
-            .leftJoin({ e2: 'enrollments' }, 'e2.course_id', 'c.id')
-            .where('c.status', 'published')
-            .groupBy('c.id', 'cat.id', 'u.id')
-            .orderBy('c.views', 'desc')
-            .limit(limit)
-            .transacting(trx)
-            .select(baseCols);
+        return maybeTx(
+            db({ c: 'courses' })
+                .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
+                .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
+                .leftJoin({ u: 'users' }, 'u.id', 'c.instructor_id')
+                .leftJoin({ e2: 'enrollments' }, 'e2.course_id', 'c.id')
+                .where('c.status', 'published')
+                .groupBy('c.id', 'cat.id', 'u.id')
+                .orderBy('c.views', 'desc')
+                .limit(limit)
+                .select(baseCols),
+            trx
+        );
     },
 
     // 3) newest
     async newest(limit = 10, trx = null) {
-        return db({ c: 'courses' })
-            .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
-            .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
-            .leftJoin({ u: 'users' }, 'u.id', 'c.instructor_id')
-            .leftJoin({ e2: 'enrollments' }, 'e2.course_id', 'c.id')
-            .where('c.status', 'published')
-            .groupBy('c.id', 'cat.id', 'u.id')
-            .orderBy('c.last_updated', 'desc')
-            .limit(limit)
-            .transacting(trx)
-            .select(baseCols);
+        return maybeTx(
+            db({ c: 'courses' })
+                .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
+                .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
+                .leftJoin({ u: 'users' }, 'u.id', 'c.instructor_id')
+                .leftJoin({ e2: 'enrollments' }, 'e2.course_id', 'c.id')
+                .where('c.status', 'published')
+                .groupBy('c.id', 'cat.id', 'u.id')
+                .orderBy('c.last_updated', 'desc')
+                .limit(limit)
+                .select(baseCols),
+            trx
+        );
     },
 
     // 4) topCategoriesThisWeek
     async topCategoriesThisWeek(limit = 8, trx = null) {
-        return db({ c: 'courses' })
-            .leftJoin({ e: 'enrollments' }, 'e.course_id', 'c.id')
-            .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
-            .where('e.enrolled_at', '>=', db.raw("now() - interval '7 days'"))
-            .groupBy('cat.id')
-            .orderBy(db.raw('COUNT(e.user_id)'), 'desc')
-            .limit(limit)
-            .transacting(trx)
-            .select(['cat.id', 'cat.name', db.raw('COUNT(e.user_id) as enroll_count')]);
+        return maybeTx(
+            db({ c: 'courses' })
+                .leftJoin({ e: 'enrollments' }, 'e.course_id', 'c.id')
+                .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
+                .where('e.enrolled_at', '>=', db.raw("now() - interval '7 days'"))
+                .groupBy('cat.id')
+                .orderBy(db.raw('COUNT(e.user_id)'), 'desc')
+                .limit(limit)
+                .select(['cat.id', 'cat.name', db.raw('COUNT(e.user_id) as enroll_count')]),
+            trx
+        );
     },
+
 
 
     /// Public search - hỗ trợ tiếng Việt + fallback ILIKE + lọc theo nhiều category
