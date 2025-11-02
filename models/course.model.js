@@ -1,4 +1,6 @@
 import db from '../utils/db.js';
+const maybeTx = (qb, trx) => (trx ? qb.transacting(trx) : qb);
+
 
 const baseCols = [
     'c.id',
@@ -67,8 +69,6 @@ async function checkAndUpdateStatus(courseId) {
 }
 
 export default {
-    // helper an toàn
-    const maybeTx = (qb, trx) => (trx ? qb.transacting(trx) : qb);
 
     // 1) featuredThisWeek
     async featuredThisWeek(limit = 4, trx = null) {
