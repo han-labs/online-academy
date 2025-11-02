@@ -4,6 +4,8 @@ import { engine } from "express-handlebars";
 import session from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";
+import 'dotenv/config';
+
 
 import categoryModel from "./models/category.model.js";
 import homeRouter from "./routes/home.route.js";
@@ -11,6 +13,7 @@ import categoryRouter from "./routes/category.route.js";
 import accountRouter from "./routes/account.route.js";
 import courseRouter from "./routes/course.route.js";
 import aboutRouter from "./routes/about.route.js";
+
 
 // Admin
 import adminRouter from "./routes/admin.route.js";
@@ -224,7 +227,7 @@ app.use(
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
 
-  // 🔥 KIỂM TRA TRẠNG THÁI TÀI KHOẢN TRÊN MỌI REQUEST
+  // KIỂM TRA TRẠNG THÁI TÀI KHOẢN TRÊN MỌI REQUEST
   if (
     req.session.user &&
     (req.session.user.is_active === false || req.session.user.is_active === 0)
@@ -238,16 +241,27 @@ app.use((req, res, next) => {
   next();
 });
 
-// inject user + categories
+// inject user + categories (có cache 60s)
+let _catCache = { at: 0, list: [], tree: [] };
+
 app.use(async (req, res, next) => {
   res.locals.user = req.session.user || null;
-  try {
-    res.locals.global_categories = await categoryModel.findAll();
-    res.locals.global_categories_tree = await categoryModel.findTree();
-  } catch {
-    res.locals.global_categories = [];
-    res.locals.global_categories_tree = [];
+
+  const now = Date.now();
+  if (now - _catCache.at > 60_000) { // refresh mỗi 60s
+    try {
+      const [list, tree] = await Promise.all([
+        categoryModel.findAll(),
+        categoryModel.findTree()
+      ]);
+      _catCache = { at: now, list, tree };
+    } catch {
+      _catCache = { at: now, list: [], tree: [] };
+    }
   }
+
+  res.locals.global_categories = _catCache.list;
+  res.locals.global_categories_tree = _catCache.tree;
   next();
 });
 
@@ -293,7 +307,13 @@ mountGoogleAuth(app);
 app.use((req, res) => res.status(404).render("vwAccount/404"));
 
 // start
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Server http://localhost:${PORT}`));
+app.set('trust proxy', 1);
+
+const PORT = parseInt(process.env.PORT, 10) || 3000;
+app.listen(PORT, () => {
+  const localHint = process.env.PORT ? '' : ` (open http://localhost:${PORT})`;
+  console.log(`✅ Server listening on port ${PORT}${localHint}`);
+});
+
 
 export default app;

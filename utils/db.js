@@ -1,22 +1,36 @@
+// utils/db.js
 import knex from 'knex';
+
 
 const db = knex({
     client: 'pg',
     connection: {
-        host: 'aws-1-ap-southeast-1.pooler.supabase.com', //thay
-        port: 5432,
+        host: 'aws-1-ap-southeast-1.pooler.supabase.com',
+        port: 6543,
         user: 'postgres.hcfyjxhpsvqtdgwounbo',
         password: 'Abc@123*#**',
         database: 'postgres',
-        ssl: { rejectUnauthorized: false }
+        ssl: { rejectUnauthorized: false },
+        keepAlive: true
     },
-    pool: { min: 0, max: 15 }
+    pool: {
+        min: 0,
+        max: 6,
+        acquireTimeoutMillis: 15000,
+        idleTimeoutMillis: 10000,
+        createTimeoutMillis: 15000,
+        reapIntervalMillis: 2000,
+        propagateCreateError: false,
+        // Thiết lập timeouts trong 1 connection ngay khi tạo
+        afterCreate: (conn, done) => {
+            conn.query("SET statement_timeout = '15s'; SET idle_in_transaction_session_timeout = '5s';", (err) => {
+                done(err, conn);
+            });
+        },
+    },
+    debug: false,
 });
 
-// Test connection (comment out sau khi test)
-db.raw('SELECT 1')
-    .then(() => console.log('DB connected successfully'))
-    .catch(err => console.error('DB connection error:', err));
 
-//export ra để mà dùng
+
 export default db;
