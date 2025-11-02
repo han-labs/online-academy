@@ -305,7 +305,7 @@ mountGoogleAuth(app);
 app.use((req, res) => res.status(404).render("vwAccount/404"));
 
 
-start
+//start
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server http://localhost:${PORT}`));
 
