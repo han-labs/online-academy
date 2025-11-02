@@ -215,6 +215,7 @@ export default {
 
 
     // Search theo nhiều category (cha + con)
+    // Search theo nhiều category (cha + con)
     async searchByCategories({ categoryIds = [], sort = 'newest', page = 1, pageSize = 12 }) {
         const offset = (page - 1) * pageSize;
 
@@ -227,10 +228,22 @@ export default {
             .whereIn('c.category_id', categoryIds);
 
         const orderBy = [];
-        if (sort === 'price_asc') orderBy.push({ column: db.raw('COALESCE(c.promotional_price, c.price)'), order: 'asc' });
-        else if (sort === 'newest') orderBy.push({ column: 'c.last_updated', order: 'desc' });
-        else if (sort === 'best_seller') orderBy.push({ column: db.raw('COUNT(DISTINCT e2.user_id)'), order: 'desc' });
-        else orderBy.push({ column: db.raw('AVG(r.rating)'), order: 'desc' });
+
+        if (sort === 'price_asc') {
+            orderBy.push({ column: db.raw('COALESCE(c.promotional_price, c.price)'), order: 'asc' });
+        } else if (sort === 'newest') {
+            orderBy.push({ column: 'c.last_updated', order: 'desc' });
+        } else if (sort === 'best_seller') {
+            orderBy.push({ column: db.raw('COUNT(DISTINCT e2.user_id)'), order: 'desc' });
+        } else { // 'rating_desc' (Top Rated) – giống y hệt logic trong search()
+            orderBy.push({
+                column: db.raw('CASE WHEN COUNT(DISTINCT r.id)=0 THEN -1 ELSE AVG(r.rating) END'),
+                order: 'desc'
+            });
+            orderBy.push({ column: db.raw('COUNT(DISTINCT r.id)'), order: 'desc' });       // nhiều review hơn thì ưu tiên
+            orderBy.push({ column: db.raw('COUNT(DISTINCT e2.user_id)'), order: 'desc' }); // nhiều học viên hơn thì ưu tiên
+            orderBy.push({ column: 'c.last_updated', order: 'desc' });                     // mới cập nhật hơn thì ưu tiên
+        }
 
         const rows = await qb.clone()
             .groupBy('c.id', 'cat.id', 'u.id')
@@ -246,6 +259,7 @@ export default {
 
         return { rows, total: Number(count || 0) };
     },
+
 
     async detail(id) {
         const course = await db({ c: 'courses' })
