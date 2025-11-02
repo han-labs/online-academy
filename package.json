@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/han-labs/online-academy#readme",
   "dependencies": {
-    "@supabase/supabase-js": "^2.75.0",
+    "@supabase/supabase-js": "^2.78.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.3",
