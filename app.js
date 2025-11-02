@@ -273,6 +273,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/healthz', (req, res) => res.send('ok'));
+
 // routes
 //app.use('/teacher', teacherRouter);
 app.use("/teacher", requireInstructor, teacherRouter);
@@ -307,9 +309,10 @@ app.use((req, res) => res.status(404).render("vwAccount/404"));
 // const PORT = 3000;
 // app.listen(PORT, () => console.log(`Server http://localhost:${PORT}`));
 const PORT = Number(process.env.PORT) || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server listening on ${PORT}`);
-});
+const HOST = '0.0.0.0'; // bắt buộc trên Render
 
+app.listen(PORT, HOST, () => {
+  console.log(`✅ Server listening on ...`);
+});
 
 export default app;

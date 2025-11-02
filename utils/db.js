@@ -24,32 +24,23 @@
 // utils/db.js
 import knex from 'knex';
 
-const isRender = !!process.env.RENDER || !!process.env.PORT;
-
 const connection = process.env.DATABASE_URL
-    ? {
-        connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false },
-    }
+    ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
     : {
         host: 'aws-1-ap-southeast-1.pooler.supabase.com',
-        port: 5432, // local của bạn vẫn chạy cổng này được
+        port: 5432, // local vẫn chạy 5432 của bạn
         user: 'postgres.hcfyjxhpsvqtdgwounbo',
         password: 'Abc@123*#**',
         database: 'postgres',
         ssl: { rejectUnauthorized: false },
     };
 
+const isRender = !!process.env.PORT;
+
 const db = knex({
     client: 'pg',
     connection,
-    pool: {
-        min: 0,
-        max: isRender ? 2 : 10,          // Render: 2 là đủ, tránh cạn slot
-        acquireTimeoutMillis: 15000,
-        idleTimeoutMillis: 5000,
-        propagateCreateError: false,
-    },
+    pool: { min: 0, max: isRender ? 2 : 10, acquireTimeoutMillis: 15000, idleTimeoutMillis: 5000 },
 });
 
 export default db;
