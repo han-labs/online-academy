@@ -4,7 +4,7 @@ import { engine } from "express-handlebars";
 import session from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";
-import 'dotenv/config';
+import db from "./utils/db.js";
 
 
 import categoryModel from "./models/category.model.js";
@@ -241,19 +241,20 @@ app.use((req, res, next) => {
   next();
 });
 
-// inject user + categories (có cache 60s)
+/// app.js (đoạn "inject user + categories (có cache 60s)")
+
 let _catCache = { at: 0, list: [], tree: [] };
 
 app.use(async (req, res, next) => {
   res.locals.user = req.session.user || null;
 
   const now = Date.now();
-  if (now - _catCache.at > 60_000) { // refresh mỗi 60s
+  if (now - _catCache.at > 60_000) {
     try {
-      const [list, tree] = await Promise.all([
-        categoryModel.findAll(),
-        categoryModel.findTree()
-      ]);
+      // ❌ TRƯỚC ĐÂY: Promise.all([...]) -> tốn 2 connection cùng lúc
+      // ✅ SAU: chạy lần lượt để không nghẽn pool
+      const list = await categoryModel.findAll();
+      const tree = await categoryModel.findTree();
       _catCache = { at: now, list, tree };
     } catch {
       _catCache = { at: now, list: [], tree: [] };
@@ -265,11 +266,6 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// optional flash (nếu có dùng)
-app.use((req, res, next) => {
-  res.locals.user = req.session.user;
-  next();
-});
 
 app.use((req, res, next) => {
   res.locals.flash = req.session.flash;
@@ -306,14 +302,10 @@ mountGoogleAuth(app);
 // 404
 app.use((req, res) => res.status(404).render("vwAccount/404"));
 
-// start
-app.set('trust proxy', 1);
 
-const PORT = parseInt(process.env.PORT, 10) || 3000;
-app.listen(PORT, () => {
-  const localHint = process.env.PORT ? '' : ` (open http://localhost:${PORT})`;
-  console.log(`✅ Server listening on port ${PORT}${localHint}`);
-});
+// start
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Server http://localhost:${PORT}`));
 
 
 export default app;
