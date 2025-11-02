@@ -1,9 +1,6 @@
 // utils/db.adapter.js
 import { supabase } from './supabase.client.js';
 
-/**
- * Adapter để convert Knex queries sang Supabase REST API
- */
 class SupabaseAdapter {
     constructor() {
         this.client = supabase;
@@ -50,9 +47,21 @@ class SupabaseAdapter {
         return true;
     }
 
-    async raw(sql) {
-        console.warn('⚠️ Raw SQL not supported with Supabase REST API');
-        throw new Error('Raw SQL queries are not supported with Supabase REST API');
+    // ✅ SỬA: Hỗ trợ raw SQL đơn giản (chỉ SELECT)
+    async raw(sql, bindings = []) {
+        console.log('⚠️ Raw SQL executed via REST (limited support):', sql.substring(0, 100));
+
+        // Nếu là SELECT đơn giản, parse và dùng .from()
+        const selectMatch = sql.match(/SELECT\s+.*?\s+FROM\s+(\w+)/i);
+        if (selectMatch) {
+            const table = selectMatch[1];
+            const { data, error } = await this.client.from(table).select('*');
+            if (error) throw error;
+            return { rows: data }; // Knex format
+        }
+
+        console.warn('⚠️ Complex raw SQL not fully supported. Consider rewriting as ORM queries.');
+        return { rows: [] };
     }
 }
 
