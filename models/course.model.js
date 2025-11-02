@@ -67,7 +67,8 @@ async function checkAndUpdateStatus(courseId) {
 }
 
 export default {
-    async featuredThisWeek(limit = 4) {
+    // 1) featuredThisWeek
+    async featuredThisWeek(limit = 4, trx = null) {
         return db({ c: 'courses' })
             .leftJoin({ e: 'enrollments' }, 'e.course_id', 'c.id')
             .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
@@ -82,10 +83,12 @@ export default {
                 { column: 'c.last_updated', order: 'desc' }
             ])
             .limit(limit)
+            .transacting(trx)
             .select(baseCols);
     },
 
-    async mostViewed(limit = 10) {
+    // 2) mostViewed
+    async mostViewed(limit = 10, trx = null) {
         return db({ c: 'courses' })
             .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
             .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
@@ -95,10 +98,12 @@ export default {
             .groupBy('c.id', 'cat.id', 'u.id')
             .orderBy('c.views', 'desc')
             .limit(limit)
+            .transacting(trx)
             .select(baseCols);
     },
 
-    async newest(limit = 10) {
+    // 3) newest
+    async newest(limit = 10, trx = null) {
         return db({ c: 'courses' })
             .leftJoin({ r: 'reviews' }, 'r.course_id', 'c.id')
             .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
@@ -108,10 +113,12 @@ export default {
             .groupBy('c.id', 'cat.id', 'u.id')
             .orderBy('c.last_updated', 'desc')
             .limit(limit)
+            .transacting(trx)
             .select(baseCols);
     },
 
-    async topCategoriesThisWeek(limit = 8) {
+    // 4) topCategoriesThisWeek
+    async topCategoriesThisWeek(limit = 8, trx = null) {
         return db({ c: 'courses' })
             .leftJoin({ e: 'enrollments' }, 'e.course_id', 'c.id')
             .leftJoin({ cat: 'categories' }, 'cat.id', 'c.category_id')
@@ -119,8 +126,10 @@ export default {
             .groupBy('cat.id')
             .orderBy(db.raw('COUNT(e.user_id)'), 'desc')
             .limit(limit)
+            .transacting(trx)
             .select(['cat.id', 'cat.name', db.raw('COUNT(e.user_id) as enroll_count')]);
     },
+
 
     /// Public search - hỗ trợ tiếng Việt + fallback ILIKE + lọc theo nhiều category
     async search({ q = '', categoryIds = null, sort = 'rating_desc', page = 1, pageSize = 12 }) {
