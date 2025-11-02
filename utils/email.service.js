@@ -9,8 +9,8 @@ const SMTP_CONFIG = {
     user: "giahanthcstmt@gmail.com",
     pass: "xwqtjzkmjuwkxzbm",
   },
-  logger: true,
-  debug: true,
+  logger: false,
+  debug: false,
 };
 
 class EmailService {
