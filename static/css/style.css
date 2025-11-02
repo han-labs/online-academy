@@ -496,8 +496,9 @@ footer a:hover {
 }
 
 .ratio-16x9::before {
-     /* ĐẢM BẢO KHÔNG CÓ display: none !important Ở ĐÂY */
-    padding-top: 56.25%; /* Giữ nguyên padding cho ratio */
+    /* ĐẢM BẢO KHÔNG CÓ display: none !important Ở ĐÂY */
+    padding-top: 56.25%;
+    /* Giữ nguyên padding cho ratio */
 }
 
 /* ============================================
@@ -887,3 +888,6 @@ footer a:hover {
     color: #8b5cf6;
 }
 
+html {
+    scrollbar-gutter: stable both-edges;
+}

@@ -79,19 +79,20 @@
     </div>
 
     {{!-- Short Description with WYSIWYG --}}
-    {{!-- Short Description with WYSIWYG --}}
     <div class="mb-3">
       <label class="fw-semibold">Short Description <span class="text-danger">*</span></label>
-      <textarea name="short_description" id="shortDescEditor" class="form-control wysiwyg-editor" rows="3"
-        required>{{course.short_description}}</textarea>
+      <textarea name="short_description" id="shortDescEditor" class="form-control wysiwyg-editor" rows="3" required>
+        {{course.short_description}}
+      </textarea>
       <small class="text-muted">Brief summary for course listings.</small>
     </div>
 
     {{!-- Detailed Description with WYSIWYG --}}
     <div class="mb-3">
       <label class="fw-semibold">Detailed Description</label>
-      <textarea name="detailed_description" id="detailedDescEditor" class="form-control wysiwyg-editor"
-        rows="6">{{course.detailed_description}}</textarea>
+      <textarea name="detailed_description" id="detailedDescEditor" class="form-control wysiwyg-editor" rows="6">
+        {{course.detailed_description}}
+      </textarea>
       <small class="text-muted">Complete course information with formatting.</small>
     </div>
 
@@ -177,8 +178,8 @@
             </tr>
 
             {{!-- Edit Lecture Modal --}}
-            <div class="modal fade" id="editLectureModal{{id}}" tabindex="-1" data-bs-focus="false"
-              data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal fade" id="editLectureModal{{id}}" tabindex="-1" data-bs-backdrop="static"
+              data-bs-keyboard="false" data-bs-scroll="true">
               <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                   <form action="/teacher/lecture/{{id}}/edit" method="POST" enctype="multipart/form-data">
@@ -253,8 +254,8 @@
             </div>
 
             {{!-- Delete Lecture Modal --}}
-            <div class="modal fade" id="deleteLectureModal{{id}}" tabindex="-1" data-bs-focus="false"
-              data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal fade" id="deleteLectureModal{{id}}" tabindex="-1" data-bs-backdrop="static"
+              data-bs-keyboard="false" data-bs-scroll="true">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <form action="/teacher/lecture/{{id}}/delete" method="POST">
@@ -291,8 +292,8 @@
       </div>
 
       {{!-- Add Lecture Modal --}}
-      <div class="modal fade" id="addLectureModal{{id}}" tabindex="-1" data-bs-focus="false" data-bs-backdrop="static"
-        data-bs-keyboard="false">
+      <div class="modal fade" id="addLectureModal{{id}}" tabindex="-1" data-bs-backdrop="static"
+        data-bs-keyboard="false" data-bs-scroll="true">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <form action="/teacher/chapter/{{id}}/lecture/add" method="POST" enctype="multipart/form-data">
@@ -356,8 +357,8 @@
       </div>
 
       {{!-- Edit Chapter Modal --}}
-      <div class="modal fade" id="editChapterModal{{id}}" tabindex="-1" data-bs-focus="false" data-bs-backdrop="static"
-        data-bs-keyboard="false">
+      <div class="modal fade" id="editChapterModal{{id}}" tabindex="-1" data-bs-backdrop="static"
+        data-bs-keyboard="false" data-bs-scroll="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <form action="/teacher/chapter/{{id}}/edit" method="POST">
@@ -381,8 +382,8 @@
       </div>
 
       {{!-- Delete Chapter Modal --}}
-      <div class="modal fade" id="deleteChapterModal{{id}}" tabindex="-1" data-bs-focus="false"
-        data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal fade" id="deleteChapterModal{{id}}" tabindex="-1" data-bs-backdrop="static"
+        data-bs-keyboard="false" data-bs-scroll="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <form action="/teacher/chapter/{{id}}/delete" method="POST">
@@ -415,8 +416,8 @@
 </div>
 
 {{!-- ROOT Add Chapter Modal --}}
-<div class="modal fade" id="addChapterModalCourse" tabindex="-1" data-bs-focus="false" data-bs-backdrop="static"
-  data-bs-keyboard="false">
+<div class="modal fade" id="addChapterModalCourse" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+  data-bs-scroll="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <form action="/teacher/course/{{course.id}}/chapter/add" method="POST">
@@ -446,40 +447,38 @@
   <a href="/teacher/course/{{course.id}}/detail" class="btn btn-info"><i class="bi bi-eye"></i> View Details</a>
 </div>
 
-{{!-- TinyMCE --}}
-<script src="hw9pfh30njixlu4voz8ag8msnnnr4ofingpiklyaaie8hhdy" referrerpolicy="origin"></script>
+{{!-- TinyMCE (CDN chuẩn) --}}
+<script src="https://cdn.tiny.cloud/1/hw9pfh30njixlu4voz8ag8msnnnr4ofingpiklyaaie8hhdy/tinymce/6/tinymce.min.js"
+  referrerpolicy="origin"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Short Description Editor - Simple toolbar
-    tinymce.init({
+    // Init TinyMCE an toàn (tránh double-init)
+    const ensureInit = (selector, opts) => {
+      const el = document.querySelector(selector);
+      if (!el || !window.tinymce) return;
+      const inst = tinymce.get(el.id);
+      if (!inst) tinymce.init(opts);
+    };
+
+    // Short Description (nhẹ)
+    ensureInit('#shortDescEditor', {
       selector: '#shortDescEditor',
       height: 200,
       menubar: false,
       plugins: 'lists link emoticons',
       toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link emoticons',
-      content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; }',
-      statusbar: false,
-      placeholder: 'Brief course summary...'
+      statusbar: false
     });
 
-    // Detailed Description Editor - Full toolbar
-    tinymce.init({
+    // Detailed Description (đầy đủ)
+    ensureInit('#detailedDescEditor', {
       selector: '#detailedDescEditor',
       height: 450,
       menubar: 'edit insert view format table tools',
-      plugins: [
-        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-        'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
-      ],
-      toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
-        'forecolor backcolor | alignleft aligncenter alignright alignjustify | ' +
-        'bullist numlist outdent indent | removeformat | link image media table | ' +
-        'emoticons charmap | preview code fullscreen | help',
-      content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.6; }',
+      plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount emoticons',
+      toolbar: 'undo redo | blocks | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | link image media table | emoticons charmap | preview code fullscreen | help',
       image_advtab: true,
-      image_caption: true,
-      placeholder: 'Complete course description with formatting...'
+      image_caption: true
     });
 
     // Cover preview
@@ -487,52 +486,43 @@
     const preview = document.getElementById('coverPreview');
     if (input && preview) {
       input.addEventListener('change', (e) => {
-        const file = e.target.files?.[0];
+        const file = e.target.files && e.target.files[0];
         if (file) preview.src = URL.createObjectURL(file);
       });
     }
 
-    // Video source toggle for all modals
+    // Video source toggle cho tất cả modal
     document.querySelectorAll('[name^="video_source"]').forEach(radio => {
       radio.addEventListener('change', function () {
         const value = this.value;
         const id = this.name.replace('video_source_', '');
         const urlDiv = document.getElementById('urlInput_' + id);
         const fileDiv = document.getElementById('fileInput_' + id);
+        if (!urlDiv || !fileDiv) return;
 
         if (value === 'url') {
           urlDiv.style.display = 'block';
           fileDiv.style.display = 'none';
-          fileDiv.querySelector('input').removeAttribute('required');
-          urlDiv.querySelector('input').setAttribute('required', 'required');
+          const fileInput = fileDiv.querySelector('input');
+          const urlInput = urlDiv.querySelector('input');
+          fileInput && fileInput.removeAttribute('required');
+          urlInput && urlInput.setAttribute('required', 'required');
         } else {
           urlDiv.style.display = 'none';
           fileDiv.style.display = 'block';
-          urlDiv.querySelector('input').removeAttribute('required');
-          fileDiv.querySelector('input').setAttribute('required', 'required');
+          const fileInput = fileDiv.querySelector('input');
+          const urlInput = urlDiv.querySelector('input');
+          urlInput && urlInput.removeAttribute('required');
+          fileInput && fileInput.setAttribute('required', 'required');
         }
       });
     });
 
-    // Move modals to body
-    const selector =
-      '#addChapterModalCourse,' +
-      '[id^="addLectureModal"],[id^="editLectureModal"],[id^="deleteLectureModal"],' +
-      '[id^="editChapterModal"],[id^="deleteChapterModal"]';
-
+    // (Tuỳ chọn) Di chuyển modal về body để đảm bảo z-index
+    const selector = '#addChapterModalCourse,[id^="addLectureModal"],[id^="editLectureModal"],[id^="deleteLectureModal"],[id^="editChapterModal"],[id^="deleteChapterModal"]';
     document.querySelectorAll(selector).forEach(m => {
-      if (m && m.parentElement !== document.body) {
-        document.body.appendChild(m);
-      }
+      if (m && m.parentElement !== document.body) document.body.appendChild(m);
     });
-  });
-
-  // Clean up backdrops
-  document.addEventListener('hidden.bs.modal', function () {
-    const backs = document.querySelectorAll('.modal-backdrop');
-    if (backs.length > 1) {
-      backs.forEach((b, i) => { if (i < backs.length - 1) b.remove(); });
-    }
   });
 </script>
 
@@ -549,17 +539,9 @@
     color: #fff;
   }
 
+  /* Giảm layout shift: giữ khe scrollbar cố định cho trang */
   html {
-    overflow-y: scroll;
-  }
-
-  body.modal-open {
-    padding-right: 0 !important;
-  }
-
-  .navbar.sticky-top,
-  .sticky-top {
-    padding-right: 0 !important;
+    scrollbar-gutter: stable both-edges;
   }
 
   .video-input-section {
